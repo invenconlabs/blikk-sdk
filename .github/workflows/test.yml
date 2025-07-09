@@ -1,0 +1,49 @@
+name: Go Test Suite
+
+on:
+  push:
+    branches:
+      - main
+  release:
+    types: [created]
+
+jobs:
+  unit-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.21'
+
+      - name: Run Go Tidy
+        run: go mod tidy
+
+      - name: Run Unit Tests
+        run: go test ./...
+
+  integration-test:
+    # This job only runs when a release is created.
+    if: github.event_name == 'release'
+    runs-on: ubuntu-latest
+    needs: unit-test # Ensures unit tests pass before running integration tests on release
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.21'
+      
+      - name: Run Go Tidy
+        run: go mod tidy
+
+      - name: Run Integration Tests
+        env:
+          BLIKK_APP_ID: ${{ secrets.BLIKK_APP_ID }}
+          BLIKK_APP_SECRET: ${{ secrets.BLIKK_APP_SECRET }}
+        run: go test -v -tags=integration ./... 

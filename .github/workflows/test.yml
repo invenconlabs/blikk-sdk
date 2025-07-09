@@ -14,7 +14,7 @@ jobs:
       contents: read
     outputs:
       go: ${{ steps.filter.outputs.go }}
-      workflows: ${{ steps.filter.outputs.workflows }}
+      self: ${{ steps.filter.outputs.self }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -25,8 +25,8 @@ jobs:
           filters: |
             go:
               - '**/*.go'
-            workflows:
-              - '.github/workflows/**'
+            self:
+              - '.github/workflows/test.yml'
 
   unit-test:
     runs-on: ubuntu-latest
@@ -34,7 +34,7 @@ jobs:
       contents: read
       checks: write
     needs: changes
-    if: github.event_name == 'release' || needs.changes.outputs.go == 'true' || needs.changes.outputs.workflows == 'true'
+    if: github.event_name == 'release' || needs.changes.outputs.go == 'true' || needs.changes.outputs.self == 'true'
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -60,12 +60,12 @@ jobs:
 
   integration-test:
     # This job only runs when a release is created.
-    if: github.event_name == 'release'
+    if: github.event_name == 'release' || needs.changes.outputs.self == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: read
       checks: write
-    needs: unit-test # Ensures unit tests pass before running integration tests on release
+    needs: [unit-test, changes] # Ensures unit tests pass before running integration tests on release
     steps:
       - name: Checkout code
         uses: actions/checkout@v4

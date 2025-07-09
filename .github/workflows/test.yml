@@ -26,12 +26,12 @@ jobs:
         run: go test -v -json ./... > unit-test-results.json
 
       - name: Report Unit Tests
-        uses: dorny/test-reporter@v1
+        uses: dorny/test-reporter@v2
         if: always()
         with:
           name: Unit Test Results
           path: unit-test-results.json
-          reporter: go-test-json
+          reporter: golang-json
 
   integration-test:
     # This job only runs when a release is created.
@@ -57,9 +57,9 @@ jobs:
         run: go test -v -tags=integration -json ./... > integration-test-results.json
 
       - name: Report Integration Tests
-        uses: dorny/test-reporter@v1
+        uses: dorny/test-reporter@v2
         if: always()
         with:
           name: Integration Test Results
           path: integration-test-results.json
-          reporter: go-test-json 
+          reporter: golang-json

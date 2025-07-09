@@ -120,12 +120,9 @@ func List[T ListItem](c *Client, options ListOptions) ([]T, error) {
 		return nil, fmt.Errorf("invalid base URL: %w", err)
 	}
 	q := u.Query()
-	// This block dynamically builds the query string for the request.
-	// It iterates over the fields of the 'options' struct using reflection.
-	// For each field, it looks for a 'paramName' tag which defines the
-	// corresponding query parameter name. If a tag is found and the field's
-	// value is not nil, it's added to the query. Special handling is
-	// provided for slices, which are joined into a comma-separated string.
+	// Build query parameters from the options struct using reflection.
+	// It adds fields with a "paramName" tag to the query, skipping zero values.
+	// Special handling is provided for DateOnly fields and slices/arrays.
 	for i := 0; i < reflect.TypeOf(options).NumField(); i++ {
 		field := reflect.TypeOf(options).Field(i)
 		paramName := field.Tag.Get("paramName")

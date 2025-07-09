@@ -17,13 +17,21 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.21'
+          go-version: '1.23'
 
       - name: Run Go Tidy
         run: go mod tidy
 
       - name: Run Unit Tests
-        run: go test ./...
+        run: go test -v -json ./... > unit-test-results.json
+
+      - name: Report Unit Tests
+        uses: dorny/test-reporter@v1
+        if: always()
+        with:
+          name: Unit Test Results
+          path: unit-test-results.json
+          reporter: go-test-json
 
   integration-test:
     # This job only runs when a release is created.
@@ -37,7 +45,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.21'
+          go-version: '1.23'
       
       - name: Run Go Tidy
         run: go mod tidy
@@ -46,4 +54,12 @@ jobs:
         env:
           BLIKK_APP_ID: ${{ secrets.BLIKK_APP_ID }}
           BLIKK_APP_SECRET: ${{ secrets.BLIKK_APP_SECRET }}
-        run: go test -v -tags=integration ./... 
+        run: go test -v -tags=integration -json ./... > integration-test-results.json
+
+      - name: Report Integration Tests
+        uses: dorny/test-reporter@v1
+        if: always()
+        with:
+          name: Integration Test Results
+          path: integration-test-results.json
+          reporter: go-test-json 

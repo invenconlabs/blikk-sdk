@@ -8,8 +8,25 @@ on:
     types: [created]
 
 jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      go: ${{ steps.filter.outputs.go }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Check for file changes
+        uses: dorny/paths-filter@v5
+        id: filter
+        with:
+          filters: |
+            go:
+              - '**/*.go'
+
   unit-test:
     runs-on: ubuntu-latest
+    needs: changes
+    if: github.event_name == 'release' || needs.changes.outputs.go == 'true'
     steps:
       - name: Checkout code
         uses: actions/checkout@v4

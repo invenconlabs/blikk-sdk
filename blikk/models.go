@@ -289,3 +289,65 @@ type User struct {
 func (User) path(query string) string {
 	return "v1/Admin/Users/" + query
 }
+
+type Project struct {
+	ObjectName  string `json:"objectName"`
+	ID          int    `json:"id"`
+	OrderNumber string `json:"orderNumber"`
+	Title       string `json:"title"`
+	Status      struct {
+		blikkObject
+		IsCompletedStatus bool `json:"isCompletedStatus"`
+	} `json:"status"`
+	ReadyForInvoice bool `json:"readyForInvoice"`
+	Category        struct {
+		blikkObject
+		Color string `json:"color"`
+	} `json:"category"`
+	InvoiceText              string      `json:"invoiceText"`
+	YourReference            string      `json:"yourReference"`
+	OurReference             string      `json:"ourReference"`
+	CustomerReferenceMarking string      `json:"customerReferenceMarking"`
+	SalesResponsible         blikkObject `json:"salesResponsible"`
+	Description              string      `json:"description"`
+	StartDate                string      `json:"startDate"`
+	EndDate                  string      `json:"endDate"`
+	InvoiceType              string      `json:"invoiceType"`
+	Location                 struct {
+		ObjectName    string  `json:"objectName"`
+		Longitude     float64 `json:"longitude"`
+		Latitude      float64 `json:"latitude"`
+		StreetAddress string  `json:"streetAddress"`
+		PostalCode    string  `json:"postalCode"`
+		City          string  `json:"city"`
+		CountryName   string  `json:"countryName"`
+	} `json:"location"`
+	ProjectManager    blikkObject `json:"projectManager"`
+	Customer          blikkObject `json:"customer"`
+	ProjectCollection struct {
+		blikkObject
+		Number string `json:"number"`
+	} `json:"projectCollection"`
+	Tags []struct {
+		ObjectName      string `json:"objectName"`
+		ID              int    `json:"id"`
+		Title           string `json:"title"`
+		Color           string `json:"color"`
+		InternalColorID int    `json:"internalColorId"`
+	} `json:"tags"`
+	CostCenter struct {
+		blikkObject
+		Code string `json:"code"`
+	} `json:"costCenter"`
+	BookingProject blikkObject   `json:"bookingProject"`
+	CreatedBy      blikkObject   `json:"createdBy"`
+	UpdatedBy      blikkObject   `json:"updatedBy"`
+	Created        string        `json:"created"`
+	Updated        string        `json:"updated"`
+	AllIsMember    bool          `json:"allIsMember"`
+	Members        []blikkObject `json:"members"`
+}
+
+func (Project) path(query string) string {
+	return "v1/Core/Projects/" + query
+}

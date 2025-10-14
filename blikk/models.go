@@ -351,3 +351,89 @@ type Project struct {
 func (Project) path(query string) string {
 	return "v1/Core/Projects/" + query
 }
+
+type Timereport struct {
+	ObjectName       string             `json:"objectName"`
+	ID               int                `json:"id"`
+	Date             dateutils.DateOnly `json:"date"`
+	ClockStart       string             `json:"clockStart"`
+	ClockEnd         string             `json:"clockEnd"`
+	Hours            float64            `json:"hours"`
+	InvoiceableHours float64            `json:"invoiceableHours"`
+	BreakMinutes     float64            `json:"breakMinutes"`
+	Cost             float64            `json:"cost"`
+	Rate             float64            `json:"rate"`
+	Discount         float64            `json:"discount"`
+	Comment          string             `json:"comment"`
+	InternalComment  string             `json:"internalComment"`
+	SentToAttestDate string             `json:"sentToAttestDate"`
+	AttestedDate     string             `json:"attestedDate"`
+	AttestedByUser   blikkObject        `json:"attestedByUser"`
+	User             blikkObject        `json:"user"`
+	Contact          blikkObject        `json:"contact"`
+	Project          struct {
+		blikkObject
+		Number string `json:"number"`
+	} `json:"project"`
+	InternalProject blikkObject `json:"internalProject"`
+	AbsenceProject  blikkObject `json:"absenceProject"`
+	Activity        blikkObject `json:"activity"`
+	TimeCode        blikkObject `json:"timeCode"`
+	TimeArticle     blikkObject `json:"timeArticle"`
+	CostCenter      blikkObject `json:"costCenter"`
+	BookingProject  blikkObject `json:"bookingProject"`
+	InvoiceID       int         `json:"invoiceId"`
+	InvoicedDate    string      `json:"invoicedDate"`
+	InvoiceDraftID  int         `json:"invoiceDraftId"`
+	Task            blikkObject `json:"task"`
+	TravelReport    struct {
+		ObjectName         string      `json:"objectName"`
+		ID                 int         `json:"id"`
+		Place              string      `json:"place"`
+		InvoicablePlace    string      `json:"invoicablePlace"`
+		Distance           float64     `json:"distance"`
+		InvoicableDistance float64     `json:"invoicableDistance"`
+		ToSalary           bool        `json:"toSalary"`
+		ToBeInvoiced       bool        `json:"toBeInvoiced"`
+		Cost               float64     `json:"cost"`
+		Rate               float64     `json:"rate"`
+		Discount           float64     `json:"discount"`
+		SentToAttestDate   string      `json:"sentToAttestDate"`
+		AttestedDate       string      `json:"attestedDate"`
+		CostCenter         blikkObject `json:"costCenter"`
+		BookingProject     blikkObject `json:"bookingProject"`
+		InvoiceID          int         `json:"invoiceId"`
+		InvoicedDate       string      `json:"invoicedDate"`
+		InvoiceDraftID     int         `json:"invoiceDraftId"`
+		CompanyCar         interface{} `json:"companyCar"`
+		Article            blikkObject `json:"article"`
+	} `json:"travelReport"`
+	AllowanceReport struct {
+		ObjectName              string      `json:"objectName"`
+		ID                      int         `json:"id"`
+		Description             string      `json:"description"`
+		Cost                    float64     `json:"cost"`
+		Amount                  float64     `json:"amount"`
+		InvoicableAmount        float64     `json:"invoicableAmount"`
+		Discount                float64     `json:"discount"`
+		InvoicableSpecification string      `json:"invoicableSpecification"`
+		ToBeInvoiced            bool        `json:"toBeInvoiced"`
+		SentToAttestDate        string      `json:"sentToAttestDate"`
+		AttestedDate            string      `json:"attestedDate"`
+		CostCenter              blikkObject `json:"costCenter"`
+		BookingProject          blikkObject `json:"bookingProject"`
+		InvoiceID               int         `json:"invoiceId"`
+		InvoicedDate            string      `json:"invoicedDate"`
+		InvoiceDraftID          int         `json:"invoiceDraftId"`
+		Article                 blikkObject `json:"article"`
+	} `json:"allowanceReport"`
+	Materials   []blikkObject `json:"materials"`
+	Equipments  []blikkObject `json:"equipments"`
+	Additions   []blikkObject `json:"additions"`
+	CreatedDate string        `json:"createdDate"`
+	UpdatedDate string        `json:"updatedDate"`
+}
+
+func (Timereport) path(query string) string {
+	return "v1/Core/TimeReports/" + query
+}

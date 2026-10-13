@@ -3,7 +3,12 @@
 package blikk
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
+	"errors"
+	"io"
+	"net/http"
 	"os"
 	"strconv"
 	"sync"
@@ -229,29 +234,148 @@ func borrowTimeReportReferences(t *testing.T, ctx context.Context, client *Clien
 	return input
 }
 
+const materialSearchLimit = 50
+
+type recordedResponse struct {
+	statusCode int
+	body       []byte
+}
+
+type responseRecorder struct {
+	mu        sync.Mutex
+	responses map[string]recordedResponse
+}
+
+func (r *responseRecorder) RoundTrip(req *http.Request) (*http.Response, error) {
+	resp, err := http.DefaultTransport.RoundTrip(req)
+	if err != nil {
+		return nil, err
+	}
+	body, err := io.ReadAll(resp.Body)
+	resp.Body.Close()
+	if err != nil {
+		return nil, err
+	}
+	resp.Body = io.NopCloser(bytes.NewReader(body))
+	r.mu.Lock()
+	r.responses[req.Method+" "+req.URL.Path] = recordedResponse{statusCode: resp.StatusCode, body: body}
+	r.mu.Unlock()
+	return resp, nil
+}
+
+func (r *responseRecorder) last(method, path string) recordedResponse {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	return r.responses[method+" "+path]
+}
+
+func newRecordingWriteClient(t *testing.T) (*Client, *responseRecorder) {
+	t.Helper()
+	recorder := &responseRecorder{responses: map[string]recordedResponse{}}
+	client, err := NewClient(os.Getenv("BLIKK_APP_ID"), os.Getenv("BLIKK_APP_SECRET"),
+		WithHTTPClient(&http.Client{Transport: recorder, Timeout: 30 * time.Second}))
+	require.NoError(t, err)
+	return client, recorder
+}
+
+func createReportWithCleanup(t *testing.T, ctx context.Context, client *Client, input TimeReportInput) int {
+	t.Helper()
+	id, err := client.TimeReports.Create(ctx, input)
+	require.NoError(t, err)
+	require.NotZero(t, id)
+	t.Cleanup(func() { deleteReportIfPresent(t, client, id) })
+	return id
+}
+
+func deleteReportIfPresent(t *testing.T, client *Client, id int) {
+	ctx := context.Background()
+	_, err := client.TimeReports.Get(ctx, id)
+	var apiErr *Error
+	if errors.As(err, &apiErr) && apiErr.StatusCode == http.StatusBadRequest {
+		return
+	}
+	if !assert.NoError(t, err, "cleanup could not read report %d; delete it by hand", id) {
+		return
+	}
+	assert.NoError(t, client.TimeReports.Delete(ctx, id), "cleanup delete of report %d", id)
+}
+
+func assertReportIsGone(t *testing.T, ctx context.Context, client *Client, id int) {
+	t.Helper()
+	_, err := client.TimeReports.Get(ctx, id)
+	var apiErr *Error
+	require.ErrorAs(t, err, &apiErr)
+	t.Logf("Get after delete of %d returned status %d: %s", id, apiErr.StatusCode, apiErr.Body)
+}
+
+func findMaterialToBorrow(t *testing.T, ctx context.Context, client *Client, userID int) (MaterialReport, bool) {
+	t.Helper()
+	page, err := client.TimeReports.List(ctx, TimeReportListParams{
+		ListOptions: ListOptions{PageSize: materialSearchLimit, SortBy: TimeReportSortByDate, SortOrder: SortDescending},
+		UserIDs:     []int{userID},
+	})
+	require.NoError(t, err)
+	for _, listed := range page.Items {
+		report, err := client.TimeReports.Get(ctx, listed.ID)
+		require.NoError(t, err)
+		for _, material := range report.Materials {
+			if material.Article != nil && material.Article.ID != 0 {
+				return material, true
+			}
+		}
+	}
+	return MaterialReport{}, false
+}
+
+func materialCount(t *testing.T, ctx context.Context, client *Client, id int) int {
+	t.Helper()
+	report, err := client.TimeReports.Get(ctx, id)
+	require.NoError(t, err)
+	return len(report.Materials)
+}
+
+func describeMaterialChange(before, after int) string {
+	switch {
+	case after == before:
+		return "kept"
+	case after == 0:
+		return "cleared"
+	default:
+		return "changed"
+	}
+}
+
+func putWithExplicitEmptyMaterials(ctx context.Context, client *Client, id int, input TimeReportInput) error {
+	encoded, err := json.Marshal(input)
+	if err != nil {
+		return err
+	}
+	var body map[string]any
+	if err := json.Unmarshal(encoded, &body); err != nil {
+		return err
+	}
+	body["materials"] = []any{}
+	return client.do(ctx, http.MethodPut, timeReportPath(id), nil, body, nil)
+}
+
 func TestIntegrationTimeReportCreateUpdateDelete(t *testing.T) {
 	userID := writeTestUserID(t)
-	client := integrationClient(t)
+	client, recorder := newRecordingWriteClient(t)
 	ctx := integrationContext(t)
 	countBefore := countWriteTestWeekReports(t, ctx, client, userID)
 	t.Cleanup(func() {
 		assert.Equal(t, countBefore, countWriteTestWeekReports(t, context.Background(), client, userID), "week 43 report count changed")
 	})
 
-	input := borrowTimeReportReferences(t, ctx, client, userID)
+	references := borrowTimeReportReferences(t, ctx, client, userID)
+	input := references
 	input.Date = NewDate(2026, time.October, 20)
 	input.Hours = 0.5
 	input.Comment = writeTestComment
 
-	id, err := client.TimeReports.Create(ctx, input)
-	require.NoError(t, err)
-	require.NotZero(t, id)
-	deleted := false
-	t.Cleanup(func() {
-		if !deleted {
-			assert.NoError(t, client.TimeReports.Delete(context.Background(), id), "cleanup delete of report %d", id)
-		}
-	})
+	id := createReportWithCleanup(t, ctx, client, input)
+	createResponse := recorder.last(http.MethodPost, "/"+timeReportsPath)
+	t.Logf("Create response: status %d, body %s", createResponse.statusCode, createResponse.body)
 
 	created, err := client.TimeReports.Get(ctx, id)
 	require.NoError(t, err)
@@ -270,10 +394,50 @@ func TestIntegrationTimeReportCreateUpdateDelete(t *testing.T) {
 	assert.Equal(t, writeTestComment+" (updated)", updated.Comment)
 
 	require.NoError(t, client.TimeReports.Delete(ctx, id))
-	deleted = true
+	assertReportIsGone(t, ctx, client, id)
 
-	_, err = client.TimeReports.Get(ctx, id)
-	var apiErr *Error
-	require.ErrorAs(t, err, &apiErr)
-	t.Logf("Get after delete returned status %d: %s", apiErr.StatusCode, apiErr.Body)
+	t.Run("PUT slice semantics for materials", func(t *testing.T) {
+		material, found := findMaterialToBorrow(t, ctx, client, userID)
+		if !found {
+			t.Skipf("none of user %d's latest %d time reports has a material with an article; skipping materials probe", userID, materialSearchLimit)
+		}
+		t.Logf("borrowing material article %d (%q)", material.Article.ID, material.Title)
+
+		probes := []struct {
+			description string
+			date        Date
+			put         func(id int, input TimeReportInput) error
+		}{
+			{"PUT with materials omitted (nil)", NewDate(2026, time.October, 21), func(id int, input TimeReportInput) error {
+				input.Materials = nil
+				return client.TimeReports.Update(ctx, id, input)
+			}},
+			{"PUT with materials as empty slice (omitempty drops it, same wire as nil)", NewDate(2026, time.October, 22), func(id int, input TimeReportInput) error {
+				input.Materials = []MaterialInput{}
+				return client.TimeReports.Update(ctx, id, input)
+			}},
+			{"PUT with explicit \"materials\":[] on the wire", NewDate(2026, time.October, 23), func(id int, input TimeReportInput) error {
+				input.Materials = nil
+				return putWithExplicitEmptyMaterials(ctx, client, id, input)
+			}},
+		}
+		for _, probe := range probes {
+			input := references
+			input.Date = probe.date
+			input.Hours = 0.5
+			input.Comment = writeTestComment + " (materials)"
+			input.Materials = []MaterialInput{{ArticleID: material.Article.ID, Title: material.Title, UnitPrice: material.UnitPrice, Units: 1}}
+
+			id := createReportWithCleanup(t, ctx, client, input)
+			before := materialCount(t, ctx, client, id)
+			require.Equal(t, 1, before, "report %d should start with one material", id)
+
+			require.NoError(t, probe.put(id, input), probe.description)
+			after := materialCount(t, ctx, client, id)
+			t.Logf("%s: materials after = %d (%s)", probe.description, after, describeMaterialChange(before, after))
+
+			require.NoError(t, client.TimeReports.Delete(ctx, id))
+			assertReportIsGone(t, ctx, client, id)
+		}
+	})
 }

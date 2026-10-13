@@ -461,6 +461,7 @@ func TestIntegrationTimeReportCreateUpdateDelete(t *testing.T) {
 			require.NoError(t, probe.put(id, input), probe.description)
 			after := additionCount(t, ctx, client, id)
 			t.Logf("%s: additions after = %d (%s)", probe.description, after, describeCountChange(before, after))
+			assert.Equal(t, 0, after, "%s should clear additions because PUT replaces the whole report", probe.description)
 
 			require.NoError(t, client.TimeReports.Delete(ctx, id))
 			assertReportIsGone(t, ctx, client, id)

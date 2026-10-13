@@ -419,6 +419,7 @@ func (s *TimeReportsService) Create(ctx context.Context, input TimeReportInput) 
 	return created.ID, nil
 }
 
+// Update replaces the whole time report; any field left unset in input is cleared.
 func (s *TimeReportsService) Update(ctx context.Context, id int, input TimeReportInput) error {
 	return s.client.do(ctx, http.MethodPut, timeReportPath(id), nil, input, nil)
 }

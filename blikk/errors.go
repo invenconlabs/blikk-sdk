@@ -72,7 +72,37 @@ func formatModelState(modelState map[string][]string) string {
 	return strings.Join(parts, "; ")
 }
 
-func IsNotFound(err error) bool { return hasStatus(err, http.StatusNotFound) }
+const notFoundPhrase = "could not be found"
+
+// IsNotFound is also true for a 400 that says "could not be found", which is how the API reports missing users and time reports.
+func IsNotFound(err error) bool {
+	var apiErr *Error
+	if !errors.As(err, &apiErr) {
+		return false
+	}
+	return apiErr.StatusCode == http.StatusNotFound || isBadRequestForMissingEntity(apiErr)
+}
+
+func isBadRequestForMissingEntity(apiErr *Error) bool {
+	if apiErr.StatusCode != http.StatusBadRequest {
+		return false
+	}
+	if mentionsNotFound(apiErr.Message) {
+		return true
+	}
+	for _, messages := range apiErr.ModelState {
+		for _, message := range messages {
+			if mentionsNotFound(message) {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+func mentionsNotFound(message string) bool {
+	return strings.Contains(strings.ToLower(message), notFoundPhrase)
+}
 
 func IsRateLimited(err error) bool { return hasStatus(err, http.StatusTooManyRequests) }
 

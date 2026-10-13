@@ -2,7 +2,6 @@ package blikk_test
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -103,13 +102,6 @@ func Example_createTimeReport() {
 		TimeArticleID:    9,
 	})
 	if err != nil {
-		var apiErr *blikk.Error
-		if errors.As(err, &apiErr) && len(apiErr.ModelState) > 0 {
-			for field, messages := range apiErr.ModelState {
-				fmt.Printf("%s: %v\n", field, messages)
-			}
-			return
-		}
 		log.Fatal(err)
 	}
 

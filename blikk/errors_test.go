@@ -93,6 +93,35 @@ func TestErrorMessageListsEveryRequiredPermissionBeforeRequestID(t *testing.T) {
 	assert.Equal(t, "blikk: 403 Forbidden: Denied (requires Timereport_Read, Timereport_Write) (request r-abc)", apiErr.Error())
 }
 
+func TestMissingUserBadRequestIsNotFound(t *testing.T) {
+	apiErr := getUserError(t, respondWith(http.StatusBadRequest, `{"message":"The user could not be found."}`))
+
+	assert.True(t, IsNotFound(apiErr))
+	assert.Equal(t, http.StatusBadRequest, apiErr.StatusCode)
+}
+
+func TestMissingTimeReportBadRequestIsNotFound(t *testing.T) {
+	client := newTestClient(t, respondWith(http.StatusBadRequest, `{"message":"The request is invalid.","modelState":{"":["The timereport could not be found."]}}`))
+
+	_, err := client.TimeReports.Get(context.Background(), 1)
+
+	assert.True(t, IsNotFound(err))
+	var apiErr *Error
+	require.ErrorAs(t, err, &apiErr)
+	assert.Equal(t, http.StatusBadRequest, apiErr.StatusCode)
+}
+
+func TestValidationBadRequestIsNotNotFound(t *testing.T) {
+	apiErr := getUserError(t, respondWith(http.StatusBadRequest, `{"message":"The request is invalid.","modelState":{"page":["The field Page must be greater than or equal to 1."]}}`))
+
+	assert.False(t, IsNotFound(apiErr))
+}
+
+func TestNotFoundPhraseOnlyCountsForBadRequest(t *testing.T) {
+	assert.False(t, IsNotFound(&Error{StatusCode: http.StatusInternalServerError, Message: "The user could not be found."}))
+	assert.True(t, IsNotFound(&Error{StatusCode: http.StatusBadRequest, Message: "THE USER COULD NOT BE FOUND."}))
+}
+
 func TestErrorHelpersSeeThroughWrapping(t *testing.T) {
 	wrapped := fmt.Errorf("loading user: %w", &Error{StatusCode: http.StatusTooManyRequests})
 

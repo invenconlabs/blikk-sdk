@@ -97,6 +97,14 @@ func TestIntegrationProjectNotFound(t *testing.T) {
 	assert.True(t, IsNotFound(err), "expected 404, got %v", err)
 }
 
+func TestIntegrationUserNotFound(t *testing.T) {
+	client := integrationClient(t)
+
+	_, err := client.Users.Get(integrationContext(t), 999999999)
+
+	assert.True(t, IsNotFound(err), "expected not found, got %v", err)
+}
+
 func TestIntegrationTimeReports(t *testing.T) {
 	client := integrationClient(t)
 	ctx := integrationContext(t)

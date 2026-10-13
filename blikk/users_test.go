@@ -15,7 +15,7 @@ func TestUsersListDecodesFixture(t *testing.T) {
 	client := newTestClient(t, handler.ServeHTTP)
 
 	page, err := client.Users.List(context.Background(), UserListParams{
-		ListOptions:       ListOptions{SortBy: "name", SortOrder: SortAscending},
+		ListOptions:       ListOptions{SortBy: UserSortByName, SortOrder: SortAscending},
 		Query:             "john",
 		IncludeDeleted:    true,
 		IncludeRestricted: true,

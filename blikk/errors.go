@@ -50,6 +50,9 @@ func (e *Error) Error() string {
 	if len(e.ModelState) > 0 {
 		b.WriteString(" (" + formatModelState(e.ModelState) + ")")
 	}
+	if len(e.PermissionsRequired) > 0 {
+		b.WriteString(" (requires " + strings.Join(e.PermissionsRequired, ", ") + ")")
+	}
 	if e.RequestID != "" {
 		b.WriteString(" (request " + e.RequestID + ")")
 	}

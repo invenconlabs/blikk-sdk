@@ -3,6 +3,7 @@ package blikk
 import (
 	"context"
 	"net/http"
+	"net/http/httptest"
 	"sync"
 	"sync/atomic"
 	"testing"
@@ -52,7 +53,7 @@ func TestPathParametersAreEscaped(t *testing.T) {
 
 func TestRateLimiterIsConsultedBeforeEveryRequest(t *testing.T) {
 	handler := &recordingHandler{respond: respondWith(http.StatusOK, `{}`)}
-	client := newTestClient(t, handler.ServeHTTP, WithRateLimit(rate.Limit(0.001)))
+	client := newTestClient(t, handler.ServeHTTP, WithRequestsPerSecond(0.001))
 
 	_, err := client.Users.Get(context.Background(), 1)
 	require.NoError(t, err)
@@ -71,6 +72,32 @@ func TestDefaultRateLimitIsFourPerSecondWithBurstOne(t *testing.T) {
 
 	assert.Equal(t, rate.Limit(4), client.limiter.Limit())
 	assert.Equal(t, 1, client.limiter.Burst())
+}
+
+func TestRequestsPerSecondOption(t *testing.T) {
+	limited, err := NewClient("id", "secret", WithRequestsPerSecond(2.5))
+	require.NoError(t, err)
+	unlimited, err := NewClient("id", "secret", WithRequestsPerSecond(0))
+	require.NoError(t, err)
+
+	assert.Equal(t, rate.Limit(2.5), limited.limiter.Limit())
+	assert.Equal(t, rate.Inf, unlimited.limiter.Limit())
+}
+
+func TestNewClientWithTokenSource(t *testing.T) {
+	handler := &recordingHandler{respond: respondWith(http.StatusOK, `{"id":3}`)}
+	server := httptest.NewServer(handler)
+	t.Cleanup(server.Close)
+
+	client, err := NewClientWithTokenSource(StaticToken("given"), WithBaseURL(server.URL), WithRequestsPerSecond(0))
+	require.NoError(t, err)
+	_, err = client.Users.Get(context.Background(), 3)
+
+	require.NoError(t, err)
+	assert.Equal(t, "Bearer given", handler.last().Header.Get("Authorization"))
+
+	_, err = NewClientWithTokenSource(nil)
+	assert.Error(t, err)
 }
 
 type recordedSleeps struct {

@@ -49,7 +49,7 @@ func TestListAllWalksEveryPage(t *testing.T) {
 	require.Len(t, handler.requests, 3)
 	for i, request := range handler.requests {
 		assert.Equal(t, strconv.Itoa(i+1), request.Query["page"][0])
-		assert.Equal(t, "100", request.Query["pageSize"][0])
+		assert.Equal(t, strconv.Itoa(MaxPageSize), request.Query["pageSize"][0])
 		assert.Equal(t, "anders", request.Query["filter.query"][0])
 	}
 }

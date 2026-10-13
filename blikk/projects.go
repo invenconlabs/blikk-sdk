@@ -24,6 +24,13 @@ func (t *InvoiceType) UnmarshalJSON(data []byte) error {
 	return unmarshalEnum(data, t, InvoiceTypeOngoing, InvoiceTypeFixedPrice, InvoiceTypeNone)
 }
 
+const (
+	ProjectSortByOrderNumber = "orderNumber"
+	ProjectSortByTitle       = "title"
+	ProjectSortByCreatedDate = "createdDate"
+	ProjectSortByUpdatedDate = "updatedDate"
+)
+
 type ProjectListParams struct {
 	ListOptions
 	CreatedDateFrom       DateTime    `query:"filter.createdDateFrom"`

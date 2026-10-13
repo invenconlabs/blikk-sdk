@@ -14,7 +14,6 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"golang.org/x/time/rate"
 )
 
 type fakeBlikk struct {
@@ -53,7 +52,7 @@ func newAppCredentialClient(t *testing.T, fake *fakeBlikk) (*Client, *appTokenSo
 	t.Helper()
 	server := httptest.NewServer(fake)
 	t.Cleanup(server.Close)
-	client, err := NewClient("my-app", "my-secret", WithBaseURL(server.URL), WithRateLimit(rate.Inf))
+	client, err := NewClient("my-app", "my-secret", WithBaseURL(server.URL), WithRequestsPerSecond(0))
 	require.NoError(t, err)
 	return client, client.tokenSource.(*appTokenSource)
 }
@@ -126,7 +125,7 @@ func TestPersistentUnauthorizedIsReturnedAfterOneRetry(t *testing.T) {
 func TestTokenEndpointErrorIsReturnedAsError(t *testing.T) {
 	server := httptest.NewServer(respondWith(http.StatusUnauthorized, ""))
 	t.Cleanup(server.Close)
-	client, err := NewClient("bad", "creds", WithBaseURL(server.URL), WithRateLimit(rate.Inf))
+	client, err := NewClient("bad", "creds", WithBaseURL(server.URL), WithRequestsPerSecond(0))
 	require.NoError(t, err)
 
 	_, err = client.Users.Get(context.Background(), 1)

@@ -17,8 +17,8 @@ import (
 )
 
 const (
-	DefaultBaseURL   = "https://publicapi.blikk.com"
-	DefaultRateLimit = rate.Limit(4)
+	DefaultBaseURL           = "https://publicapi.blikk.com"
+	DefaultRequestsPerSecond = 4.0
 
 	defaultUserAgent    = "blikk-sdk-go"
 	defaultHTTPTimeout  = 30 * time.Second
@@ -61,16 +61,23 @@ func WithUserAgent(userAgent string) Option {
 	return func(c *Client) { c.userAgent = userAgent }
 }
 
-// WithRateLimit sets the client-side request rate; the API allows 4 requests per second per token. Use rate.Inf to disable.
-func WithRateLimit(limit rate.Limit) Option {
-	return func(c *Client) { c.limiter = rate.NewLimiter(limit, 1) }
+// WithRequestsPerSecond sets the client-side request rate; the API allows 4 per second. Zero or less disables limiting.
+func WithRequestsPerSecond(requestsPerSecond float64) Option {
+	return func(c *Client) { c.limiter = newLimiter(requestsPerSecond) }
+}
+
+func newLimiter(requestsPerSecond float64) *rate.Limiter {
+	if requestsPerSecond <= 0 {
+		return rate.NewLimiter(rate.Inf, 1)
+	}
+	return rate.NewLimiter(rate.Limit(requestsPerSecond), 1)
 }
 
 func NewClient(appID, appSecret string, opts ...Option) (*Client, error) {
 	c := &Client{
 		baseURL:    DefaultBaseURL,
 		httpClient: &http.Client{Timeout: defaultHTTPTimeout},
-		limiter:    rate.NewLimiter(DefaultRateLimit, 1),
+		limiter:    newLimiter(DefaultRequestsPerSecond),
 		userAgent:  defaultUserAgent,
 		sleep:      sleepContext,
 	}
@@ -91,6 +98,13 @@ func NewClient(appID, appSecret string, opts ...Option) (*Client, error) {
 	c.Projects = &ProjectsService{client: c}
 	c.TimeReports = &TimeReportsService{client: c}
 	return c, nil
+}
+
+func NewClientWithTokenSource(source TokenSource, opts ...Option) (*Client, error) {
+	if source == nil {
+		return nil, errors.New("blikk: token source is nil")
+	}
+	return NewClient("", "", append([]Option{WithTokenSource(source)}, opts...)...)
 }
 
 func validateBaseURL(baseURL string) error {

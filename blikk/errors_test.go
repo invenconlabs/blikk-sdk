@@ -46,7 +46,7 @@ func TestForbiddenErrorDecodesPermissions(t *testing.T) {
 	assert.Equal(t, []string{"Contact_Read"}, apiErr.PermissionsRequired)
 	require.NotNil(t, apiErr.IPAddressAllowed)
 	assert.True(t, *apiErr.IPAddressAllowed)
-	assert.Equal(t, "blikk: 403 Forbidden: You don't have the necessary permissions to perform this action", apiErr.Error())
+	assert.Equal(t, "blikk: 403 Forbidden: You don't have the necessary permissions to perform this action (requires Contact_Read)", apiErr.Error())
 }
 
 func TestForbiddenErrorDecodesIPRestriction(t *testing.T) {
@@ -85,6 +85,12 @@ func TestErrorBodyIsCappedAt64KB(t *testing.T) {
 	apiErr := getUserError(t, respondWith(http.StatusInternalServerError, strings.Repeat("x", 100<<10)))
 
 	assert.Len(t, apiErr.Body, 64<<10)
+}
+
+func TestErrorMessageListsEveryRequiredPermissionBeforeRequestID(t *testing.T) {
+	apiErr := &Error{StatusCode: http.StatusForbidden, Message: "Denied", PermissionsRequired: []string{"Timereport_Read", "Timereport_Write"}, RequestID: "r-abc"}
+
+	assert.Equal(t, "blikk: 403 Forbidden: Denied (requires Timereport_Read, Timereport_Write) (request r-abc)", apiErr.Error())
 }
 
 func TestErrorHelpersSeeThroughWrapping(t *testing.T) {

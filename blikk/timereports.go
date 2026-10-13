@@ -41,6 +41,17 @@ func (s *InvoiceStatus) UnmarshalJSON(data []byte) error {
 	return unmarshalEnum(data, s, InvoiceStatusPending, InvoiceStatusDraft, InvoiceStatusInvoiced)
 }
 
+const (
+	TimeReportSortByDate             = "date"
+	TimeReportSortByUserName         = "userName"
+	TimeReportSortByHours            = "hours"
+	TimeReportSortByInvoiceableHours = "invoiceableHours"
+	TimeReportSortBySentToAttestDate = "sentToAttestDate"
+	TimeReportSortByAttestedDate     = "attestedDate"
+	TimeReportSortByCreatedDate      = "createdDate"
+	TimeReportSortByUpdatedDate      = "updatedDate"
+)
+
 // TimeReportListParams uses *bool for its boolean filters because false is a meaningful filter; leave them nil to not filter.
 type TimeReportListParams struct {
 	ListOptions
@@ -258,21 +269,21 @@ type AdditionReport struct {
 
 type TimeReportInput struct {
 	Date              Date                  `json:"date"`
-	ClockStart        *string               `json:"clockStart,omitempty"`
-	ClockEnd          *string               `json:"clockEnd,omitempty"`
+	ClockStart        string                `json:"clockStart,omitempty"`
+	ClockEnd          string                `json:"clockEnd,omitempty"`
 	Hours             float64               `json:"hours"`
 	InvoiceableHours  float64               `json:"invoiceableHours"`
-	BreakMinutes      *int                  `json:"breakMinutes,omitempty"`
-	Comment           *string               `json:"comment,omitempty"`
-	InternalComment   *string               `json:"internalComment,omitempty"`
+	BreakMinutes      int                   `json:"breakMinutes,omitempty"`
+	Comment           string                `json:"comment,omitempty"`
+	InternalComment   string                `json:"internalComment,omitempty"`
 	UserID            int                   `json:"userId"`
-	ProjectID         *int                  `json:"projectId,omitempty"`
-	InternalProjectID *int                  `json:"internalProjectId,omitempty"`
-	AbsenceProjectID  *int                  `json:"absenceProjectId,omitempty"`
+	ProjectID         int                   `json:"projectId,omitempty"`
+	InternalProjectID int                   `json:"internalProjectId,omitempty"`
+	AbsenceProjectID  int                   `json:"absenceProjectId,omitempty"`
 	ActivityID        int                   `json:"activityId"`
 	TimeCodeID        int                   `json:"timeCodeId"`
 	TimeArticleID     int                   `json:"timeArticleId"`
-	TaskID            *int                  `json:"taskId,omitempty"`
+	TaskID            int                   `json:"taskId,omitempty"`
 	TravelReport      *TravelReportInput    `json:"travelReport,omitempty"`
 	AllowanceReport   *AllowanceReportInput `json:"allowanceReport,omitempty"`
 	Materials         []MaterialInput       `json:"materials,omitempty"`
@@ -283,55 +294,57 @@ type TimeReportInput struct {
 type TravelReportInput struct {
 	Place               string           `json:"place"`
 	Distance            float64          `json:"distance"`
-	InvoiceableDistance *float64         `json:"invoiceableDistance,omitempty"`
+	InvoiceableDistance float64          `json:"invoiceableDistance,omitempty"`
 	ToSalary            bool             `json:"toSalary"`
 	CompanyCar          *CompanyCarInput `json:"companyCar,omitempty"`
 }
 
 type CompanyCarInput struct {
-	ID           int      `json:"id"`
-	TripStart    *float64 `json:"tripStart,omitempty"`
-	TripEnd      *float64 `json:"tripEnd,omitempty"`
-	AddressStart *string  `json:"addressStart,omitempty"`
-	AddressGoal  *string  `json:"addressGoal,omitempty"`
-	AddressEnd   *string  `json:"addressEnd,omitempty"`
+	ID           int     `json:"id"`
+	TripStart    float64 `json:"tripStart,omitempty"`
+	TripEnd      float64 `json:"tripEnd,omitempty"`
+	AddressStart string  `json:"addressStart,omitempty"`
+	AddressGoal  string  `json:"addressGoal,omitempty"`
+	AddressEnd   string  `json:"addressEnd,omitempty"`
 }
 
 type AllowanceReportInput struct {
-	AllowanceTypeID int     `json:"allowanceTypeId"`
-	Description     *string `json:"description,omitempty"`
-	ToBeInvoiced    bool    `json:"toBeInvoiced"`
+	AllowanceTypeID int    `json:"allowanceTypeId"`
+	Description     string `json:"description,omitempty"`
+	ToBeInvoiced    bool   `json:"toBeInvoiced"`
 }
 
 type MaterialInput struct {
-	ID                   *int     `json:"id,omitempty"`
-	ArticleID            *int     `json:"articleId,omitempty"`
-	ArticleNumber        *string  `json:"articleNumber,omitempty"`
-	Title                string   `json:"title"`
-	UnitPrice            float64  `json:"unitPrice"`
-	InvoiceableUnitPrice *float64 `json:"invoiceableUnitPrice,omitempty"`
-	Units                float64  `json:"units"`
-	InvoiceableUnits     *float64 `json:"invoiceableUnits,omitempty"`
-	CalculatedUnits      *float64 `json:"calculatedUnits,omitempty"`
-	UnitText             *string  `json:"unitText,omitempty"`
-	Cost                 *float64 `json:"cost,omitempty"`
-	DiscountInPercent    *float64 `json:"discountInPercent,omitempty"`
-	IsTextOnly           bool     `json:"isTextOnly"`
+	ID                   int     `json:"id,omitempty"`
+	ArticleID            int     `json:"articleId,omitempty"`
+	ArticleNumber        string  `json:"articleNumber,omitempty"`
+	Title                string  `json:"title"`
+	UnitPrice            float64 `json:"unitPrice"`
+	InvoiceableUnitPrice float64 `json:"invoiceableUnitPrice,omitempty"`
+	Units                float64 `json:"units"`
+	InvoiceableUnits     float64 `json:"invoiceableUnits,omitempty"`
+	CalculatedUnits      float64 `json:"calculatedUnits,omitempty"`
+	UnitText             string  `json:"unitText,omitempty"`
+	Cost                 float64 `json:"cost,omitempty"`
+	DiscountInPercent    float64 `json:"discountInPercent,omitempty"`
+	IsTextOnly           bool    `json:"isTextOnly"`
 }
 
 type EquipmentInput struct {
-	ID        *int    `json:"id,omitempty"`
+	ID        int     `json:"id,omitempty"`
 	Hours     float64 `json:"hours"`
 	ArticleID int     `json:"articleId"`
-	Comment   *string `json:"comment,omitempty"`
+	Comment   string  `json:"comment,omitempty"`
 }
 
 type AdditionInput struct {
-	ID          *int     `json:"id,omitempty"`
-	ArticleID   int      `json:"articleId"`
-	YesNo       *bool    `json:"yesNo,omitempty"`
-	NumberCount *float64 `json:"numberCount,omitempty"`
+	ID          int     `json:"id,omitempty"`
+	ArticleID   int     `json:"articleId"`
+	YesNo       bool    `json:"yesNo,omitempty"`
+	NumberCount float64 `json:"numberCount,omitempty"`
 }
+
+const UserDayStatisticsSortByName = "name"
 
 type UserDayStatisticsParams struct {
 	ListOptions
@@ -354,6 +367,27 @@ type UserDayStatisticsEntry struct {
 	ScheduledHours float64   `json:"scheduledHours"`
 	LockedDate     *DateTime `json:"lockedDate"`
 	AttestedDate   *DateTime `json:"attestedDate"`
+}
+
+func (r TimeReportListItem) ProjectName() string {
+	return firstProjectName(r.Project, r.InternalProject, r.AbsenceProject)
+}
+
+func (r TimeReport) ProjectName() string {
+	return firstProjectName(r.Project, r.InternalProject, r.AbsenceProject)
+}
+
+func firstProjectName(project *ProjectRef, internalProject, absenceProject *NameID) string {
+	switch {
+	case project != nil:
+		return project.Name
+	case internalProject != nil:
+		return internalProject.Name
+	case absenceProject != nil:
+		return absenceProject.Name
+	default:
+		return ""
+	}
 }
 
 type createdResource struct {

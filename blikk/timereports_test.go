@@ -17,7 +17,7 @@ func TestTimeReportsListEncodesEveryFilter(t *testing.T) {
 	moment := DateTimeOf(time.Date(2021, 1, 1, 14, 0, 0, 0, time.UTC))
 
 	_, err := client.TimeReports.List(context.Background(), TimeReportListParams{
-		ListOptions:           ListOptions{SortBy: "date", SortOrder: SortDescending},
+		ListOptions:           ListOptions{SortBy: TimeReportSortByDate, SortOrder: SortDescending},
 		CreatedDateFrom:       moment,
 		CreatedDateTo:         moment,
 		UpdatedDateFrom:       moment,
@@ -209,15 +209,15 @@ func TestTimeReportsCreateSendsBodyAndReturnsID(t *testing.T) {
 
 	id, err := client.TimeReports.Create(context.Background(), TimeReportInput{
 		Date:             NewDate(2021, time.November, 10),
-		ClockStart:       Ptr("10:00"),
+		ClockStart:       "10:00",
 		Hours:            7.75,
 		InvoiceableHours: 9,
 		UserID:           1,
-		ProjectID:        Ptr(1),
+		ProjectID:        1,
 		ActivityID:       1,
 		TimeCodeID:       1,
 		TimeArticleID:    1,
-		Additions:        []AdditionInput{{ArticleID: 15, YesNo: Ptr(true)}},
+		Additions:        []AdditionInput{{ArticleID: 15, YesNo: true}},
 	})
 
 	require.NoError(t, err)
@@ -260,30 +260,75 @@ func TestTimeReportInputMatchesDocumentedRequest(t *testing.T) {
 	encoded, err := json.Marshal(input)
 	require.NoError(t, err)
 
+	var reencoded map[string]any
+	require.NoError(t, json.Unmarshal(encoded, &reencoded))
 	documented["date"] = "2021-11-10"
-	want, err := json.Marshal(withoutNulls(documented))
-	require.NoError(t, err)
-	assert.JSONEq(t, string(want), string(encoded))
+	assert.Equal(t, withoutEmptyValues(documented), withoutEmptyValues(reencoded))
 }
 
-func withoutNulls(value any) any {
+func withoutEmptyValues(value any) any {
 	switch v := value.(type) {
 	case map[string]any:
 		cleaned := map[string]any{}
 		for key, element := range v {
-			if element != nil {
-				cleaned[key] = withoutNulls(element)
+			if !isEmptyJSONValue(element) {
+				cleaned[key] = withoutEmptyValues(element)
 			}
 		}
 		return cleaned
 	case []any:
 		cleaned := make([]any, len(v))
 		for i, element := range v {
-			cleaned[i] = withoutNulls(element)
+			cleaned[i] = withoutEmptyValues(element)
 		}
 		return cleaned
 	default:
 		return value
+	}
+}
+
+func isEmptyJSONValue(value any) bool {
+	return value == nil || value == false || value == 0.0 || value == ""
+}
+
+func TestTimeReportInputOmitsUnsetOptionalFieldsAndKeepsRequiredZeros(t *testing.T) {
+	encoded, err := json.Marshal(TimeReportInput{
+		Date:         NewDate(2021, time.November, 10),
+		TravelReport: &TravelReportInput{Place: "Piteå"},
+		Materials:    []MaterialInput{{Title: "Text row", IsTextOnly: true}},
+	})
+
+	require.NoError(t, err)
+	assert.JSONEq(t, `{
+		"date": "2021-11-10",
+		"hours": 0,
+		"invoiceableHours": 0,
+		"userId": 0,
+		"activityId": 0,
+		"timeCodeId": 0,
+		"timeArticleId": 0,
+		"travelReport": {"place": "Piteå", "distance": 0, "toSalary": false},
+		"materials": [{"title": "Text row", "unitPrice": 0, "units": 0, "isTextOnly": true}]
+	}`, string(encoded))
+}
+
+func TestProjectNamePicksWhicheverProjectIsSet(t *testing.T) {
+	tests := []struct {
+		name   string
+		report TimeReportListItem
+		want   string
+	}{
+		{"project", TimeReportListItem{Project: &ProjectRef{Name: "Roof"}}, "Roof"},
+		{"internal project", TimeReportListItem{InternalProject: &NameID{Name: "Admin"}}, "Admin"},
+		{"absence project", TimeReportListItem{AbsenceProject: &NameID{Name: "Vacation"}}, "Vacation"},
+		{"none", TimeReportListItem{}, ""},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			assert.Equal(t, tc.want, tc.report.ProjectName())
+			detail := TimeReport{Project: tc.report.Project, InternalProject: tc.report.InternalProject, AbsenceProject: tc.report.AbsenceProject}
+			assert.Equal(t, tc.want, detail.ProjectName())
+		})
 	}
 }
 

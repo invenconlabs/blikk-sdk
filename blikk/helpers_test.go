@@ -10,7 +10,6 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"golang.org/x/time/rate"
 )
 
 const testToken = "test-token"
@@ -22,7 +21,7 @@ func newTestClient(t *testing.T, handler http.HandlerFunc, opts ...Option) *Clie
 	defaults := []Option{
 		WithBaseURL(server.URL),
 		WithTokenSource(StaticToken(testToken)),
-		WithRateLimit(rate.Inf),
+		WithRequestsPerSecond(0),
 	}
 	client, err := NewClient("", "", append(defaults, opts...)...)
 	require.NoError(t, err)

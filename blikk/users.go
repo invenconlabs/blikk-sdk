@@ -13,6 +13,8 @@ type UsersService struct {
 	client *Client
 }
 
+const UserSortByName = "name"
+
 type UserListParams struct {
 	ListOptions
 	Query             string `query:"filter.query"`

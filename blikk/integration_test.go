@@ -5,6 +5,7 @@ package blikk
 import (
 	"context"
 	"os"
+	"strconv"
 	"sync"
 	"testing"
 	"time"
@@ -37,7 +38,7 @@ func TestIntegrationUsers(t *testing.T) {
 	client := integrationClient(t)
 	ctx := integrationContext(t)
 
-	page, err := client.Users.List(ctx, UserListParams{ListOptions: ListOptions{PageSize: 10, SortBy: "name"}})
+	page, err := client.Users.List(ctx, UserListParams{ListOptions: ListOptions{PageSize: 10, SortBy: UserSortByName}})
 	require.NoError(t, err)
 	require.NotEmpty(t, page.Items)
 	assert.Equal(t, 1, page.Page)
@@ -60,7 +61,7 @@ func TestIntegrationProjects(t *testing.T) {
 	client := integrationClient(t)
 	ctx := integrationContext(t)
 
-	page, err := client.Projects.List(ctx, ProjectListParams{ListOptions: ListOptions{PageSize: 10, SortBy: "updatedDate", SortOrder: SortDescending}})
+	page, err := client.Projects.List(ctx, ProjectListParams{ListOptions: ListOptions{PageSize: 10, SortBy: ProjectSortByUpdatedDate, SortOrder: SortDescending}})
 	require.NoError(t, err)
 	require.NotEmpty(t, page.Items)
 	listed := page.Items[0]
@@ -176,4 +177,103 @@ func TestIntegrationUserDayStatisticsRejectsLongRange(t *testing.T) {
 	require.ErrorAs(t, err, &apiErr)
 	assert.Equal(t, 400, apiErr.StatusCode)
 	assert.NotEmpty(t, apiErr.ModelState)
+}
+
+const writeTestComment = "blikk-sdk integration test"
+
+var writeTestWeekStart, writeTestWeekEnd = NewDate(2026, time.October, 19), NewDate(2026, time.October, 25)
+
+func writeTestUserID(t *testing.T) int {
+	t.Helper()
+	raw := os.Getenv("BLIKK_WRITE_TEST_USER_ID")
+	if raw == "" {
+		t.Skip("BLIKK_WRITE_TEST_USER_ID not set; skipping live write test")
+	}
+	userID, err := strconv.Atoi(raw)
+	require.NoError(t, err, "BLIKK_WRITE_TEST_USER_ID must be an integer")
+	return userID
+}
+
+func countWriteTestWeekReports(t *testing.T, ctx context.Context, client *Client, userID int) int {
+	t.Helper()
+	page, err := client.TimeReports.List(ctx, TimeReportListParams{UserIDs: []int{userID}, From: writeTestWeekStart, To: writeTestWeekEnd})
+	require.NoError(t, err)
+	return page.TotalItemCount
+}
+
+func borrowTimeReportReferences(t *testing.T, ctx context.Context, client *Client, userID int) TimeReportInput {
+	t.Helper()
+	page, err := client.TimeReports.List(ctx, TimeReportListParams{
+		ListOptions: ListOptions{PageSize: 1, SortBy: TimeReportSortByDate, SortOrder: SortDescending},
+		UserIDs:     []int{userID},
+	})
+	require.NoError(t, err)
+	if len(page.Items) == 0 {
+		t.Skipf("user %d has no time reports to borrow project, activity, time code and time article from", userID)
+	}
+	existing := page.Items[0]
+	input := TimeReportInput{
+		UserID:        userID,
+		ActivityID:    existing.Activity.ID,
+		TimeCodeID:    existing.TimeCode.ID,
+		TimeArticleID: existing.TimeArticle.ID,
+	}
+	switch {
+	case existing.Project != nil:
+		input.ProjectID = existing.Project.ID
+	case existing.InternalProject != nil:
+		input.InternalProjectID = existing.InternalProject.ID
+	case existing.AbsenceProject != nil:
+		input.AbsenceProjectID = existing.AbsenceProject.ID
+	}
+	return input
+}
+
+func TestIntegrationTimeReportCreateUpdateDelete(t *testing.T) {
+	userID := writeTestUserID(t)
+	client := integrationClient(t)
+	ctx := integrationContext(t)
+	countBefore := countWriteTestWeekReports(t, ctx, client, userID)
+	t.Cleanup(func() {
+		assert.Equal(t, countBefore, countWriteTestWeekReports(t, context.Background(), client, userID), "week 43 report count changed")
+	})
+
+	input := borrowTimeReportReferences(t, ctx, client, userID)
+	input.Date = NewDate(2026, time.October, 20)
+	input.Hours = 0.5
+	input.Comment = writeTestComment
+
+	id, err := client.TimeReports.Create(ctx, input)
+	require.NoError(t, err)
+	require.NotZero(t, id)
+	deleted := false
+	t.Cleanup(func() {
+		if !deleted {
+			assert.NoError(t, client.TimeReports.Delete(context.Background(), id), "cleanup delete of report %d", id)
+		}
+	})
+
+	created, err := client.TimeReports.Get(ctx, id)
+	require.NoError(t, err)
+	assert.Equal(t, input.Date, created.Date)
+	assert.Equal(t, 0.5, created.Hours)
+	assert.Equal(t, writeTestComment, created.Comment)
+	assert.Equal(t, userID, created.User.ID)
+
+	input.Hours = 1
+	input.Comment = writeTestComment + " (updated)"
+	require.NoError(t, client.TimeReports.Update(ctx, id, input))
+
+	updated, err := client.TimeReports.Get(ctx, id)
+	require.NoError(t, err)
+	assert.Equal(t, 1.0, updated.Hours)
+	assert.Equal(t, writeTestComment+" (updated)", updated.Comment)
+
+	require.NoError(t, client.TimeReports.Delete(ctx, id))
+	deleted = true
+
+	_, err = client.TimeReports.Get(ctx, id)
+	var apiErr *Error
+	require.ErrorAs(t, err, &apiErr)
+	t.Logf("Get after delete returned status %d: %s", apiErr.StatusCode, apiErr.Body)
 }

@@ -8,7 +8,7 @@ import (
 	"strconv"
 )
 
-const listAllPageSize = 100
+const MaxPageSize = 100
 
 type SortOrder string
 
@@ -50,7 +50,7 @@ func listAll[T any](ctx context.Context, c *Client, path string, params any) ite
 			return
 		}
 		setIfAbsent(query, "page", "1")
-		setIfAbsent(query, "pageSize", strconv.Itoa(listAllPageSize))
+		setIfAbsent(query, "pageSize", strconv.Itoa(MaxPageSize))
 		pageNumber, _ := strconv.Atoi(query.Get("page"))
 		for {
 			query.Set("page", strconv.Itoa(pageNumber))

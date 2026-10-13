@@ -1,0 +1,101 @@
+{
+  "objectName": "project.list",
+  "id": 42,
+  "orderNumber": "26",
+  "title": "Lorem ipsum",
+  "status": {
+    "objectName": "project.list.status",
+    "id": 1,
+    "name": "Ongoing",
+    "isCompletedStatus": false
+  },
+  "readyForInvoice": true,
+  "category": {
+    "objectName": "project.list.category",
+    "id": 1,
+    "name": "Lorem ipsum",
+    "color": "#e3168a"
+  },
+  "invoiceText": "Lorem ipsum",
+  "yourReference": "Lorem ipsum",
+  "ourReference": "Lorem ipsum",
+  "customerReferenceMarking": "Lorem ipsum",
+  "salesResponsible": {
+    "objectName": "generic.name_id",
+    "id": 1,
+    "name": "John Doe"
+  },
+  "description": "Lorem ipsum",
+  "startDate": "2021-02-01",
+  "endDate": "2022-02-15",
+  "invoiceType": "Ongoing",
+  "location": {
+    "objectName": "project.list.location",
+    "longitude": 21.48181104660036,
+    "latitude": 65.3175658912035,
+    "streetAddress": "Some street 123",
+    "postalCode": "94100",
+    "city": "Washington",
+    "countryName": "USA"
+  },
+  "projectManager": {
+    "objectName": "generic.name_id",
+    "id": 1,
+    "name": "John Doe"
+  },
+  "customer": {
+    "objectName": "generic.name_id",
+    "id": 1,
+    "name": "Ipsum"
+  },
+  "projectCollection": {
+    "objectName": "projectcollection.name_id",
+    "id": 14,
+    "name": "Dolar sit amet",
+    "number": "P012"
+  },
+  "tags": [
+    {
+      "objectName": "generic.tag",
+      "id": 1,
+      "title": "Ipsum",
+      "color": "#41b18b",
+      "internalColorId": 1
+    }
+  ],
+  "costCenter": {
+    "objectName": "costcenter.name_id",
+    "id": 123,
+    "name": "Cost Center 123",
+    "code": "CC123"
+  },
+  "bookingProject": {
+    "objectName": "generic.name_id",
+    "id": 609,
+    "name": "Booking Project 570"
+  },
+  "createdBy": {
+    "objectName": "generic.name_id",
+    "id": 1,
+    "name": "John Doe"
+  },
+  "updatedBy": null,
+  "created": "2026-09-28 09:40:57 +00:00",
+  "updated": null,
+  "completedDate": "2026-10-12 09:40:57 +00:00",
+  "electronicInvoiceReferenceCode": "Lorem ipsum",
+  "importantInvoiceInformation": "Lorem ipsum",
+  "allIsMember": false,
+  "members": [
+    {
+      "objectName": "generic.name_id",
+      "id": 1,
+      "name": "John Doe"
+    },
+    {
+      "objectName": "generic.name_id",
+      "id": 2,
+      "name": "Jane Doe"
+    }
+  ]
+}

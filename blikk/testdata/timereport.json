@@ -1,0 +1,64 @@
+{
+  "objectName": "timereport.detail",
+  "id": 270,
+  "date": "2021-08-30",
+  "clockStart": null,
+  "clockEnd": null,
+  "hours": 8,
+  "invoiceableHours": 7,
+  "breakMinutes": null,
+  "cost": 200,
+  "rate": 500,
+  "discount": null,
+  "comment": "A comment that is visible on the invoice",
+  "internalComment": "A comment that is not visible on the invoice",
+  "sentToAttestDate": "2021-09-15 07:02:16 +00:00",
+  "attestedDate": "2021-09-15 07:10:18 +00:00",
+  "attestedByUser": null,
+  "user": {
+    "objectName": "generic.name_id",
+    "id": 1,
+    "name": "John Doe"
+  },
+  "contact": {
+    "objectName": "generic.name_id",
+    "id": 87,
+    "name": "Microsoft"
+  },
+  "project": {
+    "objectName": "project.name_id",
+    "id": 19,
+    "name": "Maintenance",
+    "number": "12"
+  },
+  "internalProject": null,
+  "absenceProject": null,
+  "activity": {
+    "objectName": "generic.name_id",
+    "id": 34,
+    "name": "Project management"
+  },
+  "timeCode": {
+    "objectName": "generic.name_id",
+    "id": 16,
+    "name": "Normal"
+  },
+  "timeArticle": {
+    "objectName": "generic.name_id",
+    "id": 49,
+    "name": "Work hours"
+  },
+  "costCenter": null,
+  "bookingProject": null,
+  "invoiceId": null,
+  "invoicedDate": null,
+  "invoiceDraftId": null,
+  "task": null,
+  "travelReport": null,
+  "allowanceReport": null,
+  "materials": [],
+  "equipments": [],
+  "additions": [],
+  "createdDate": "2021-09-15 05:02:04 +00:00",
+  "updatedDate": null
+}

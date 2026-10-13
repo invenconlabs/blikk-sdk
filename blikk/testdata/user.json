@@ -1,0 +1,65 @@
+{
+  "objectName": "user.detail",
+  "id": 1,
+  "firstName": "John",
+  "lastName": "Doe",
+  "license": "Total",
+  "email": "john.doe@test.com",
+  "socialSecurityNumber": null,
+  "mobilePhoneNumber": "+46701234567",
+  "workPhoneNumber": null,
+  "note": "This is a note about this user",
+  "startDate": "2021-12-01",
+  "endDate": null,
+  "department": {
+    "objectName": "generic.name_id",
+    "id": 1,
+    "name": "Developers"
+  },
+  "costCenter": null,
+  "salaryType": "Monthly",
+  "costPerHour": 450.0,
+  "employeeNumber": "12",
+  "settlementAccount": null,
+  "address": null,
+  "nextOfKin": null,
+  "nextOfKinRelation": null,
+  "nextOfKinPhoneNumber": null,
+  "manager": {
+    "objectName": "generic.name_id",
+    "id": 1,
+    "name": "John Doe"
+  },
+  "schedule": {
+    "objectName": "generic.name_id",
+    "id": 1,
+    "name": "Full time"
+  },
+  "standardTimeArticle": {
+    "objectName": "generic.name_id",
+    "id": 1,
+    "name": "Consulting"
+  },
+  "standardActivity": {
+    "objectName": "generic.name_id",
+    "id": 1,
+    "name": "Project management"
+  },
+  "timeReportingProfile": {
+    "objectName": "generic.name_id",
+    "id": 1,
+    "name": "Base reporting profile"
+  },
+  "timeBankEnabled": false,
+  "currentTimeBank": null,
+  "planningCapacityInPercent": null,
+  "tags": null,
+  "permissions": [
+    "administrator"
+  ],
+  "createdBy": null,
+  "updatedBy": null,
+  "createdDate": "2021-12-15 09:24:13 +00:00",
+  "updatedDate": null,
+  "isRestricted": false
+}

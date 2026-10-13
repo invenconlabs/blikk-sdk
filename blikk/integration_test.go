@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
 	"sync"
 	"testing"
 	"time"
@@ -234,7 +235,7 @@ func borrowTimeReportReferences(t *testing.T, ctx context.Context, client *Clien
 	return input
 }
 
-const materialSearchLimit = 50
+const additionSearchLimit = 100
 
 type recordedResponse struct {
 	statusCode int
@@ -308,33 +309,59 @@ func assertReportIsGone(t *testing.T, ctx context.Context, client *Client, id in
 	t.Logf("Get after delete of %d returned status %d: %s", id, apiErr.StatusCode, apiErr.Body)
 }
 
-func findMaterialToBorrow(t *testing.T, ctx context.Context, client *Client, userID int) (MaterialReport, bool) {
+type additionArticle struct {
+	AdditionType string `json:"additionType"`
+}
+
+func findAdditionToBorrow(t *testing.T, ctx context.Context, client *Client, userID int) (AdditionInput, bool) {
 	t.Helper()
-	page, err := client.TimeReports.List(ctx, TimeReportListParams{
-		ListOptions: ListOptions{PageSize: materialSearchLimit, SortBy: TimeReportSortByDate, SortOrder: SortDescending},
-		UserIDs:     []int{userID},
-	})
-	require.NoError(t, err)
-	for _, listed := range page.Items {
-		report, err := client.TimeReports.Get(ctx, listed.ID)
+	for _, userIDs := range [][]int{{userID}, nil} {
+		page, err := client.TimeReports.List(ctx, TimeReportListParams{
+			ListOptions:  ListOptions{PageSize: additionSearchLimit, SortBy: TimeReportSortByDate, SortOrder: SortDescending},
+			UserIDs:      userIDs,
+			HasAdditions: Ptr(true),
+		})
 		require.NoError(t, err)
-		for _, material := range report.Materials {
-			if material.Article != nil && material.Article.ID != 0 {
-				return material, true
+		for _, listed := range page.Items {
+			report, err := client.TimeReports.Get(ctx, listed.ID)
+			require.NoError(t, err)
+			for _, addition := range report.Additions {
+				if input, ok := additionInputFrom(t, ctx, client, addition); ok {
+					t.Logf("borrowing addition article %d (%q) from report %d: %+v", addition.Article.ID, addition.Article.Name, report.ID, input)
+					return input, true
+				}
 			}
 		}
 	}
-	return MaterialReport{}, false
+	return AdditionInput{}, false
 }
 
-func materialCount(t *testing.T, ctx context.Context, client *Client, id int) int {
+// The detail response has no yesNo/numberCount, so the input field is chosen by the article's additionType.
+func additionInputFrom(t *testing.T, ctx context.Context, client *Client, addition AdditionReport) (AdditionInput, bool) {
+	t.Helper()
+	path, err := resourcePath("v1/admin/articles", strconv.Itoa(addition.Article.ID))
+	require.NoError(t, err)
+	var article additionArticle
+	require.NoError(t, client.do(ctx, http.MethodGet, path, nil, nil, &article))
+	switch {
+	case strings.EqualFold(article.AdditionType, "Number"):
+		return AdditionInput{ArticleID: addition.Article.ID, NumberCount: addition.SalaryCount}, true
+	case strings.EqualFold(article.AdditionType, "Boolean"):
+		return AdditionInput{ArticleID: addition.Article.ID, YesNo: true}, true
+	default:
+		t.Logf("skipping addition article %d with additionType %q", addition.Article.ID, article.AdditionType)
+		return AdditionInput{}, false
+	}
+}
+
+func additionCount(t *testing.T, ctx context.Context, client *Client, id int) int {
 	t.Helper()
 	report, err := client.TimeReports.Get(ctx, id)
 	require.NoError(t, err)
-	return len(report.Materials)
+	return len(report.Additions)
 }
 
-func describeMaterialChange(before, after int) string {
+func describeCountChange(before, after int) string {
 	switch {
 	case after == before:
 		return "kept"
@@ -345,7 +372,7 @@ func describeMaterialChange(before, after int) string {
 	}
 }
 
-func putWithExplicitEmptyMaterials(ctx context.Context, client *Client, id int, input TimeReportInput) error {
+func putWithExplicitEmptyAdditions(ctx context.Context, client *Client, id int, input TimeReportInput) error {
 	encoded, err := json.Marshal(input)
 	if err != nil {
 		return err
@@ -354,7 +381,7 @@ func putWithExplicitEmptyMaterials(ctx context.Context, client *Client, id int, 
 	if err := json.Unmarshal(encoded, &body); err != nil {
 		return err
 	}
-	body["materials"] = []any{}
+	body["additions"] = []any{}
 	return client.do(ctx, http.MethodPut, timeReportPath(id), nil, body, nil)
 }
 
@@ -396,45 +423,44 @@ func TestIntegrationTimeReportCreateUpdateDelete(t *testing.T) {
 	require.NoError(t, client.TimeReports.Delete(ctx, id))
 	assertReportIsGone(t, ctx, client, id)
 
-	t.Run("PUT slice semantics for materials", func(t *testing.T) {
-		material, found := findMaterialToBorrow(t, ctx, client, userID)
+	t.Run("PUT slice semantics for additions", func(t *testing.T) {
+		addition, found := findAdditionToBorrow(t, ctx, client, userID)
 		if !found {
-			t.Skipf("none of user %d's latest %d time reports has a material with an article; skipping materials probe", userID, materialSearchLimit)
+			t.Skipf("no usable addition in the latest %d reports with additions (user %d first, then tenant-wide); skipping additions probe", additionSearchLimit, userID)
 		}
-		t.Logf("borrowing material article %d (%q)", material.Article.ID, material.Title)
 
 		probes := []struct {
 			description string
 			date        Date
 			put         func(id int, input TimeReportInput) error
 		}{
-			{"PUT with materials omitted (nil)", NewDate(2026, time.October, 21), func(id int, input TimeReportInput) error {
-				input.Materials = nil
+			{"PUT with additions omitted (nil)", NewDate(2026, time.October, 21), func(id int, input TimeReportInput) error {
+				input.Additions = nil
 				return client.TimeReports.Update(ctx, id, input)
 			}},
-			{"PUT with materials as empty slice (omitempty drops it, same wire as nil)", NewDate(2026, time.October, 22), func(id int, input TimeReportInput) error {
-				input.Materials = []MaterialInput{}
+			{"PUT with additions as empty slice (omitempty drops it, same wire as nil)", NewDate(2026, time.October, 22), func(id int, input TimeReportInput) error {
+				input.Additions = []AdditionInput{}
 				return client.TimeReports.Update(ctx, id, input)
 			}},
-			{"PUT with explicit \"materials\":[] on the wire", NewDate(2026, time.October, 23), func(id int, input TimeReportInput) error {
-				input.Materials = nil
-				return putWithExplicitEmptyMaterials(ctx, client, id, input)
+			{"PUT with explicit \"additions\":[] on the wire", NewDate(2026, time.October, 23), func(id int, input TimeReportInput) error {
+				input.Additions = nil
+				return putWithExplicitEmptyAdditions(ctx, client, id, input)
 			}},
 		}
 		for _, probe := range probes {
 			input := references
 			input.Date = probe.date
 			input.Hours = 0.5
-			input.Comment = writeTestComment + " (materials)"
-			input.Materials = []MaterialInput{{ArticleID: material.Article.ID, Title: material.Title, UnitPrice: material.UnitPrice, Units: 1}}
+			input.Comment = writeTestComment + " (additions)"
+			input.Additions = []AdditionInput{addition}
 
 			id := createReportWithCleanup(t, ctx, client, input)
-			before := materialCount(t, ctx, client, id)
-			require.Equal(t, 1, before, "report %d should start with one material", id)
+			before := additionCount(t, ctx, client, id)
+			require.Equal(t, 1, before, "report %d should start with one addition", id)
 
 			require.NoError(t, probe.put(id, input), probe.description)
-			after := materialCount(t, ctx, client, id)
-			t.Logf("%s: materials after = %d (%s)", probe.description, after, describeMaterialChange(before, after))
+			after := additionCount(t, ctx, client, id)
+			t.Logf("%s: additions after = %d (%s)", probe.description, after, describeCountChange(before, after))
 
 			require.NoError(t, client.TimeReports.Delete(ctx, id))
 			assertReportIsGone(t, ctx, client, id)

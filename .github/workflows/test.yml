@@ -122,3 +122,4 @@ jobs:
           comment: true
           detailed_summary: true
           failed_summary_logs: true
+          skip_success_summary: true

@@ -122,4 +122,3 @@ jobs:
           comment: true
           detailed_summary: true
           failed_summary_logs: true
-          include_empty_in_summary: false

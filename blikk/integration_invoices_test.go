@@ -43,7 +43,7 @@ func TestIntegrationInvoiceAttachments(t *testing.T) {
 
 	invoiceID, attachment := firstInvoiceAttachment(t, ctx, client)
 	if attachment == nil {
-		t.Skip("none of the 100 newest invoices has an attachment")
+		t.Skipf("none of the %d newest invoices has an attachment", invoicesScannedForAttachments)
 	}
 	assert.NotZero(t, attachment.ID)
 	assert.NotEmpty(t, attachment.Name)
@@ -57,9 +57,12 @@ func TestIntegrationInvoiceAttachments(t *testing.T) {
 	t.Logf("attachment %q content type %q, download filename %q content type %q", attachment.Name, attachment.ContentType, download.Filename, download.ContentType)
 }
 
+// Each invoice costs one rate-limited request, so scanning a full page took about 25 seconds.
+const invoicesScannedForAttachments = 20
+
 func firstInvoiceAttachment(t *testing.T, ctx context.Context, client *Client) (int, *InvoiceAttachment) {
 	t.Helper()
-	invoices, err := client.Invoices.List(ctx, InvoiceListParams{ListOptions: ListOptions{PageSize: MaxPageSize, SortBy: InvoiceSortByCreatedDate, SortOrder: SortDescending}})
+	invoices, err := client.Invoices.List(ctx, InvoiceListParams{ListOptions: ListOptions{PageSize: invoicesScannedForAttachments, SortBy: InvoiceSortByCreatedDate, SortOrder: SortDescending}})
 	require.NoError(t, err)
 	for _, invoice := range invoices.Items {
 		attachments, err := client.Invoices.ListAttachments(ctx, invoice.ID, ListOptions{PageSize: 1})

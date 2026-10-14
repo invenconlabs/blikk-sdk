@@ -60,4 +60,5 @@ func TestIntegrationTaskSubresourceOfMissingTask(t *testing.T) {
 	var apiErr *Error
 	require.ErrorAs(t, err, &apiErr)
 	assert.Equal(t, 400, apiErr.StatusCode, "the API answers a missing task with 400, not 404")
+	assert.True(t, IsNotFound(err), "a 400 saying the task could not be found counts as not found: %v", err)
 }

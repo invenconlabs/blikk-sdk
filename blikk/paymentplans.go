@@ -56,10 +56,10 @@ type PaymentPlanInput struct {
 }
 
 type PaymentPlanArticleRowInput struct {
-	ArticleNumber string  `json:"articleNumber,omitempty"`
-	Description   string  `json:"description,omitempty"`
-	Quantity      float64 `json:"quantity,omitempty"`
-	UnitPrice     float64 `json:"unitPrice,omitempty"`
+	ArticleNumber string   `json:"articleNumber,omitempty"`
+	Description   string   `json:"description,omitempty"`
+	Quantity      *float64 `json:"quantity,omitempty"`
+	UnitPrice     float64  `json:"unitPrice,omitempty"`
 }
 
 type PaymentPlanCreateResult struct {

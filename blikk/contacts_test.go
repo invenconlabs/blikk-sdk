@@ -126,13 +126,15 @@ func TestContactsGetByExternalIDAndCustomerNumberUseLookupPaths(t *testing.T) {
 	assert.Len(t, handler.all(), 2)
 }
 
-func TestContactsCreateSendsFullBodyAndReturnsID(t *testing.T) {
+func TestContactsCreateSendsFullBodyAndReturnsContact(t *testing.T) {
 	client, handler := newRecordingClient(t, respondWith(http.StatusCreated, string(loadFixture(t, "contact.json"))))
 
-	id, err := client.Contacts.Create(context.Background(), fullContactInput())
+	contact, err := client.Contacts.Create(context.Background(), fullContactInput())
 
 	require.NoError(t, err)
-	assert.Equal(t, 32, id)
+	assert.Equal(t, 32, contact.ID)
+	assert.Equal(t, "Lotta Larsson", contact.Name)
+	assert.Equal(t, ContactTypePerson, contact.ContactType)
 	request := handler.last()
 	assert.Equal(t, http.MethodPost, request.Method)
 	assert.Equal(t, "/v1/Core/Contacts", request.Path)
@@ -168,10 +170,10 @@ func TestContactsCreateSendsFullBodyAndReturnsID(t *testing.T) {
 func TestContactsCreateSendsMinimalBody(t *testing.T) {
 	client, handler := newRecordingClient(t, respondWith(http.StatusCreated, `{"id":33}`))
 
-	id, err := client.Contacts.Create(context.Background(), ContactInput{Name: "Lotta Larsson", ContactType: ContactTypePerson})
+	contact, err := client.Contacts.Create(context.Background(), ContactInput{Name: "Lotta Larsson", ContactType: ContactTypePerson})
 
 	require.NoError(t, err)
-	assert.Equal(t, 33, id)
+	assert.Equal(t, 33, contact.ID)
 	assert.JSONEq(t, `{
 		"name": "Lotta Larsson",
 		"contactType": "Person",

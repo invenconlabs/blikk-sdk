@@ -43,7 +43,7 @@ type CostCenter struct {
 type CostCenterInput struct {
 	Name     string `json:"name"`
 	Code     string `json:"code,omitempty"`
-	IsActive bool   `json:"isActive"`
+	IsActive *bool  `json:"isActive,omitempty"`
 }
 
 func (s *CostCentersService) List(ctx context.Context, params CostCenterListParams) (*Page[CostCenter], error) {

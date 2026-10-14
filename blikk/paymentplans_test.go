@@ -81,7 +81,7 @@ func TestPaymentPlansCreateSendsDocumentedBodyAndDecodesResult(t *testing.T) {
 		Date:        DateTimeOf(time.Date(2026, 8, 1, 0, 0, 0, 0, time.UTC)),
 		Amount:      12000,
 		Description: "Installation",
-		ArticleRows: []PaymentPlanArticleRowInput{{ArticleNumber: "PP01", Description: "Installation + material", Quantity: 1, UnitPrice: 12000}},
+		ArticleRows: []PaymentPlanArticleRowInput{{ArticleNumber: "PP01", Description: "Installation + material", Quantity: Ptr(1.0), UnitPrice: 12000}},
 	})
 
 	require.NoError(t, err)
@@ -112,6 +112,18 @@ func TestPaymentPlansCreateMinimalBodyOmitsOptionalFields(t *testing.T) {
 	}, handler.last().jsonBody(t))
 }
 
+func TestPaymentPlansCreateSendsExplicitZeroQuantity(t *testing.T) {
+	client, handler := newRecordingClient(t, serveFixture(t, "paymentplans_create_result.json"))
+
+	_, err := client.PaymentPlans.Create(context.Background(), PaymentPlanInput{
+		ProjectID:   1,
+		ArticleRows: []PaymentPlanArticleRowInput{{ArticleNumber: "PP01", Quantity: Ptr(0.0)}},
+	})
+
+	require.NoError(t, err)
+	assert.Equal(t, []any{map[string]any{"articleNumber": "PP01", "quantity": 0.0}}, handler.last().jsonBody(t)["articleRows"])
+}
+
 func TestPaymentPlanInputReadsDocumentedRequest(t *testing.T) {
 	var input PaymentPlanInput
 	require.NoError(t, json.Unmarshal(loadFixture(t, "paymentplans_create_input.json"), &input))
@@ -119,6 +131,6 @@ func TestPaymentPlanInputReadsDocumentedRequest(t *testing.T) {
 	assert.Equal(t, PaymentPlanInput{
 		ProjectID:   1,
 		Date:        DateTimeOf(time.Date(2026, 8, 1, 0, 0, 0, 0, time.UTC)),
-		ArticleRows: []PaymentPlanArticleRowInput{{ArticleNumber: "PP01", Description: "Installation + material", Quantity: 1, UnitPrice: 12000}},
+		ArticleRows: []PaymentPlanArticleRowInput{{ArticleNumber: "PP01", Description: "Installation + material", Quantity: Ptr(1.0), UnitPrice: 12000}},
 	}, input)
 }

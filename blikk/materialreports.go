@@ -28,8 +28,8 @@ type MaterialReportListParams struct {
 	UpdatedDateTo         DateTime `query:"filter.updatedDateTo"`
 	CreatedOrUpdatedSince DateTime `query:"filter.createdOrUpdatedSince"`
 	Query                 string   `query:"filter.query"`
-	OnlyText              bool     `query:"filter.onlyText"`
-	OnlyInvoiced          bool     `query:"filter.onlyInvoiced"`
+	OnlyText              *bool    `query:"filter.onlyText"`
+	OnlyInvoiced          *bool    `query:"filter.onlyInvoiced"`
 	ProjectID             int      `query:"filter.projectId"`
 	TimeReportID          int      `query:"filter.timeReportId"`
 }
@@ -71,21 +71,21 @@ type MaterialReportCreateInput struct {
 	InvoiceableUnits float64  `json:"invoicableUnits"`
 	Title            string   `json:"title,omitempty"`
 	UnitText         string   `json:"unitText,omitempty"`
-	Cost             float64  `json:"cost,omitempty"`
-	UnitPrice        float64  `json:"unitPrice,omitempty"`
-	Discount         float64  `json:"discount,omitempty"`
+	Cost             *float64 `json:"cost,omitempty"`
+	UnitPrice        *float64 `json:"unitPrice,omitempty"`
+	Discount         *float64 `json:"discount,omitempty"`
 	Created          DateTime `json:"created,omitzero"`
 }
 
 type MaterialReportUpdateInput struct {
-	ArticleNumber    string  `json:"articleNumber,omitempty"`
-	Units            float64 `json:"units,omitempty"`
-	InvoiceableUnits float64 `json:"invoicableUnits,omitempty"`
-	Title            string  `json:"title,omitempty"`
-	UnitText         string  `json:"unitText,omitempty"`
-	Cost             float64 `json:"cost,omitempty"`
-	UnitPrice        float64 `json:"unitPrice,omitempty"`
-	Discount         float64 `json:"discount,omitempty"`
+	ArticleNumber    string   `json:"articleNumber,omitempty"`
+	Units            *float64 `json:"units,omitempty"`
+	InvoiceableUnits *float64 `json:"invoicableUnits,omitempty"`
+	Title            string   `json:"title,omitempty"`
+	UnitText         string   `json:"unitText,omitempty"`
+	Cost             *float64 `json:"cost,omitempty"`
+	UnitPrice        *float64 `json:"unitPrice,omitempty"`
+	Discount         *float64 `json:"discount,omitempty"`
 }
 
 func (s *MaterialReportsService) List(ctx context.Context, params MaterialReportListParams) (*Page[MaterialReport], error) {

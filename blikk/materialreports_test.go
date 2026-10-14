@@ -22,8 +22,8 @@ func TestMaterialReportsListEncodesEveryFilter(t *testing.T) {
 		UpdatedDateTo:         moment,
 		CreatedOrUpdatedSince: moment,
 		Query:                 "cable",
-		OnlyText:              true,
-		OnlyInvoiced:          true,
+		OnlyText:              Ptr(true),
+		OnlyInvoiced:          Ptr(false),
 		ProjectID:             407,
 		TimeReportID:          270,
 	})
@@ -42,7 +42,7 @@ func TestMaterialReportsListEncodesEveryFilter(t *testing.T) {
 		"filter.createdOrUpdatedSince": {"2026-09-01 12:00:00"},
 		"filter.query":                 {"cable"},
 		"filter.onlyText":              {"true"},
-		"filter.onlyInvoiced":          {"true"},
+		"filter.onlyInvoiced":          {"false"},
 		"filter.projectId":             {"407"},
 		"filter.timeReportId":          {"270"},
 	}, request.Query)
@@ -107,9 +107,9 @@ func TestMaterialReportsCreateSendsFullBody(t *testing.T) {
 		InvoiceableUnits: 2,
 		Title:            "My article",
 		UnitText:         "pcs",
-		Cost:             200,
-		UnitPrice:        250,
-		Discount:         10,
+		Cost:             Ptr(200.0),
+		UnitPrice:        Ptr(250.0),
+		Discount:         Ptr(10.0),
 		Created:          DateTimeOf(time.Date(2026, 9, 28, 7, 16, 57, 0, time.UTC)),
 	})
 
@@ -146,18 +146,41 @@ func TestMaterialReportsCreateMinimalBodyKeepsRequiredFields(t *testing.T) {
 	}, handler.last().jsonBody(t))
 }
 
+func TestMaterialReportsCreateSendsExplicitZeroPrices(t *testing.T) {
+	client, handler := newRecordingClient(t, respondWith(http.StatusOK, `{"id":8}`))
+
+	_, err := client.MaterialReports.Create(context.Background(), MaterialReportCreateInput{
+		ArticleID: 12,
+		ProjectID: 1,
+		Cost:      Ptr(0.0),
+		UnitPrice: Ptr(0.0),
+		Discount:  Ptr(0.0),
+	})
+
+	require.NoError(t, err)
+	assert.Equal(t, map[string]any{
+		"articleId":       12.0,
+		"workOrderId":     1.0,
+		"units":           0.0,
+		"invoicableUnits": 0.0,
+		"cost":            0.0,
+		"unitPrice":       0.0,
+		"discount":        0.0,
+	}, handler.last().jsonBody(t))
+}
+
 func TestMaterialReportsUpdateSendsFullBody(t *testing.T) {
 	client, handler := newRecordingClient(t, respondWith(http.StatusOK, ""))
 
 	err := client.MaterialReports.Update(context.Background(), 1, MaterialReportUpdateInput{
 		ArticleNumber:    "PP02",
-		Units:            2,
-		InvoiceableUnits: 3,
+		Units:            Ptr(2.0),
+		InvoiceableUnits: Ptr(3.0),
 		Title:            "Updated material report title",
 		UnitText:         "Updated unit text",
-		Cost:             100,
-		UnitPrice:        300,
-		Discount:         20,
+		Cost:             Ptr(100.0),
+		UnitPrice:        Ptr(300.0),
+		Discount:         Ptr(20.0),
 	})
 
 	require.NoError(t, err)
@@ -183,6 +206,27 @@ func TestMaterialReportsUpdateMinimalBodyIsEmpty(t *testing.T) {
 
 	require.NoError(t, err)
 	assert.Equal(t, map[string]any{"title": "Renamed"}, handler.last().jsonBody(t))
+}
+
+func TestMaterialReportsUpdateSendsExplicitZeros(t *testing.T) {
+	client, handler := newRecordingClient(t, respondWith(http.StatusOK, ""))
+
+	err := client.MaterialReports.Update(context.Background(), 1, MaterialReportUpdateInput{
+		Units:            Ptr(0.0),
+		InvoiceableUnits: Ptr(0.0),
+		Cost:             Ptr(0.0),
+		UnitPrice:        Ptr(0.0),
+		Discount:         Ptr(0.0),
+	})
+
+	require.NoError(t, err)
+	assert.Equal(t, map[string]any{
+		"units":           0.0,
+		"invoicableUnits": 0.0,
+		"cost":            0.0,
+		"unitPrice":       0.0,
+		"discount":        0.0,
+	}, handler.last().jsonBody(t))
 }
 
 func TestMaterialReportsDelete(t *testing.T) {

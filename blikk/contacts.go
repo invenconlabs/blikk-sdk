@@ -191,9 +191,8 @@ func (s *ContactsService) GetByCustomerNumber(ctx context.Context, customerNumbe
 	return getResource[Contact](ctx, s.client, contactsPath, "byCustomerNumber", customerNumber)
 }
 
-// Create returns the ID of the new contact.
-func (s *ContactsService) Create(ctx context.Context, input ContactInput) (int, error) {
-	return createResourceID(ctx, s.client, input, contactsPath)
+func (s *ContactsService) Create(ctx context.Context, input ContactInput) (*Contact, error) {
+	return createResource[Contact](ctx, s.client, input, contactsPath)
 }
 
 // Update replaces the whole contact; the API requires ResponsibleID here and clears ExternalID when it is left empty.

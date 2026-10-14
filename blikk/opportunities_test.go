@@ -110,21 +110,37 @@ func TestOpportunityStateAcceptsLowercaseDocsSpelling(t *testing.T) {
 }
 
 func TestOpportunitiesCreateSendsFullInput(t *testing.T) {
-	client, handler := newRecordingClient(t, respondWith(http.StatusCreated, `{"id": 42}`))
+	client, handler := newRecordingClient(t, respondWith(http.StatusCreated, `{
+		"objectName": "opportunity",
+		"id": 42,
+		"customerId": 1,
+		"title": "Lorem",
+		"statusId": 2,
+		"turnover": 1500.5,
+		"estimatedClosingDate": "2026-12-31 00:00:00",
+		"description": "Ipsum",
+		"userId": 3,
+		"createdDate": "2026-10-14 08:30:00",
+		"createdById": 7
+	}`))
 	closing := DateTimeOf(time.Date(2026, 12, 31, 0, 0, 0, 0, time.UTC))
 
-	id, err := client.Opportunities.Create(context.Background(), OpportunityCreateInput{
+	created, err := client.Opportunities.Create(context.Background(), OpportunityCreateInput{
 		CustomerID:           1,
 		Title:                "Lorem",
 		StatusID:             2,
 		UserID:               3,
 		Turnover:             1500.5,
-		EstimatedClosingDate: &closing,
+		EstimatedClosingDate: closing,
 		Description:          "Ipsum",
 	})
 
 	require.NoError(t, err)
-	assert.Equal(t, 42, id)
+	assert.Equal(t, 42, created.ID)
+	assert.Equal(t, "Lorem", created.Title)
+	assert.Equal(t, &closing, created.EstimatedClosingDate)
+	assert.Equal(t, 7, created.CreatedByID)
+	assert.Equal(t, DateTimeOf(time.Date(2026, 10, 14, 8, 30, 0, 0, time.UTC)), created.CreatedDate)
 	request := handler.last()
 	assert.Equal(t, http.MethodPost, request.Method)
 	assert.Equal(t, "/v1/Core/Opportunities", request.Path)
@@ -165,7 +181,7 @@ func TestOpportunitiesUpdateSendsFullInput(t *testing.T) {
 		CustomerID:           1,
 		ContactID:            4,
 		Turnover:             1500.5,
-		EstimatedClosingDate: &closing,
+		EstimatedClosingDate: closing,
 		TagIDs:               []int{5, 6},
 	})
 

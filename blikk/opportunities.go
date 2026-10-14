@@ -90,25 +90,38 @@ type Opportunity struct {
 }
 
 type OpportunityCreateInput struct {
+	CustomerID           int      `json:"customerId"`
+	Title                string   `json:"title"`
+	StatusID             int      `json:"statusId"`
+	UserID               int      `json:"userId"`
+	Turnover             float64  `json:"turnover,omitempty"`
+	EstimatedClosingDate DateTime `json:"estimatedClosingDate,omitzero"`
+	Description          string   `json:"description,omitempty"`
+}
+
+type OpportunityCreateResult struct {
+	ID                   int       `json:"id"`
 	CustomerID           int       `json:"customerId"`
 	Title                string    `json:"title"`
 	StatusID             int       `json:"statusId"`
+	Turnover             float64   `json:"turnover"`
+	EstimatedClosingDate *DateTime `json:"estimatedClosingDate"`
+	Description          string    `json:"description"`
 	UserID               int       `json:"userId"`
-	Turnover             float64   `json:"turnover,omitempty"`
-	EstimatedClosingDate *DateTime `json:"estimatedClosingDate,omitempty"`
-	Description          string    `json:"description,omitempty"`
+	CreatedDate          DateTime  `json:"createdDate"`
+	CreatedByID          int       `json:"createdById"`
 }
 
 type OpportunityUpdateInput struct {
-	Title                string    `json:"title"`
-	UserID               int       `json:"userId"`
-	Probability          int       `json:"probability"`
-	Description          string    `json:"description,omitempty"`
-	CustomerID           int       `json:"customerId,omitempty"`
-	ContactID            int       `json:"contactId,omitempty"`
-	Turnover             float64   `json:"turnover,omitempty"`
-	EstimatedClosingDate *DateTime `json:"estimatedClosingDate,omitempty"`
-	TagIDs               []int     `json:"tagIds,omitempty"`
+	Title                string   `json:"title"`
+	UserID               int      `json:"userId"`
+	Probability          int      `json:"probability"`
+	Description          string   `json:"description,omitempty"`
+	CustomerID           int      `json:"customerId,omitempty"`
+	ContactID            int      `json:"contactId,omitempty"`
+	Turnover             float64  `json:"turnover,omitempty"`
+	EstimatedClosingDate DateTime `json:"estimatedClosingDate,omitzero"`
+	TagIDs               []int    `json:"tagIds,omitempty"`
 }
 
 func (s *OpportunitiesService) List(ctx context.Context, params OpportunityListParams) (*Page[OpportunityListItem], error) {
@@ -124,9 +137,8 @@ func (s *OpportunitiesService) Get(ctx context.Context, id int) (*Opportunity, e
 	return getResource[Opportunity](ctx, s.client, opportunitiesPath, strconv.Itoa(id))
 }
 
-// Create returns the ID of the new opportunity.
-func (s *OpportunitiesService) Create(ctx context.Context, input OpportunityCreateInput) (int, error) {
-	return createResourceID(ctx, s.client, input, opportunitiesPath)
+func (s *OpportunitiesService) Create(ctx context.Context, input OpportunityCreateInput) (*OpportunityCreateResult, error) {
+	return createResource[OpportunityCreateResult](ctx, s.client, input, opportunitiesPath)
 }
 
 // Update replaces the whole opportunity; any field left unset in input is cleared.

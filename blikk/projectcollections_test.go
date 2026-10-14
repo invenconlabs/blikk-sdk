@@ -12,7 +12,7 @@ import (
 func TestProjectCollectionsListEncodesSortingAndDecodesFixture(t *testing.T) {
 	client, handler := newRecordingClient(t, serveFixtureAt(t, http.MethodGet, "/v1/Core/ProjectCollections", "projectcollections_list.json"))
 
-	page, err := client.ProjectCollections.List(context.Background(), ListOptions{PageSize: 50, SortBy: ProjectCollectionSortByProjectNumber, SortOrder: SortAscending})
+	page, err := client.ProjectCollections.List(context.Background(), ProjectCollectionListParams{ListOptions: ListOptions{PageSize: 50, SortBy: ProjectCollectionSortByProjectNumber, SortOrder: SortAscending}})
 
 	require.NoError(t, err)
 	assert.Equal(t, map[string][]string{

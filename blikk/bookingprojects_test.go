@@ -128,8 +128,8 @@ func TestBookingProjectsCreateSendsFullInput(t *testing.T) {
 		Name:          "Booking Project 1",
 		BookingNumber: "123",
 		IsActive:      Ptr(false),
-		StartDate:     &start,
-		EndDate:       &end,
+		StartDate:     start,
+		EndDate:       end,
 	})
 
 	require.NoError(t, err)

@@ -90,38 +90,38 @@ func TestCostCentersGetByCodeSendsCodeQuery(t *testing.T) {
 	assert.Equal(t, 42, costCenter.ID)
 }
 
-func TestCostCentersCreateSendsBodyAndReturnsID(t *testing.T) {
+func TestCostCentersCreateSendsBodyAndReturnsCostCenter(t *testing.T) {
 	handler := &recordingHandler{respond: func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusCreated)
 		_, _ = w.Write(loadFixture(t, "costcenter.json"))
 	}}
 	client := newTestClient(t, handler.ServeHTTP)
 
-	id, err := client.CostCenters.Create(context.Background(), CostCenterInput{Name: "Cost Center 1", Code: "123", IsActive: Ptr(false)})
+	costCenter, err := client.CostCenters.Create(context.Background(), CostCenterInput{Name: "Cost Center 1", Code: "123"})
 
 	require.NoError(t, err)
-	assert.Equal(t, 42, id)
+	assert.Equal(t, 42, costCenter.ID)
 	request := handler.last()
 	assert.Equal(t, http.MethodPost, request.Method)
 	assert.Equal(t, "/v1/Admin/CostCenters", request.Path)
 	assert.Equal(t, map[string]any{"name": "Cost Center 1", "code": "123", "isActive": false}, request.jsonBody(t))
 }
 
-func TestCostCentersCreateMinimalInputSendsOnlyName(t *testing.T) {
+func TestCostCentersCreateMinimalInputSendsNameAndIsActive(t *testing.T) {
 	handler := &recordingHandler{respond: serveFixture(t, "costcenter.json")}
 	client := newTestClient(t, handler.ServeHTTP)
 
 	_, err := client.CostCenters.Create(context.Background(), CostCenterInput{Name: "Cost Center 1"})
 
 	require.NoError(t, err)
-	assert.Equal(t, map[string]any{"name": "Cost Center 1"}, handler.last().jsonBody(t))
+	assert.Equal(t, map[string]any{"name": "Cost Center 1", "isActive": false}, handler.last().jsonBody(t))
 }
 
 func TestCostCentersUpdateSendsPutAndReturnsCostCenter(t *testing.T) {
 	handler := &recordingHandler{respond: serveFixture(t, "costcenter.json")}
 	client := newTestClient(t, handler.ServeHTTP)
 
-	costCenter, err := client.CostCenters.Update(context.Background(), 42, CostCenterInput{Name: "Cost Center 1", Code: "123", IsActive: Ptr(true)})
+	costCenter, err := client.CostCenters.Update(context.Background(), 42, CostCenterInput{Name: "Cost Center 1", Code: "123", IsActive: true})
 
 	require.NoError(t, err)
 	assert.Equal(t, 42, costCenter.ID)
@@ -138,5 +138,5 @@ func TestCostCentersUpdateMinimalInputSendsOnlyName(t *testing.T) {
 	_, err := client.CostCenters.Update(context.Background(), 42, CostCenterInput{Name: "Cost Center 1"})
 
 	require.NoError(t, err)
-	assert.Equal(t, map[string]any{"name": "Cost Center 1"}, handler.last().jsonBody(t))
+	assert.Equal(t, map[string]any{"name": "Cost Center 1", "isActive": false}, handler.last().jsonBody(t))
 }

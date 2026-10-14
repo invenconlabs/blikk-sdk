@@ -77,17 +77,17 @@ func TestUnitsGetByNameSendsNameQuery(t *testing.T) {
 	assert.Equal(t, 42, unit.ID)
 }
 
-func TestUnitsCreateSendsBodyAndReturnsID(t *testing.T) {
+func TestUnitsCreateSendsBodyAndReturnsUnit(t *testing.T) {
 	handler := &recordingHandler{respond: func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusCreated)
 		_, _ = w.Write(loadFixture(t, "unit.json"))
 	}}
 	client := newTestClient(t, handler.ServeHTTP)
 
-	id, err := client.Units.Create(context.Background(), UnitInput{Name: "Unit 1", SortOrder: 1, IsStandard: true})
+	unit, err := client.Units.Create(context.Background(), UnitInput{Name: "Unit 1", SortOrder: 1, IsStandard: true})
 
 	require.NoError(t, err)
-	assert.Equal(t, 42, id)
+	assert.Equal(t, 42, unit.ID)
 	request := handler.last()
 	assert.Equal(t, http.MethodPost, request.Method)
 	assert.Equal(t, "/v1/Admin/Units", request.Path)

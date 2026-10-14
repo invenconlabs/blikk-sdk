@@ -40,11 +40,10 @@ type CostCenter struct {
 	Updated   *DateTime `json:"updated"`
 }
 
-// IsActive is a pointer so that an explicit false can be sent.
 type CostCenterInput struct {
 	Name     string `json:"name"`
 	Code     string `json:"code,omitempty"`
-	IsActive *bool  `json:"isActive,omitempty"`
+	IsActive bool   `json:"isActive"`
 }
 
 func (s *CostCentersService) List(ctx context.Context, params CostCenterListParams) (*Page[CostCenter], error) {
@@ -63,8 +62,8 @@ func (s *CostCentersService) GetByCode(ctx context.Context, code string) (*CostC
 	return getResourceWithQuery[CostCenter](ctx, s.client, costCentersPath, url.Values{"code": {code}})
 }
 
-func (s *CostCentersService) Create(ctx context.Context, input CostCenterInput) (int, error) {
-	return createResourceID(ctx, s.client, input, costCentersPath)
+func (s *CostCentersService) Create(ctx context.Context, input CostCenterInput) (*CostCenter, error) {
+	return createResource[CostCenter](ctx, s.client, input, costCentersPath)
 }
 
 func (s *CostCentersService) Update(ctx context.Context, id int, input CostCenterInput) (*CostCenter, error) {

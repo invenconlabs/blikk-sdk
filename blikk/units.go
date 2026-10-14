@@ -56,8 +56,8 @@ func (s *UnitsService) GetByName(ctx context.Context, name string) (*Unit, error
 	return getResourceWithQuery[Unit](ctx, s.client, unitsPath, url.Values{"name": {name}})
 }
 
-func (s *UnitsService) Create(ctx context.Context, input UnitInput) (int, error) {
-	return createResourceID(ctx, s.client, input, unitsPath)
+func (s *UnitsService) Create(ctx context.Context, input UnitInput) (*Unit, error) {
+	return createResource[Unit](ctx, s.client, input, unitsPath)
 }
 
 func (s *UnitsService) Update(ctx context.Context, id int, input UnitInput) (*Unit, error) {

@@ -14,7 +14,7 @@ func TestIntegrationProjectCollections(t *testing.T) {
 	client := integrationClient(t)
 	ctx := integrationContext(t)
 
-	page, err := client.ProjectCollections.List(ctx, ListOptions{PageSize: 10, SortBy: ProjectCollectionSortByName})
+	page, err := client.ProjectCollections.List(ctx, ProjectCollectionListParams{ListOptions: ListOptions{PageSize: 10, SortBy: ProjectCollectionSortByName}})
 	require.NoError(t, err)
 	assert.Equal(t, 1, page.Page)
 	if len(page.Items) == 0 {
@@ -35,7 +35,7 @@ func TestIntegrationProjectCollections(t *testing.T) {
 func TestIntegrationProjectCategories(t *testing.T) {
 	client := integrationClient(t)
 
-	page, err := client.ProjectCategories.List(integrationContext(t), ListOptions{SortBy: ProjectCategorySortByName})
+	page, err := client.ProjectCategories.List(integrationContext(t), ProjectCategoryListParams{ListOptions: ListOptions{SortBy: ProjectCategorySortByName}})
 
 	require.NoError(t, err)
 	assert.Equal(t, 1, page.Page)
@@ -61,7 +61,7 @@ func TestIntegrationProjectStatuses(t *testing.T) {
 func TestIntegrationProjectTags(t *testing.T) {
 	client := integrationClient(t)
 
-	page, err := client.ProjectTags.List(integrationContext(t), ListOptions{SortBy: ProjectTagSortByName})
+	page, err := client.ProjectTags.List(integrationContext(t), ProjectTagListParams{ListOptions: ListOptions{SortBy: ProjectTagSortByName}})
 
 	require.NoError(t, err)
 	assert.Equal(t, 1, page.Page)

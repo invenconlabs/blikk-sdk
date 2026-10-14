@@ -338,7 +338,7 @@ type EquipmentInput struct {
 type AdditionInput struct {
 	ID          int     `json:"id,omitempty"`
 	ArticleID   int     `json:"articleId"`
-	YesNo       bool    `json:"yesNo,omitempty"`
+	YesNo       bool    `json:"yesNo"`
 	NumberCount float64 `json:"numberCount,omitempty"`
 }
 

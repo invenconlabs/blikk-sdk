@@ -127,7 +127,7 @@ type ProjectCreateInput struct {
 	YourReference            string                       `json:"yourReference,omitempty"`
 	OurReference             string                       `json:"ourReference,omitempty"`
 	CustomerReferenceMarking string                       `json:"customerReferenceMarking,omitempty"`
-	AllIsMember              bool                         `json:"allIsMember,omitempty"`
+	AllIsMember              bool                         `json:"allIsMember"`
 }
 
 type ProjectCreateResult struct {
@@ -149,7 +149,7 @@ type ProjectUpdateInput struct {
 	SalesResponsibleID       int                          `json:"salesResponsibleId,omitempty"`
 	Description              string                       `json:"description,omitempty"`
 	StatusID                 int                          `json:"statusId,omitempty"`
-	ReadyForInvoice          bool                         `json:"readyForInvoice,omitempty"`
+	ReadyForInvoice          bool                         `json:"readyForInvoice"`
 	CostCenterID             int                          `json:"costCenterId,omitempty"`
 	BookingProjectID         int                          `json:"bookingProjectId,omitempty"`
 	CategoryID               int                          `json:"categoryId,omitempty"`
@@ -157,7 +157,7 @@ type ProjectUpdateInput struct {
 	YourReference            string                       `json:"yourReference,omitempty"`
 	OurReference             string                       `json:"ourReference,omitempty"`
 	CustomerReferenceMarking string                       `json:"customerReferenceMarking,omitempty"`
-	AllIsMember              bool                         `json:"allIsMember,omitempty"`
+	AllIsMember              bool                         `json:"allIsMember"`
 }
 
 type projectNextNumber struct {
@@ -222,6 +222,7 @@ func (s *ProjectsService) Create(ctx context.Context, input ProjectCreateInput) 
 	return createResource[ProjectCreateResult](ctx, s.client, input, projectsPath)
 }
 
+// Update always sends ReadyForInvoice and AllIsMember, so set them to the values the project should keep.
 func (s *ProjectsService) Update(ctx context.Context, id int, input ProjectUpdateInput) error {
 	input.ID = id
 	return updateResource(ctx, s.client, input, projectsPath, strconv.Itoa(id))

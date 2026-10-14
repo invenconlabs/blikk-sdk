@@ -133,7 +133,7 @@ func TestTasksCreateSendsMinimalInput(t *testing.T) {
 	_, err := client.Tasks.Create(context.Background(), TaskInput{Title: "My task"})
 
 	require.NoError(t, err)
-	assert.Equal(t, map[string]any{"title": "My task"}, handler.last().jsonBody(t))
+	assert.Equal(t, map[string]any{"title": "My task", "isCompleted": false, "timeReportingEnabled": false, "isArchived": false}, handler.last().jsonBody(t))
 }
 
 func TestTasksUpdateSendsPut(t *testing.T) {
@@ -145,7 +145,7 @@ func TestTasksUpdateSendsPut(t *testing.T) {
 	request := handler.last()
 	assert.Equal(t, http.MethodPut, request.Method)
 	assert.Equal(t, "/v1/Core/Tasks/7", request.Path)
-	assert.Equal(t, map[string]any{"title": "Renamed", "projectId": 15.0}, request.jsonBody(t))
+	assert.Equal(t, map[string]any{"title": "Renamed", "projectId": 15.0, "isCompleted": false, "timeReportingEnabled": false, "isArchived": false}, request.jsonBody(t))
 }
 
 func TestTasksDeleteSendsDelete(t *testing.T) {
@@ -246,7 +246,7 @@ func TestTasksCreateChecklistSendsFullInput(t *testing.T) {
 		"name": "Lorem ipsum",
 		"items": []any{
 			map[string]any{"name": "Lorem ipsum dolar", "isCompleted": true},
-			map[string]any{"name": "Lorem ipsum dolar sit"},
+			map[string]any{"name": "Lorem ipsum dolar sit", "isCompleted": false},
 		},
 	}, handler.last().jsonBody(t))
 }
@@ -276,8 +276,8 @@ func TestTasksUpdateChecklistKeepsExistingItemIDs(t *testing.T) {
 	assert.Equal(t, map[string]any{
 		"name": "Lorem ipsum dolar",
 		"items": []any{
-			map[string]any{"id": 1.0, "name": "Existing item"},
-			map[string]any{"name": "New item"},
+			map[string]any{"id": 1.0, "name": "Existing item", "isCompleted": false},
+			map[string]any{"name": "New item", "isCompleted": false},
 		},
 	}, handler.last().jsonBody(t))
 }

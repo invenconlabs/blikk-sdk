@@ -154,13 +154,13 @@ func TestProjectsCreateSendsFullBodyAndDecodesResult(t *testing.T) {
 	}`, string(request.Body))
 }
 
-func TestProjectsCreateMinimalInputSendsOnlyRequiredFields(t *testing.T) {
+func TestProjectsCreateMinimalInputSendsRequiredFieldsAndBooleans(t *testing.T) {
 	client, handler := newRecordingClient(t, respondWith(http.StatusCreated, `{"id":1,"nextProjectNumber":"P-124"}`))
 
 	_, err := client.Projects.Create(context.Background(), ProjectCreateInput{Title: "Lorem projectum", ContactID: 1, ResponsibleID: 2})
 
 	require.NoError(t, err)
-	assert.JSONEq(t, `{"title":"Lorem projectum","contactId":1,"responsibleId":2}`, string(handler.last().Body))
+	assert.JSONEq(t, `{"title":"Lorem projectum","contactId":1,"responsibleId":2,"allIsMember":false}`, string(handler.last().Body))
 }
 
 func TestProjectsUpdateSendsFullBodyWithID(t *testing.T) {
@@ -218,13 +218,13 @@ func TestProjectsUpdateSendsFullBodyWithID(t *testing.T) {
 	}`, string(request.Body))
 }
 
-func TestProjectsUpdateMinimalInputSendsOnlyIDFromArgument(t *testing.T) {
+func TestProjectsUpdateMinimalInputSendsIDFromArgumentAndBooleans(t *testing.T) {
 	client, handler := newRecordingClient(t, respondWith(http.StatusNoContent, ""))
 
 	err := client.Projects.Update(context.Background(), 42, ProjectUpdateInput{ID: 7})
 
 	require.NoError(t, err)
-	assert.JSONEq(t, `{"id":42}`, string(handler.last().Body))
+	assert.JSONEq(t, `{"id":42,"readyForInvoice":false,"allIsMember":false}`, string(handler.last().Body))
 }
 
 func TestProjectsNextProjectNumberUnwrapsObject(t *testing.T) {

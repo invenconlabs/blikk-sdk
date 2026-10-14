@@ -29,6 +29,10 @@ const (
 	ProjectCollectionSortByProjectNumber = "projectNumber"
 )
 
+type ProjectCollectionListParams struct {
+	ListOptions
+}
+
 type ProjectCollection struct {
 	ID            int                        `json:"id"`
 	Name          string                     `json:"name"`
@@ -52,12 +56,12 @@ type projectCollectionNextNumber struct {
 	NextProjectNumberInCollection string `json:"nextProjectNumberInCollection"`
 }
 
-func (s *ProjectCollectionsService) List(ctx context.Context, params ListOptions) (*Page[ProjectCollection], error) {
+func (s *ProjectCollectionsService) List(ctx context.Context, params ProjectCollectionListParams) (*Page[ProjectCollection], error) {
 	return listPage[ProjectCollection](ctx, s.client, projectCollectionsPath, params)
 }
 
 // ListAll walks every page from params.Page onwards; on failure it yields a single error and stops.
-func (s *ProjectCollectionsService) ListAll(ctx context.Context, params ListOptions) iter.Seq2[ProjectCollection, error] {
+func (s *ProjectCollectionsService) ListAll(ctx context.Context, params ProjectCollectionListParams) iter.Seq2[ProjectCollection, error] {
 	return listAll[ProjectCollection](ctx, s.client, projectCollectionsPath, params)
 }
 

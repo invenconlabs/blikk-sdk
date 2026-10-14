@@ -53,11 +53,11 @@ type BookingProject struct {
 
 // BookingProjectInput.IsActive is a pointer because the API defaults it to true on create and keeps it on update when omitted.
 type BookingProjectInput struct {
-	Name          string    `json:"name"`
-	BookingNumber string    `json:"bookingNumber"`
-	IsActive      *bool     `json:"isActive,omitempty"`
-	StartDate     *DateTime `json:"startDate,omitempty"`
-	EndDate       *DateTime `json:"endDate,omitempty"`
+	Name          string   `json:"name"`
+	BookingNumber string   `json:"bookingNumber"`
+	IsActive      *bool    `json:"isActive,omitempty"`
+	StartDate     DateTime `json:"startDate,omitzero"`
+	EndDate       DateTime `json:"endDate,omitzero"`
 }
 
 func (s *BookingProjectsService) List(ctx context.Context, params BookingProjectListParams) (*Page[BookingProject], error) {

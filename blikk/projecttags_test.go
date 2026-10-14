@@ -12,7 +12,7 @@ import (
 func TestProjectTagsListEncodesSortingAndDecodesFixture(t *testing.T) {
 	client, handler := newRecordingClient(t, serveFixtureAt(t, http.MethodGet, "/v1/Admin/ProjectTags", "projecttags_list.json"))
 
-	page, err := client.ProjectTags.List(context.Background(), ListOptions{Page: 2, SortBy: ProjectTagSortByCreatedDate})
+	page, err := client.ProjectTags.List(context.Background(), ProjectTagListParams{ListOptions: ListOptions{Page: 2, SortBy: ProjectTagSortByCreatedDate}})
 
 	require.NoError(t, err)
 	assert.Equal(t, map[string][]string{

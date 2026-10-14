@@ -71,8 +71,8 @@ type TaskMember struct {
 type TaskInput struct {
 	Title                string   `json:"title"`
 	Description          string   `json:"description,omitempty"`
-	IsCompleted          bool     `json:"isCompleted,omitempty"`
-	TimeReportingEnabled bool     `json:"timeReportingEnabled,omitempty"`
+	IsCompleted          bool     `json:"isCompleted"`
+	TimeReportingEnabled bool     `json:"timeReportingEnabled"`
 	Estimate             float64  `json:"estimate,omitempty"`
 	StartDate            DateTime `json:"startDate,omitzero"`
 	EndDate              DateTime `json:"endDate,omitzero"`
@@ -80,7 +80,7 @@ type TaskInput struct {
 	MemberIDs            []int    `json:"memberIds,omitempty"`
 	TaskBoardColumnID    int      `json:"taskBoardColumnId,omitempty"`
 	ProjectID            int      `json:"projectId,omitempty"`
-	IsArchived           bool     `json:"isArchived,omitempty"`
+	IsArchived           bool     `json:"isArchived"`
 }
 
 const TaskCommentSortByCreatedDate = "createdDate"
@@ -119,7 +119,7 @@ type TaskChecklistInput struct {
 type TaskChecklistItemInput struct {
 	ID          int    `json:"id,omitempty"`
 	Name        string `json:"name"`
-	IsCompleted bool   `json:"isCompleted,omitempty"`
+	IsCompleted bool   `json:"isCompleted"`
 }
 
 const TaskAttachmentSortByName = "name"

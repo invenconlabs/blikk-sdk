@@ -12,7 +12,7 @@ import (
 func TestProjectCategoriesListEncodesSortingAndDecodesFixture(t *testing.T) {
 	client, handler := newRecordingClient(t, serveFixtureAt(t, http.MethodGet, "/v1/Admin/ProjectCategories", "projectcategories_list.json"))
 
-	page, err := client.ProjectCategories.List(context.Background(), ListOptions{SortBy: ProjectCategorySortByName, SortOrder: SortDescending})
+	page, err := client.ProjectCategories.List(context.Background(), ProjectCategoryListParams{ListOptions: ListOptions{SortBy: ProjectCategorySortByName, SortOrder: SortDescending}})
 
 	require.NoError(t, err)
 	assert.Equal(t, map[string][]string{
@@ -27,7 +27,7 @@ func TestProjectCategoriesListAllWalksPages(t *testing.T) {
 	client, handler := newRecordingClient(t, serveFixtureAt(t, http.MethodGet, "/v1/Admin/ProjectCategories", "projectcategories_list.json"))
 
 	var names []string
-	for category, err := range client.ProjectCategories.ListAll(context.Background(), ListOptions{}) {
+	for category, err := range client.ProjectCategories.ListAll(context.Background(), ProjectCategoryListParams{}) {
 		require.NoError(t, err)
 		names = append(names, category.Name)
 	}

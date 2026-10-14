@@ -40,7 +40,7 @@ jobs:
           go-version-file: go.mod
 
       - name: Install gotestsum
-        run: go install gotest.tools/gotestsum@v1.13.0
+        run: go install gotest.tools/gotestsum@v1.12.3
 
       - name: Run Go Tidy
         run: go mod tidy -diff
@@ -79,7 +79,7 @@ jobs:
           go-version-file: go.mod
 
       - name: Install gotestsum
-        run: go install gotest.tools/gotestsum@v1.13.0
+        run: go install gotest.tools/gotestsum@v1.12.3
 
       - name: Run Go Tidy
         run: go mod tidy -diff

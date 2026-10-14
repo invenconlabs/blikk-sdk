@@ -100,6 +100,18 @@ func TestMissingUserBadRequestIsNotFound(t *testing.T) {
 	assert.Equal(t, http.StatusBadRequest, apiErr.StatusCode)
 }
 
+func TestCouldNotFindBadRequestIsNotFound(t *testing.T) {
+	client := newTestClient(t, respondWith(http.StatusBadRequest, `{"message":"Could not find the project collection"}`))
+
+	_, err := client.ProjectCollections.NextProjectNumber(context.Background(), 999999999)
+
+	assert.True(t, IsNotFound(err))
+	var apiErr *Error
+	require.ErrorAs(t, err, &apiErr)
+	assert.Equal(t, http.StatusBadRequest, apiErr.StatusCode)
+	assert.Equal(t, "/v1/Core/ProjectCollections/999999999/nextProjectNumber", apiErr.Path)
+}
+
 func TestMissingTimeReportBadRequestIsNotFound(t *testing.T) {
 	client := newTestClient(t, respondWith(http.StatusBadRequest, `{"message":"The request is invalid.","modelState":{"":["The timereport could not be found."]}}`))
 

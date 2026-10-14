@@ -148,7 +148,7 @@ type TaskAttachment struct {
 	Name            string             `json:"name"`
 	Type            TaskAttachmentType `json:"type"`
 	ContentType     string             `json:"contentType"`
-	SizeInBytes     *int               `json:"sizeInBytes"`
+	SizeInBytes     int                `json:"sizeInBytes"`
 	ExternalLinkURL string             `json:"externalLinkUrl"`
 	CreatedByUser   *NameID            `json:"createdByUser"`
 	CreatedDate     *DateTime          `json:"createdDate"`

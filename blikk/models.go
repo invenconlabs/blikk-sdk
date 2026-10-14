@@ -18,9 +18,10 @@ type CostCenterRef struct {
 }
 
 type TagRef struct {
-	ID    int    `json:"id"`
-	Title string `json:"title"`
-	Color string `json:"color"`
+	ID              int    `json:"id"`
+	Title           string `json:"title"`
+	Color           string `json:"color"`
+	InternalColorID int    `json:"internalColorId"`
 }
 
 type Address struct {

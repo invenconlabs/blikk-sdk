@@ -185,11 +185,19 @@ type ArticleInput struct {
 	IsActive      *bool   `json:"isActive,omitempty"`
 }
 
+// Requests take the addition type by number while responses report it by name as ArticleAdditionType.
+type AdditionTypeID int
+
+const (
+	AdditionTypeIDNumber  AdditionTypeID = 1
+	AdditionTypeIDBoolean AdditionTypeID = 2
+)
+
 type AdditionArticleInput struct {
 	ArticleInput
-	AdditionType      int    `json:"additionType,omitempty"` // 1 = Number, 2 = Boolean; responses report it by name
-	SalaryCode        string `json:"salaryCode,omitempty"`
-	SalaryCodeForHour string `json:"salaryCodeForHour,omitempty"`
+	AdditionType      AdditionTypeID `json:"additionType,omitempty"`
+	SalaryCode        string         `json:"salaryCode,omitempty"`
+	SalaryCodeForHour string         `json:"salaryCodeForHour,omitempty"`
 }
 
 type AllowanceArticleInput struct {

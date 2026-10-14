@@ -53,7 +53,7 @@ type DeletedEntityFilter struct {
 type DeletedEntity struct {
 	EntityType  EntityType `json:"entityType"`
 	EntityID    int        `json:"entityId"`
-	DeletedDate *DateTime  `json:"deletedDate"`
+	DeletedDate *Date      `json:"deletedDate"`
 	DeletedByID int        `json:"deletedById"`
 }
 

@@ -54,8 +54,8 @@ func TestDeletedEntitiesListDecodesFixture(t *testing.T) {
 
 	require.NoError(t, err)
 	assert.Equal(t, []DeletedEntity{
-		{EntityType: EntityTypeTimeReport, EntityID: 1, DeletedDate: Ptr(DateTimeOf(time.Date(2026, 10, 8, 0, 0, 0, 0, time.UTC))), DeletedByID: 1},
-		{EntityType: EntityTypeContact, EntityID: 2, DeletedDate: Ptr(DateTimeOf(time.Date(2026, 10, 9, 0, 0, 0, 0, time.UTC))), DeletedByID: 1},
+		{EntityType: EntityTypeTimeReport, EntityID: 1, DeletedDate: Ptr(NewDate(2026, time.October, 8)), DeletedByID: 1},
+		{EntityType: EntityTypeContact, EntityID: 2, DeletedDate: Ptr(NewDate(2026, time.October, 9)), DeletedByID: 1},
 	}, page.Items)
 }
 

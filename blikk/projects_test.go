@@ -2,6 +2,7 @@ package blikk
 
 import (
 	"context"
+	"encoding/json"
 	"net/http"
 	"testing"
 	"time"
@@ -92,6 +93,7 @@ func TestProjectsGetDecodesFixture(t *testing.T) {
 	assert.Equal(t, "Lorem ipsum", project.ImportantInvoiceInformation)
 	assert.False(t, project.AllIsMember)
 	assert.Equal(t, []NameID{{ID: 1, Name: "John Doe"}, {ID: 2, Name: "Jane Doe"}}, project.Members)
+	assert.Equal(t, []TagRef{{ID: 1, Title: "Ipsum", Color: "#41b18b", InternalColorID: 1}}, project.Tags)
 }
 
 func TestProjectsGetByOrderNumberUsesOrderPath(t *testing.T) {
@@ -332,6 +334,7 @@ func TestProjectsTimeCalculationDecodesFixture(t *testing.T) {
 			{Activity: &NameID{ID: 2, Name: "Activity 2"}, Calculation: 26},
 			{Activity: &NameID{ID: 3, Name: "Activity 3"}, Calculation: 16},
 		},
+		UserActivityCalculations: json.RawMessage("null"),
 	}, calculation)
 }
 

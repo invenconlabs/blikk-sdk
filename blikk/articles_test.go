@@ -140,7 +140,7 @@ func TestArticlesCreateAdditionSendsFullInputAndDecodesResponse(t *testing.T) {
 			ExternalID:    "EXT-123",
 			IsActive:      Ptr(true),
 		},
-		AdditionType:      1,
+		AdditionType:      AdditionTypeIDNumber,
 		SalaryCode:        "1234",
 		SalaryCodeForHour: "1234",
 	})
@@ -275,7 +275,7 @@ func TestArticlesUpdatePerKindSendsPutToKindPath(t *testing.T) {
 		path   string
 	}{
 		{"addition", func(s *ArticlesService) (int, error) {
-			updated, err := s.UpdateAddition(context.Background(), 42, AdditionArticleInput{ArticleInput: minimal, AdditionType: 2})
+			updated, err := s.UpdateAddition(context.Background(), 42, AdditionArticleInput{ArticleInput: minimal, AdditionType: AdditionTypeIDBoolean})
 			return articleIDOf(updated, err, func(a *AdditionArticle) int { return a.ID })
 		}, "/v1/admin/articles/addition/42"},
 		{"allowance", func(s *ArticlesService) (int, error) {

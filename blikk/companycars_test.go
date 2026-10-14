@@ -2,6 +2,7 @@ package blikk
 
 import (
 	"context"
+	"encoding/json"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -28,11 +29,20 @@ func TestCompanyCarsListDecodesFixture(t *testing.T) {
 	assert.True(t, item.IsActive)
 	assert.Equal(t, "BMW 320 GT", item.MakeAndModel)
 	assert.Equal(t, "ABC123", item.RegistrationNumber)
-	assert.Equal(t, "CompanyCar", item.Type)
+	assert.Equal(t, CompanyCarTypeCompanyCar, item.Type)
 	assert.Equal(t, &NameID{ID: 1, Name: "John Doe"}, item.CreatedBy)
 	assert.Nil(t, item.UpdatedBy)
 	assert.Equal(t, "2026-10-03 09:40:57", item.Created.String())
 	assert.Nil(t, item.Updated)
+}
+
+func TestCompanyCarTypeMatchesCaseAndKeepsUnknown(t *testing.T) {
+	var cars []CompanyCar
+	require.NoError(t, json.Unmarshal([]byte(`[{"type":"officalcar"},{"type":"CompanyCar"},{"type":"Van"}]`), &cars))
+
+	assert.Equal(t, CompanyCarTypeOfficalCar, cars[0].Type)
+	assert.Equal(t, CompanyCarTypeCompanyCar, cars[1].Type)
+	assert.Equal(t, CompanyCarType("Van"), cars[2].Type)
 }
 
 func TestCompanyCarsListAllUsesListPath(t *testing.T) {

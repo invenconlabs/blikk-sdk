@@ -304,14 +304,14 @@ func TestTasksListAttachmentsDecodesFileAndLink(t *testing.T) {
 	assert.Equal(t, "MyImage.png", file.Name)
 	assert.Equal(t, TaskAttachmentTypeFile, file.Type)
 	assert.Equal(t, "image/png", file.ContentType)
-	assert.Equal(t, Ptr(12542), file.SizeInBytes)
+	assert.Equal(t, 12542, file.SizeInBytes)
 	assert.Empty(t, file.ExternalLinkURL)
 	assert.Equal(t, &NameID{ID: 1, Name: "John Doe"}, file.CreatedByUser)
 	assert.Equal(t, "2026-10-11 09:40:57", file.CreatedDate.String())
 	assert.Nil(t, file.UpdatedDate)
 	assert.Equal(t, TaskAttachmentTypeLink, link.Type)
 	assert.Empty(t, link.ContentType)
-	assert.Nil(t, link.SizeInBytes)
+	assert.Zero(t, link.SizeInBytes)
 	assert.Equal(t, "https://example.com", link.ExternalLinkURL)
 }
 

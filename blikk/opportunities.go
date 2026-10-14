@@ -55,7 +55,7 @@ type OpportunityListItem struct {
 	Customer             *NameID          `json:"customer"`
 	Contact              *NameID          `json:"contact"`
 	OpportunityState     OpportunityState `json:"opportunityState"`
-	ClosedDate           *DateTime        `json:"closedDate"`
+	ClosedDate           *Date            `json:"closedDate"`
 	EstimatedClosingDate *DateTime        `json:"estimatedClosingDate"`
 	ClosedByUser         *NameID          `json:"closedByUser"`
 	Status               *NameID          `json:"status"`
@@ -78,7 +78,7 @@ type Opportunity struct {
 	Contact              *NameID          `json:"contact"`
 	EstimatedClosingDate *DateTime        `json:"estimatedClosingDate"`
 	OpportunityState     OpportunityState `json:"opportunityState"`
-	ClosedDate           *DateTime        `json:"closedDate"`
+	ClosedDate           *Date            `json:"closedDate"`
 	ClosedByUser         *NameID          `json:"closedByUser"`
 	Project              *NameID          `json:"project"`
 	Status               *NameID          `json:"status"`
@@ -100,16 +100,16 @@ type OpportunityCreateInput struct {
 }
 
 type OpportunityCreateResult struct {
-	ID                   int       `json:"id"`
-	CustomerID           int       `json:"customerId"`
-	Title                string    `json:"title"`
-	StatusID             int       `json:"statusId"`
-	Turnover             float64   `json:"turnover"`
-	EstimatedClosingDate *DateTime `json:"estimatedClosingDate"`
-	Description          string    `json:"description"`
-	UserID               int       `json:"userId"`
-	CreatedDate          DateTime  `json:"createdDate"`
-	CreatedByID          int       `json:"createdById"`
+	ID                   int      `json:"id"`
+	CustomerID           int      `json:"customerId"`
+	Title                string   `json:"title"`
+	StatusID             int      `json:"statusId"`
+	Turnover             float64  `json:"turnover"`
+	EstimatedClosingDate *Date    `json:"estimatedClosingDate"`
+	Description          string   `json:"description"`
+	UserID               int      `json:"userId"`
+	CreatedDate          DateTime `json:"createdDate"`
+	CreatedByID          int      `json:"createdById"`
 }
 
 type OpportunityUpdateInput struct {

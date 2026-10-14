@@ -2,6 +2,7 @@ package blikk
 
 import (
 	"context"
+	"encoding/json"
 	"iter"
 	"net/http"
 	"strconv"
@@ -177,22 +178,16 @@ type ProjectCommentListParams struct {
 }
 
 type ProjectTimeCalculation struct {
-	Total                    float64                          `json:"total"`
-	IsTotal                  bool                             `json:"isTotal"`
-	IsByActivity             bool                             `json:"isByActivity"`
-	IsByActivityAndUser      bool                             `json:"isByActivityAndUser"`
-	ActivityCalculations     []ProjectActivityCalculation     `json:"activityCalculations"`
-	UserActivityCalculations []ProjectUserActivityCalculation `json:"userActivityCalculations"`
+	Total                float64                      `json:"total"`
+	IsTotal              bool                         `json:"isTotal"`
+	IsByActivity         bool                         `json:"isByActivity"`
+	IsByActivityAndUser  bool                         `json:"isByActivityAndUser"`
+	ActivityCalculations []ProjectActivityCalculation `json:"activityCalculations"`
+	// Undocumented shape, and the live account has no example.
+	UserActivityCalculations json.RawMessage `json:"userActivityCalculations"`
 }
 
 type ProjectActivityCalculation struct {
-	Activity    *NameID `json:"activity"`
-	Calculation float64 `json:"calculation"`
-}
-
-// The docs give no example of this shape and the live account has none; the fields are a guess modelled on ProjectActivityCalculation.
-type ProjectUserActivityCalculation struct {
-	User        *NameID `json:"user"`
 	Activity    *NameID `json:"activity"`
 	Calculation float64 `json:"calculation"`
 }

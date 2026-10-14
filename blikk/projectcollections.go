@@ -44,7 +44,7 @@ type ProjectCollection struct {
 	Category      *ProjectCollectionCategory `json:"category"`
 	Manager       *NameID                    `json:"manager"`
 	Customer      *NameID                    `json:"customer"`
-	FinishedDate  *DateTime                  `json:"finishedDate"`
+	FinishedDate  *Date                      `json:"finishedDate"`
 }
 
 type ProjectCollectionCategory struct {

@@ -33,8 +33,8 @@ type InvoiceListItem struct {
 	CreatedDate         DateTime  `json:"createdDate"`
 	InvoiceDate         DateTime  `json:"invoiceDate"`
 	Customer            *NameID   `json:"customer"`
-	FromDate            *DateTime `json:"fromDate"`
-	ToDate              *DateTime `json:"toDate"`
+	FromDate            *Date     `json:"fromDate"`
+	ToDate              *Date     `json:"toDate"`
 	Sum                 float64   `json:"sum"`
 	SentToEconomySystem *DateTime `json:"sentToEconomySystem"`
 }
@@ -79,10 +79,12 @@ const (
 	InvoiceRowTypeTime      InvoiceRowType = "Time"
 	InvoiceRowTypeAllowance InvoiceRowType = "Allowance"
 	InvoiceRowTypePurchase  InvoiceRowType = "Purchase"
+	InvoiceRowTypeTravel    InvoiceRowType = "Travel"
+	InvoiceRowTypePeriodRow InvoiceRowType = "PeriodRow"
 )
 
 func (t *InvoiceRowType) UnmarshalJSON(data []byte) error {
-	return unmarshalEnum(data, t, InvoiceRowTypeNone, InvoiceRowTypeTime, InvoiceRowTypeAllowance, InvoiceRowTypePurchase)
+	return unmarshalEnum(data, t, InvoiceRowTypeNone, InvoiceRowTypeTime, InvoiceRowTypeAllowance, InvoiceRowTypePurchase, InvoiceRowTypeTravel, InvoiceRowTypePeriodRow)
 }
 
 type InvoiceRow struct {

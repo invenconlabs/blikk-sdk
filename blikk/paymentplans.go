@@ -35,14 +35,14 @@ type PaymentPlan struct {
 	Price          float64    `json:"price"`
 	Units          float64    `json:"units"`
 	BatchID        string     `json:"batchId"`
-	Date           *DateTime  `json:"date"`
+	Date           *Date      `json:"date"`
 	InvoiceID      int        `json:"invoiceId"`
 	InvoicedDate   *DateTime  `json:"invoicedDate"`
 	InvoiceDraftID int        `json:"invoiceDraftId"`
 	Article        *NameID    `json:"article"`
 	Project        ProjectRef `json:"project"`
 	CreatedDate    DateTime   `json:"createdDate"`
-	CreatedBy      NameID     `json:"createdBy"`
+	CreatedBy      *NameID    `json:"createdBy"`
 	UpdatedDate    *DateTime  `json:"updatedDate"`
 	UpdatedBy      *NameID    `json:"updatedBy"`
 }

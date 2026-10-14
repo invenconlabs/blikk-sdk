@@ -49,8 +49,8 @@ func TestInvoicesListDecodesFixture(t *testing.T) {
 	assert.Equal(t, "2026-10-13 09:40:57", invoice.CreatedDate.String())
 	assert.Equal(t, "2026-10-13 09:40:57", invoice.InvoiceDate.String())
 	assert.Equal(t, &NameID{ID: 123, Name: "Toyota"}, invoice.Customer)
-	assert.Equal(t, "2026-10-13 00:00:00", invoice.FromDate.String())
-	assert.Equal(t, "2026-10-13 00:00:00", invoice.ToDate.String())
+	assert.Equal(t, "2026-10-13", invoice.FromDate.String())
+	assert.Equal(t, "2026-10-13", invoice.ToDate.String())
 	assert.Equal(t, 1200.50, invoice.Sum)
 	assert.Equal(t, "2026-10-13 09:40:57", invoice.SentToEconomySystem.String())
 }
@@ -127,11 +127,13 @@ func TestInvoicesGetDecodesFixture(t *testing.T) {
 
 func TestInvoiceRowTypeMatchesLowercaseAndKeepsUnknown(t *testing.T) {
 	var rows []InvoiceRow
-	require.NoError(t, json.Unmarshal([]byte(`[{"type":"time"},{"type":"Purchase"},{"type":"Fee"}]`), &rows))
+	require.NoError(t, json.Unmarshal([]byte(`[{"type":"time"},{"type":"Purchase"},{"type":"travel"},{"type":"PeriodRow"},{"type":"Fee"}]`), &rows))
 
 	assert.Equal(t, InvoiceRowTypeTime, rows[0].Type)
 	assert.Equal(t, InvoiceRowTypePurchase, rows[1].Type)
-	assert.Equal(t, InvoiceRowType("Fee"), rows[2].Type)
+	assert.Equal(t, InvoiceRowTypeTravel, rows[2].Type)
+	assert.Equal(t, InvoiceRowTypePeriodRow, rows[3].Type)
+	assert.Equal(t, InvoiceRowType("Fee"), rows[4].Type)
 }
 
 func TestInvoicesSetSentToEconomySystemSendsQueryWithoutBody(t *testing.T) {

@@ -33,7 +33,7 @@ func TestProjectCollectionsListEncodesSortingAndDecodesFixture(t *testing.T) {
 	assert.Equal(t, &ProjectCollectionCategory{Name: "Category 1", Color: "Green"}, collection.Category)
 	assert.Equal(t, &NameID{ID: 1, Name: "John Doe"}, collection.Manager)
 	assert.Equal(t, &NameID{ID: 1, Name: "Ipsum"}, collection.Customer)
-	assert.Equal(t, "2021-02-01 00:00:00", collection.FinishedDate.String())
+	assert.Equal(t, "2021-02-01", collection.FinishedDate.String())
 }
 
 func TestProjectCollectionsGetDecodesFixture(t *testing.T) {
@@ -47,7 +47,7 @@ func TestProjectCollectionsGetDecodesFixture(t *testing.T) {
 	assert.Equal(t, &ProjectStatusRef{ID: 1, Name: "Active"}, collection.Status)
 	assert.Equal(t, &ProjectCollectionCategory{Name: "Category 1", Color: "Red"}, collection.Category)
 	assert.Equal(t, &NameID{ID: 1, Name: "ACME Inc."}, collection.Customer)
-	assert.Equal(t, "2026-10-13 00:00:00", collection.FinishedDate.String())
+	assert.Equal(t, "2026-10-13", collection.FinishedDate.String())
 }
 
 func TestProjectCollectionTypeMatchesLowercaseValues(t *testing.T) {

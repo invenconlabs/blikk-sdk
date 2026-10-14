@@ -4,44 +4,31 @@ on:
   push:
     branches:
       - main
+    paths:
+      - '**/*.go'
+      - 'go.mod'
+      - 'go.sum'
+      - '**/testdata/**'
+      - '.github/workflows/test.yml'
   pull_request:
     branches:
       - main
+    paths:
+      - '**/*.go'
+      - 'go.mod'
+      - 'go.sum'
+      - '**/testdata/**'
+      - '.github/workflows/test.yml'
   release:
     types: [created]
 
 jobs:
-  changes:
-    runs-on: ubuntu-26.04
-    permissions:
-      contents: read
-    outputs:
-      go: ${{ steps.filter.outputs.go }}
-      self: ${{ steps.filter.outputs.self }}
-      trusted: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - name: Check for file changes
-        uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4.0.3
-        id: filter
-        with:
-          filters: |
-            go:
-              - '**/*.go'
-              - 'go.mod'
-              - 'go.sum'
-              - '**/testdata/**'
-            self:
-              - '.github/workflows/test.yml'
-
   unit-test:
     runs-on: ubuntu-26.04
     permissions:
       contents: read
       checks: write
-    needs: changes
-    if: github.event_name == 'release' || needs.changes.outputs.go == 'true' || needs.changes.outputs.self == 'true'
+      pull-requests: write
     steps:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -49,7 +36,10 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         with:
-          go-version: '1.23'
+          go-version-file: go.mod
+
+      - name: Install gotestsum
+        run: go install gotest.tools/gotestsum@v1.13.0
 
       - name: Run Go Tidy
         run: go mod tidy -diff
@@ -58,24 +48,25 @@ jobs:
         run: go vet ./...
 
       - name: Run Unit Tests
-        run: go test -race -v -json ./... > unit-test-results.json
+        run: gotestsum --format github-actions --junitfile unit.xml -- -race ./...
 
       - name: Report Unit Tests
-        uses: dorny/test-reporter@a43b3a5f7366b97d083190328d2c652e1a8b6aa2 # v3.0.0
-        if: always() && needs.changes.outputs.trusted == 'true'
+        if: always() && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
+        uses: EnricoMi/publish-unit-test-result-action/linux@7622c5bf3d112a72ab4fa3951c2aa5723d8ab92d # v2.25.0
         with:
-          name: Unit Test Results
-          path: unit-test-results.json
-          reporter: golang-json
+          check_name: Unit Test Results
+          files: unit.xml
+          comment_mode: failures
 
   integration-test:
-    # Needs repository secrets, so never on pull requests from forks.
-    if: needs.changes.outputs.trusted == 'true' && (github.event_name == 'release' || github.event_name == 'pull_request' || needs.changes.outputs.self == 'true')
+    # Fork pull requests get no secrets and a read-only token, so they only run unit tests and post nothing.
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-26.04
     permissions:
       contents: read
       checks: write
-    needs: [unit-test, changes] # Ensures unit tests pass before running integration tests on release
+      pull-requests: write
+    needs: unit-test
     steps:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -83,8 +74,11 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         with:
-          go-version: '1.23'
-      
+          go-version-file: go.mod
+
+      - name: Install gotestsum
+        run: go install gotest.tools/gotestsum@v1.13.0
+
       - name: Run Go Tidy
         run: go mod tidy -diff
 
@@ -95,12 +89,12 @@ jobs:
         env:
           BLIKK_APP_ID: ${{ secrets.BLIKK_APP_ID }}
           BLIKK_APP_SECRET: ${{ secrets.BLIKK_APP_SECRET }}
-        run: go test -v -tags=integration -json ./... > integration-test-results.json
+        run: gotestsum --format github-actions --junitfile integration.xml -- -tags=integration ./...
 
       - name: Report Integration Tests
-        uses: dorny/test-reporter@a43b3a5f7366b97d083190328d2c652e1a8b6aa2 # v3.0.0
         if: always()
+        uses: EnricoMi/publish-unit-test-result-action/linux@7622c5bf3d112a72ab4fa3951c2aa5723d8ab92d # v2.25.0
         with:
-          name: Integration Test Results
-          path: integration-test-results.json
-          reporter: golang-json
+          check_name: Integration Test Results
+          files: integration.xml
+          comment_mode: failures

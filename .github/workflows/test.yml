@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
   release:
     types: [created]
 
@@ -15,6 +18,7 @@ jobs:
     outputs:
       go: ${{ steps.filter.outputs.go }}
       self: ${{ steps.filter.outputs.self }}
+      trusted: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -55,15 +59,15 @@ jobs:
 
       - name: Report Unit Tests
         uses: dorny/test-reporter@v2
-        if: always()
+        if: always() && needs.changes.outputs.trusted == 'true'
         with:
           name: Unit Test Results
           path: unit-test-results.json
           reporter: golang-json
 
   integration-test:
-    # This job only runs when a release is created.
-    if: github.event_name == 'release' || needs.changes.outputs.self == 'true'
+    # Needs repository secrets, so never on pull requests from forks.
+    if: needs.changes.outputs.trusted == 'true' && (github.event_name == 'release' || github.event_name == 'pull_request' || needs.changes.outputs.self == 'true')
     runs-on: ubuntu-latest
     permissions:
       contents: read

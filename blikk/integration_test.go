@@ -296,6 +296,20 @@ func createReportWithCleanup(t *testing.T, ctx context.Context, client *Client, 
 	return id
 }
 
+func createReportWithCleanupOrSkip(t *testing.T, client *Client, create func() (int, error)) int {
+	t.Helper()
+	id, err := create()
+	var apiErr *Error
+	if errors.As(err, &apiErr) && apiErr.StatusCode == http.StatusBadRequest {
+		t.Logf("create rejected: %v; body %s", err, apiErr.Body)
+		t.Skip("create returned 400; skipping")
+	}
+	require.NoError(t, err)
+	require.NotZero(t, id)
+	t.Cleanup(func() { deleteReportIfPresent(t, client, id) })
+	return id
+}
+
 func deleteReportIfPresent(t *testing.T, client *Client, id int) {
 	ctx := context.Background()
 	_, err := client.TimeReports.Get(ctx, id)
@@ -380,17 +394,53 @@ func describeCountChange(before, after int) string {
 	}
 }
 
-func putWithExplicitEmptyAdditions(ctx context.Context, client *Client, id int, input TimeReportInput) error {
+func inputAsMap(input TimeReportInput) (map[string]any, error) {
 	encoded, err := json.Marshal(input)
+	if err != nil {
+		return nil, err
+	}
+	var body map[string]any
+	err = json.Unmarshal(encoded, &body)
+	return body, err
+}
+
+func putWithExplicitEmptyAdditions(ctx context.Context, client *Client, id int, input TimeReportInput) error {
+	body, err := inputAsMap(input)
 	if err != nil {
 		return err
 	}
-	var body map[string]any
-	if err := json.Unmarshal(encoded, &body); err != nil {
+	body["additions"] = []any{}
+	path, err := resourcePath(timeReportsPath, strconv.Itoa(id))
+	if err != nil {
 		return err
 	}
-	body["additions"] = []any{}
-	return client.do(ctx, http.MethodPut, timeReportPath(id), nil, body, nil)
+	return client.do(ctx, http.MethodPut, path, nil, body, nil)
+}
+
+func postWithExplicitZeroInvoiceableDistance(ctx context.Context, client *Client, input TimeReportInput) (int, error) {
+	body, err := inputAsMap(input)
+	if err != nil {
+		return 0, err
+	}
+	travelReport, ok := body["travelReport"].(map[string]any)
+	if !ok {
+		return 0, errors.New("input has no travelReport")
+	}
+	travelReport["invoiceableDistance"] = 0
+	var created createdResource
+	err = client.do(ctx, http.MethodPost, timeReportsPath, nil, body, &created)
+	return created.ID, err
+}
+
+func logTravelDistances(t *testing.T, ctx context.Context, client *Client, label string, id int) {
+	t.Helper()
+	report, err := client.TimeReports.Get(ctx, id)
+	require.NoError(t, err)
+	if report.TravelReport == nil {
+		t.Logf("%s: report %d has no travelReport", label, id)
+		return
+	}
+	t.Logf("%s: travel distance=%v invoiceableDistance=%v", label, report.TravelReport.Distance, report.TravelReport.InvoiceableDistance)
 }
 
 func TestIntegrationTimeReportCreateUpdateDelete(t *testing.T) {
@@ -471,6 +521,28 @@ func TestIntegrationTimeReportCreateUpdateDelete(t *testing.T) {
 			t.Logf("%s: additions after = %d (%s)", probe.description, after, describeCountChange(before, after))
 			assert.Equal(t, 0, after, "%s should clear additions because PUT replaces the whole report", probe.description)
 
+			require.NoError(t, client.TimeReports.Delete(ctx, id))
+			assertReportIsGone(t, ctx, client, id)
+		}
+	})
+
+	t.Run("zero on invoiceable override", func(t *testing.T) {
+		input := references
+		input.Date = NewDate(2026, time.October, 24)
+		input.Hours = 0.5
+		input.Comment = writeTestComment + " (travel)"
+		input.TravelReport = &TravelReportInput{Place: "blikk-sdk test", Distance: 10, InvoiceableDistance: 0}
+
+		probes := []struct {
+			label  string
+			create func() (int, error)
+		}{
+			{"invoiceableDistance omitted", func() (int, error) { return client.TimeReports.Create(ctx, input) }},
+			{"explicit \"invoiceableDistance\":0", func() (int, error) { return postWithExplicitZeroInvoiceableDistance(ctx, client, input) }},
+		}
+		for _, probe := range probes {
+			id := createReportWithCleanupOrSkip(t, client, probe.create)
+			logTravelDistances(t, ctx, client, probe.label, id)
 			require.NoError(t, client.TimeReports.Delete(ctx, id))
 			assertReportIsGone(t, ctx, client, id)
 		}

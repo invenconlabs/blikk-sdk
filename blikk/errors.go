@@ -1,6 +1,7 @@
 package blikk
 
 import (
+	"cmp"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -10,6 +11,8 @@ import (
 )
 
 type Error struct {
+	Method              string
+	Path                string
 	StatusCode          int
 	Message             string
 	ModelState          map[string][]string
@@ -27,23 +30,31 @@ type errorBody struct {
 	RequestID           string              `json:"requestId"`
 }
 
-func newError(statusCode int, body []byte) *Error {
+const requestIDHeader = "X-Request-Id"
+
+func newError(method, path string, statusCode int, header http.Header, body []byte) *Error {
 	var decoded errorBody
 	_ = json.Unmarshal(body, &decoded)
 	return &Error{
+		Method:              method,
+		Path:                path,
 		StatusCode:          statusCode,
 		Message:             decoded.Message,
 		ModelState:          decoded.ModelState,
 		PermissionsRequired: decoded.PermissionsRequired,
 		IPAddressAllowed:    decoded.IPAddressAllowed,
-		RequestID:           decoded.RequestID,
+		RequestID:           cmp.Or(decoded.RequestID, header.Get(requestIDHeader)),
 		Body:                body,
 	}
 }
 
 func (e *Error) Error() string {
 	var b strings.Builder
-	fmt.Fprintf(&b, "blikk: %d %s", e.StatusCode, http.StatusText(e.StatusCode))
+	b.WriteString("blikk: ")
+	if e.Method != "" {
+		b.WriteString(e.Method + " " + e.Path + ": ")
+	}
+	fmt.Fprintf(&b, "%d %s", e.StatusCode, http.StatusText(e.StatusCode))
 	if e.Message != "" {
 		b.WriteString(": " + e.Message)
 	}
@@ -67,14 +78,22 @@ func formatModelState(modelState map[string][]string) string {
 	sort.Strings(fields)
 	parts := make([]string, len(fields))
 	for i, field := range fields {
-		parts[i] = field + ": " + strings.Join(modelState[field], ", ")
+		parts[i] = formatModelStateEntry(field, modelState[field])
 	}
 	return strings.Join(parts, "; ")
 }
 
+func formatModelStateEntry(field string, messages []string) string {
+	joined := strings.Join(messages, ", ")
+	if field == "" {
+		return joined
+	}
+	return field + ": " + joined
+}
+
 const notFoundPhrase = "could not be found"
 
-// IsNotFound is also true for a 400 that says "could not be found", which is how the API reports missing users and time reports.
+// IsNotFound is also true for a GET or DELETE 400 saying "could not be found"; on writes that 400 means a referenced entity is missing.
 func IsNotFound(err error) bool {
 	var apiErr *Error
 	if !errors.As(err, &apiErr) {
@@ -84,7 +103,7 @@ func IsNotFound(err error) bool {
 }
 
 func isBadRequestForMissingEntity(apiErr *Error) bool {
-	if apiErr.StatusCode != http.StatusBadRequest {
+	if apiErr.StatusCode != http.StatusBadRequest || !isReadOrDelete(apiErr.Method) {
 		return false
 	}
 	if mentionsNotFound(apiErr.Message) {
@@ -98,6 +117,10 @@ func isBadRequestForMissingEntity(apiErr *Error) bool {
 		}
 	}
 	return false
+}
+
+func isReadOrDelete(method string) bool {
+	return method == http.MethodGet || method == http.MethodDelete
 }
 
 func mentionsNotFound(message string) bool {

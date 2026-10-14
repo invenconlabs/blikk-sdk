@@ -1,6 +1,7 @@
 package blikk
 
 import (
+	"cmp"
 	"context"
 	"encoding/json"
 	"errors"
@@ -14,6 +15,8 @@ const (
 	tokenPath            = "v1/Auth/Token"
 	tokenRefreshMargin   = 60 * time.Second
 	defaultTokenLifetime = time.Hour
+	// Long enough for a few capped 429 retries, short enough that a hung token request cannot block every caller.
+	tokenFetchTimeout = 60 * time.Second
 )
 
 type TokenSource interface {
@@ -31,13 +34,14 @@ func (t staticToken) Token(context.Context) (string, error) { return string(t), 
 func (staticToken) Invalidate(string) {}
 
 type appTokenSource struct {
-	appID      string
-	appSecret  string
-	tokenURL   string
-	userAgent  string
-	httpClient *http.Client
-	now        func() time.Time
-	sleep      func(ctx context.Context, d time.Duration) error
+	appID        string
+	appSecret    string
+	tokenURL     string
+	userAgent    string
+	httpClient   *http.Client
+	now          func() time.Time
+	sleep        func(ctx context.Context, d time.Duration) error
+	fetchTimeout time.Duration
 
 	mu      sync.Mutex
 	token   string
@@ -84,10 +88,13 @@ func (s *appTokenSource) refreshInFlight(ctx context.Context) *tokenRefresh {
 }
 
 func (s *appTokenSource) runRefresh(ctx context.Context, refresh *tokenRefresh) {
-	token, expiry, err := s.fetchToken(ctx)
+	token, expiry, err := s.fetchTokenWithDeadline(ctx)
 	s.mu.Lock()
-	if err == nil {
+	switch {
+	case err == nil:
 		s.token, s.expiry = token, expiry
+	case s.hasUnexpiredToken():
+		token, err = s.token, nil
 	}
 	s.refresh = nil
 	s.mu.Unlock()
@@ -108,6 +115,16 @@ func (s *appTokenSource) hasFreshToken() bool {
 	return s.token != "" && s.now().Add(tokenRefreshMargin).Before(s.expiry)
 }
 
+func (s *appTokenSource) hasUnexpiredToken() bool {
+	return s.token != "" && s.now().Before(s.expiry)
+}
+
+func (s *appTokenSource) fetchTokenWithDeadline(ctx context.Context) (string, time.Time, error) {
+	ctx, cancel := context.WithTimeout(ctx, cmp.Or(s.fetchTimeout, tokenFetchTimeout))
+	defer cancel()
+	return s.fetchToken(ctx)
+}
+
 func (s *appTokenSource) fetchToken(ctx context.Context) (string, time.Time, error) {
 	for rateLimitRetries := 0; ; rateLimitRetries++ {
 		statusCode, header, body, err := s.requestToken(ctx)
@@ -121,7 +138,7 @@ func (s *appTokenSource) fetchToken(ctx context.Context) (string, time.Time, err
 			continue
 		}
 		if !isSuccess(statusCode) {
-			return "", time.Time{}, newError(statusCode, body)
+			return "", time.Time{}, newError(http.MethodPost, "/"+tokenPath, statusCode, header, body)
 		}
 		return s.decodeToken(body)
 	}

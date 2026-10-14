@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"iter"
-	"net/http"
 	"strconv"
 )
 
@@ -76,7 +75,7 @@ type TimeReportListParams struct {
 	HasAllowanceReports   *bool                 `query:"filter.hasAllowanceReports"`
 	HasTravelReports      *bool                 `query:"filter.hasTravelReports"`
 	TaskID                int                   `query:"filter.taskId"`
-	InvoiceStatus         []InvoiceStatus       `query:"filter.invoiceStatus"`
+	InvoiceStatuses       []InvoiceStatus       `query:"filter.invoiceStatus"`
 }
 
 type TimeReportListItem struct {
@@ -409,8 +408,8 @@ func (s *TimeReportsService) Get(ctx context.Context, id int) (*TimeReport, erro
 
 // Create returns the ID of the new time report.
 func (s *TimeReportsService) Create(ctx context.Context, input TimeReportInput) (int, error) {
-	var created createdResource
-	if err := s.client.do(ctx, http.MethodPost, timeReportsPath, nil, input, &created); err != nil {
+	created, err := createResource[createdResource](ctx, s.client, input, timeReportsPath)
+	if err != nil {
 		return 0, err
 	}
 	if created.ID == 0 {
@@ -421,11 +420,11 @@ func (s *TimeReportsService) Create(ctx context.Context, input TimeReportInput) 
 
 // Update replaces the whole time report; any field left unset in input is cleared.
 func (s *TimeReportsService) Update(ctx context.Context, id int, input TimeReportInput) error {
-	return s.client.do(ctx, http.MethodPut, timeReportPath(id), nil, input, nil)
+	return updateResource(ctx, s.client, input, timeReportsPath, strconv.Itoa(id))
 }
 
 func (s *TimeReportsService) Delete(ctx context.Context, id int) error {
-	return s.client.do(ctx, http.MethodDelete, timeReportPath(id), nil, nil, nil)
+	return deleteResource(ctx, s.client, timeReportsPath, strconv.Itoa(id))
 }
 
 // ListUserDayStatistics returns one page; the API rejects ranges longer than 31 days.
@@ -436,8 +435,4 @@ func (s *TimeReportsService) ListUserDayStatistics(ctx context.Context, params U
 // ListAllUserDayStatistics walks every page like ListAll; on failure it yields a single error and stops.
 func (s *TimeReportsService) ListAllUserDayStatistics(ctx context.Context, params UserDayStatisticsParams) iter.Seq2[UserDayStatistics, error] {
 	return listAll[UserDayStatistics](ctx, s.client, userDayStatisticsPath, params)
-}
-
-func timeReportPath(id int) string {
-	return timeReportsPath + "/" + strconv.Itoa(id)
 }

@@ -282,3 +282,58 @@ func TestTokenWaiterWithExpiredContextReturnsWhileRefreshIsInFlight(t *testing.T
 	assert.ErrorIs(t, err, context.Canceled)
 	assert.Less(t, time.Since(start), 100*time.Millisecond)
 }
+
+func TestHungTokenRequestTimesOutAndNextCallFetchesAgain(t *testing.T) {
+	var requests atomic.Int32
+	release := make(chan struct{})
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if requests.Add(1) == 1 {
+			select {
+			case <-r.Context().Done():
+			case <-release:
+			}
+			return
+		}
+		_, _ = w.Write([]byte(`{"accessToken":"second","expires":"2099-01-01 00:00:00 +00:00"}`))
+	}))
+	t.Cleanup(server.Close)
+	t.Cleanup(func() { close(release) })
+	source := &appTokenSource{tokenURL: server.URL, httpClient: &http.Client{}, now: time.Now, sleep: sleepContext, fetchTimeout: 50 * time.Millisecond}
+
+	_, err := source.Token(context.Background())
+	require.ErrorIs(t, err, context.DeadlineExceeded)
+
+	token, err := source.Token(context.Background())
+	require.NoError(t, err)
+	assert.Equal(t, "second", token)
+	assert.EqualValues(t, 2, requests.Load())
+}
+
+func TestFailedRefreshKeepsUsingUnexpiredToken(t *testing.T) {
+	now := time.Date(2026, 10, 13, 9, 0, 0, 0, time.UTC)
+	var requests atomic.Int32
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if requests.Add(1) == 1 {
+			_, _ = w.Write([]byte(`{"accessToken":"first","expires":"2026-10-13 10:00:00 +00:00"}`))
+			return
+		}
+		w.WriteHeader(http.StatusInternalServerError)
+	}))
+	t.Cleanup(server.Close)
+	source := &appTokenSource{tokenURL: server.URL, httpClient: server.Client(), now: func() time.Time { return now }, sleep: sleepContext}
+	_, err := source.Token(context.Background())
+	require.NoError(t, err)
+
+	now = now.Add(time.Hour - 30*time.Second)
+	token, err := source.Token(context.Background())
+	require.NoError(t, err)
+	assert.Equal(t, "first", token)
+	assert.EqualValues(t, 2, requests.Load())
+
+	now = now.Add(time.Minute)
+	_, err = source.Token(context.Background())
+	var apiErr *Error
+	require.ErrorAs(t, err, &apiErr)
+	assert.Equal(t, http.StatusInternalServerError, apiErr.StatusCode)
+	assert.Equal(t, "/v1/Auth/Token", apiErr.Path)
+}

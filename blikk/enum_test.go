@@ -31,7 +31,20 @@ func TestEnumsNormaliseCaseAndPassUnknownValuesThrough(t *testing.T) {
 	assert.Equal(t, InvoiceStatus(""), decoded.Null)
 }
 
-func TestEnumRejectsNonString(t *testing.T) {
+func TestEnumKeepsNumberAsDecimalString(t *testing.T) {
+	var decoded struct {
+		License       License       `json:"license"`
+		InvoiceStatus InvoiceStatus `json:"invoiceStatus"`
+	}
+
+	require.NoError(t, json.Unmarshal([]byte(`{"license":42,"invoiceStatus":3}`), &decoded))
+
+	assert.Equal(t, License("42"), decoded.License)
+	assert.Equal(t, InvoiceStatus("3"), decoded.InvoiceStatus)
+}
+
+func TestEnumRejectsNonStringNonNumber(t *testing.T) {
 	var license License
-	assert.Error(t, json.Unmarshal([]byte(`42`), &license))
+	assert.Error(t, json.Unmarshal([]byte(`true`), &license))
+	assert.Error(t, json.Unmarshal([]byte(`{"name":"Total"}`), &license))
 }

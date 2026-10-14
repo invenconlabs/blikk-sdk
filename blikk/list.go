@@ -80,18 +80,6 @@ func fetchPage[T any](ctx context.Context, c *Client, path string, query url.Val
 	return &page, nil
 }
 
-func getResource[T any](ctx context.Context, c *Client, base string, pathParams ...string) (*T, error) {
-	path, err := resourcePath(base, pathParams...)
-	if err != nil {
-		return nil, err
-	}
-	var resource T
-	if err := c.do(ctx, http.MethodGet, path, nil, nil, &resource); err != nil {
-		return nil, err
-	}
-	return &resource, nil
-}
-
 func setIfAbsent(query url.Values, key, value string) {
 	if query.Get(key) == "" {
 		query.Set(key, value)

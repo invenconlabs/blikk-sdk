@@ -7,6 +7,8 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"math"
+	"net"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -112,7 +114,29 @@ func validateBaseURL(baseURL string) error {
 	if err != nil || parsed.Scheme == "" || parsed.Host == "" {
 		return fmt.Errorf("blikk: invalid base URL %q", baseURL)
 	}
+	if !isAllowedScheme(parsed) {
+		return fmt.Errorf("blikk: base URL %q must use https unless the host is loopback", baseURL)
+	}
 	return nil
+}
+
+func isAllowedScheme(parsed *url.URL) bool {
+	switch parsed.Scheme {
+	case "https":
+		return true
+	case "http":
+		return isLoopbackHost(parsed.Hostname())
+	default:
+		return false
+	}
+}
+
+func isLoopbackHost(host string) bool {
+	if host == "localhost" {
+		return true
+	}
+	ip := net.ParseIP(host)
+	return ip != nil && ip.IsLoopback()
 }
 
 func (c *Client) newAppTokenSource(appID, appSecret string) (*appTokenSource, error) {
@@ -167,7 +191,7 @@ func (c *Client) do(ctx context.Context, method, resourcePath string, query url.
 		case isSuccess(statusCode):
 			return decodeBody(method, resourcePath, responseBody, out)
 		default:
-			return newError(statusCode, responseBody)
+			return newError(method, "/"+resourcePath, statusCode, header, responseBody)
 		}
 	}
 }
@@ -184,7 +208,7 @@ func (c *Client) buildURL(resourcePath string, query url.Values) (string, error)
 }
 
 func (c *Client) send(ctx context.Context, method, requestURL string, payload []byte, token string) (int, http.Header, []byte, error) {
-	if err := c.limiter.Wait(ctx); err != nil {
+	if err := c.waitForRateLimit(ctx); err != nil {
 		return 0, nil, nil, err
 	}
 	req, err := c.newRequest(ctx, method, requestURL, payload, token)
@@ -200,6 +224,19 @@ func (c *Client) send(ctx context.Context, method, requestURL string, payload []
 		return 0, nil, nil, fmt.Errorf("blikk: reading response of %s %s: %w", method, req.URL.Path, err)
 	}
 	return statusCode, resp.Header, body, nil
+}
+
+// rate.Limiter fails early with a plain error when the wait would outlast the deadline, before ctx is done.
+func (c *Client) waitForRateLimit(ctx context.Context) error {
+	err := c.limiter.Wait(ctx)
+	switch {
+	case err == nil:
+		return nil
+	case ctx.Err() != nil:
+		return fmt.Errorf("blikk: waiting for rate limit: %w", ctx.Err())
+	default:
+		return fmt.Errorf("blikk: waiting for rate limit: %w (%v)", context.DeadlineExceeded, err)
+	}
 }
 
 func (c *Client) newRequest(ctx context.Context, method, requestURL string, payload []byte, token string) (*http.Request, error) {
@@ -267,12 +304,12 @@ func retryAfter(header http.Header, body []byte) time.Duration {
 	if !ok {
 		wait = defaultRetryAfter
 	}
-	return min(max(wait, 0), maxRetryAfter)
+	return wait
 }
 
 func retryAfterFromHeader(header http.Header) (time.Duration, bool) {
 	seconds, err := strconv.ParseFloat(header.Get("Retry-After"), 64)
-	if err != nil {
+	if err != nil || !isUsableWait(seconds) {
 		return 0, false
 	}
 	return secondsToDuration(seconds), true
@@ -280,14 +317,19 @@ func retryAfterFromHeader(header http.Header) (time.Duration, bool) {
 
 func retryAfterFromBody(body []byte) (time.Duration, bool) {
 	var decoded rateLimitBody
-	if err := json.Unmarshal(body, &decoded); err != nil || decoded.WaitInSeconds <= 0 {
+	if err := json.Unmarshal(body, &decoded); err != nil || !isUsableWait(decoded.WaitInSeconds) {
 		return 0, false
 	}
 	return secondsToDuration(decoded.WaitInSeconds), true
 }
 
+func isUsableWait(seconds float64) bool {
+	return !math.IsNaN(seconds) && !math.IsInf(seconds, 0) && seconds > 0
+}
+
+// Clamping before the conversion matters: a huge float overflows time.Duration.
 func secondsToDuration(seconds float64) time.Duration {
-	return time.Duration(seconds * float64(time.Second))
+	return time.Duration(min(seconds, maxRetryAfter.Seconds()) * float64(time.Second))
 }
 
 func sleepContext(ctx context.Context, d time.Duration) error {

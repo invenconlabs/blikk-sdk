@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"sync"
 	"sync/atomic"
 	"testing"
@@ -62,7 +63,8 @@ func TestRateLimiterIsConsultedBeforeEveryRequest(t *testing.T) {
 	defer cancel()
 	_, err = client.Users.Get(ctx, 1)
 
-	require.Error(t, err)
+	assert.ErrorIs(t, err, context.DeadlineExceeded)
+	assert.True(t, strings.HasPrefix(err.Error(), "blikk: "), err.Error())
 	assert.Len(t, handler.requests, 1)
 }
 
@@ -159,7 +161,18 @@ func TestRetryAfterIsCappedAndFallsBackToBody(t *testing.T) {
 	assert.Equal(t, 30*time.Second, retryAfter(http.Header{"Retry-After": {"120"}}, nil))
 	assert.Equal(t, 2*time.Second, retryAfter(http.Header{}, []byte(`{"waitInSeconds":2}`)))
 	assert.Equal(t, time.Second, retryAfter(http.Header{}, nil))
-	assert.Equal(t, time.Duration(0), retryAfter(http.Header{"Retry-After": {"-3"}}, nil))
+	assert.Equal(t, time.Second, retryAfter(http.Header{"Retry-After": {"-3"}}, nil))
+}
+
+func TestUnusableRetryAfterHeaderIsIgnored(t *testing.T) {
+	for _, header := range []string{"1e10", "Inf", "NaN", "-1"} {
+		got := retryAfter(http.Header{"Retry-After": {header}}, []byte(`{"waitInSeconds":2}`))
+		want := 2 * time.Second
+		if header == "1e10" {
+			want = 30 * time.Second
+		}
+		assert.Equal(t, want, got, "Retry-After %q", header)
+	}
 }
 
 func TestRetrySleepHonoursContext(t *testing.T) {
@@ -201,9 +214,16 @@ func TestMalformedSuccessBodyIsADecodeError(t *testing.T) {
 }
 
 func TestNewClientRejectsInvalidBaseURL(t *testing.T) {
-	for _, baseURL := range []string{"", "publicapi.blikk.com", "://bad"} {
+	for _, baseURL := range []string{"", "publicapi.blikk.com", "://bad", "http://publicapi.blikk.com", "http://10.0.0.1:8080", "ftp://publicapi.blikk.com"} {
 		_, err := NewClient("id", "secret", WithBaseURL(baseURL))
 		assert.Error(t, err, "base URL %q", baseURL)
+	}
+}
+
+func TestNewClientAcceptsHTTPSAndLoopbackHTTP(t *testing.T) {
+	for _, baseURL := range []string{"https://publicapi.blikk.com", "http://127.0.0.1:8080", "http://localhost", "http://[::1]:9000/proxy"} {
+		_, err := NewClient("id", "secret", WithBaseURL(baseURL))
+		assert.NoError(t, err, "base URL %q", baseURL)
 	}
 }
 

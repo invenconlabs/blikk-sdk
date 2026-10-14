@@ -39,7 +39,7 @@ func TestTimeReportsListEncodesEveryFilter(t *testing.T) {
 		HasAllowanceReports:   Ptr(false),
 		HasTravelReports:      Ptr(true),
 		TaskID:                8,
-		InvoiceStatus:         []InvoiceStatus{InvoiceStatusPending, InvoiceStatusInvoiced},
+		InvoiceStatuses:       []InvoiceStatus{InvoiceStatusPending, InvoiceStatusInvoiced},
 	})
 
 	require.NoError(t, err)

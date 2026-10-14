@@ -99,10 +99,11 @@ jobs:
     runs-on: ubuntu-26.04
     permissions:
       contents: read
-      checks: write
       pull-requests: write
-      issues: read
     steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
       - name: Download Test Results
         uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
@@ -110,9 +111,22 @@ jobs:
           path: results
           merge-multiple: true
 
-      - name: Report Test Results
-        uses: EnricoMi/publish-unit-test-result-action/linux@7622c5bf3d112a72ab4fa3951c2aa5723d8ab92d # v2.25.0
-        with:
-          check_name: Test Results
-          files: results/*.xml
-          comment_mode: always
+      - name: Build Test Report
+        run: python3 .github/scripts/test_report.py "Unit tests=results/unit.xml" "Live API tests=results/integration.xml" > report.md
+
+      - name: Add Report to Job Summary
+        run: cat report.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Comment Report on Pull Request
+        if: github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR: ${{ github.event.pull_request.number }}
+        run: |
+          comments_url="repos/${{ github.repository }}/issues/$PR/comments"
+          existing_id=$(gh api --paginate "$comments_url" --jq '.[] | select(.user.login == "github-actions[bot]" and (.body | contains("<!-- blikk-test-report -->"))) | .id' | head -n 1)
+          if [ -n "$existing_id" ]; then
+            gh api --method PATCH "repos/${{ github.repository }}/issues/comments/$existing_id" -F body=@report.md
+          else
+            gh api --method POST "$comments_url" -F body=@report.md
+          fi

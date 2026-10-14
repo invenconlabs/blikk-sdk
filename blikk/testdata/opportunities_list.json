@@ -1,0 +1,61 @@
+{
+  "objectName": "generic.pagedlist",
+  "page": 1,
+  "pageSize": 25,
+  "itemCount": 1,
+  "totalItemCount": 1,
+  "totalPages": 1,
+  "items": [
+    {
+      "objectName": "opportunity.list",
+      "id": 1,
+      "title": "Lorem Ipsum",
+      "turnover": 100000.0,
+      "hasOffers": true,
+      "user": {
+        "objectName": "generic.name_id",
+        "id": 1,
+        "name": "John Doe"
+      },
+      "customer": {
+        "objectName": "generic.name_id",
+        "id": 1,
+        "name": "Ipsum"
+      },
+      "contact": null,
+      "opportunityState": "Won",
+      "closedDate": "2026-10-13",
+      "estimatedClosingDate": null,
+      "closedByUser": {
+        "objectName": "generic.name_id",
+        "id": 1,
+        "name": "John Doe"
+      },
+      "status": {
+        "objectName": "generic.name_id",
+        "id": 1,
+        "name": "Lorem"
+      },
+      "updatedDate": "2026-10-13 09:40:57 +00:00",
+      "updatedByUser": {
+        "objectName": "generic.name_id",
+        "id": 1,
+        "name": "John Doe"
+      },
+      "createdDate": "2026-10-13 09:40:57 +00:00",
+      "createdByUser": {
+        "objectName": "generic.name_id",
+        "id": 1,
+        "name": "John Doe"
+      },
+      "tags": [
+        {
+          "objectName": "generic.tag",
+          "id": 1,
+          "title": "Ipsum",
+          "color": "#41b18b"
+        }
+      ]
+    }
+  ]
+}

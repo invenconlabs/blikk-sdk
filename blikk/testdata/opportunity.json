@@ -1,0 +1,54 @@
+{
+  "objectName": "opportunity.detail",
+  "id": 1,
+  "title": "Lorem Ipsum",
+  "description": null,
+  "turnover": 100000.0,
+  "probability": null,
+  "hasOffers": true,
+  "user": {
+    "objectName": "generic.name_id",
+    "id": 1,
+    "name": "John Doe"
+  },
+  "customer": {
+    "objectName": "generic.name_id",
+    "id": 1,
+    "name": "Ipsum"
+  },
+  "contact": null,
+  "estimatedClosingDate": null,
+  "opportunityState": null,
+  "closedDate": "2026-10-13",
+  "closedByUser": {
+    "objectName": "generic.name_id",
+    "id": 1,
+    "name": "John Doe"
+  },
+  "project": null,
+  "status": {
+    "objectName": "generic.name_id",
+    "id": 1,
+    "name": "Lorem"
+  },
+  "updatedDate": "2026-10-13 09:40:57 +00:00",
+  "updatedByUser": {
+    "objectName": "generic.name_id",
+    "id": 1,
+    "name": "John Doe"
+  },
+  "createdDate": "2026-10-13 09:40:57 +00:00",
+  "createdByUser": {
+    "objectName": "generic.name_id",
+    "id": 1,
+    "name": "John Doe"
+  },
+  "tags": [
+    {
+      "objectName": "generic.tag",
+      "id": 1,
+      "title": "Ipsum",
+      "color": "#41b18b"
+    }
+  ]
+}

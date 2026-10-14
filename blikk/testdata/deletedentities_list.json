@@ -1,0 +1,24 @@
+{
+  "objectName": "generic.pagedlist",
+  "page": 1,
+  "pageSize": 25,
+  "itemCount": 2,
+  "totalItemCount": 2,
+  "totalPages": 1,
+  "items": [
+    {
+      "objectName": "deletedentity.list",
+      "entityType": "timereport",
+      "entityId": 1,
+      "deletedDate": "2026-10-08",
+      "deletedById": 1
+    },
+    {
+      "objectName": "deletedentity.list",
+      "entityType": "contact",
+      "entityId": 2,
+      "deletedDate": "2026-10-09",
+      "deletedById": 1
+    }
+  ]
+}

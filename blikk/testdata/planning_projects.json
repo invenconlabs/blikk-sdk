@@ -1,0 +1,13 @@
+{
+  "objectName": "generic.pagedlist",
+  "page": 1,
+  "pageSize": 25,
+  "itemCount": 3,
+  "totalItemCount": 3,
+  "totalPages": 1,
+  "items": [
+    {"objectName": "planning.hasresourceplanning.project", "id": 101, "orderNumber": "P001", "title": "Website Redesign"},
+    {"objectName": "planning.hasresourceplanning.project", "id": 102, "orderNumber": "P002", "title": "Mobile App Development"},
+    {"objectName": "planning.hasresourceplanning.project", "id": 103, "orderNumber": "P003", "title": "Infrastructure Upgrade"}
+  ]
+}

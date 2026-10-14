@@ -32,4 +32,6 @@ for report, err := range client.TimeReports.ListAll(ctx, blikk.TimeReportListPar
 }
 ```
 
+The client has one service per API resource. Core: contacts, deleted entities, invoices, logs, material reports, offers, opportunities, payment plans, planning, project collections, projects, supplier invoices, task boards, tasks, time reports and vacation requests. Admin: absence projects, activities, articles, booking projects, company cars, contact tags, cost centers, countries, departments, internal projects, opportunity statuses and tags, project categories, statuses and tags, time codes, units, users and VAT codes.
+
 `ListAll` yields `(item, err)`: on failure it yields a single non-nil error and stops.

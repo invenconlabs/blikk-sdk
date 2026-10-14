@@ -1,0 +1,23 @@
+{
+  "objectName": "generic.pagedlist",
+  "page": 1,
+  "pageSize": 25,
+  "itemCount": 1,
+  "totalItemCount": 1,
+  "totalPages": 1,
+  "items": [
+    {
+      "objectName": "project.comment.list",
+      "id": 1,
+      "text": "Lorem ipsum dolar sit amet",
+      "createdByUser": {
+        "objectName": "generic.name_id",
+        "id": 1,
+        "name": "John Doe"
+      },
+      "updatedByUser": null,
+      "createdDate": "2026-10-11 09:40:57 +00:00",
+      "updatedDate": null
+    }
+  ]
+}

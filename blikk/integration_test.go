@@ -157,7 +157,7 @@ func TestIntegrationUserDayStatistics(t *testing.T) {
 	ctx := integrationContext(t)
 	today := time.Now()
 
-	page, err := client.TimeReports.ListUserDayStatistics(ctx, UserDayStatisticsParams{
+	page, err := client.TimeReports.ListUserDayStatistics(ctx, UserDayStatisticsListParams{
 		From: DateOf(today.AddDate(0, 0, -6)),
 		To:   DateOf(today),
 	})
@@ -175,7 +175,7 @@ func TestIntegrationUserDayStatisticsRejectsLongRange(t *testing.T) {
 	client := integrationClient(t)
 	today := time.Now()
 
-	_, err := client.TimeReports.ListUserDayStatistics(integrationContext(t), UserDayStatisticsParams{
+	_, err := client.TimeReports.ListUserDayStatistics(integrationContext(t), UserDayStatisticsListParams{
 		From: DateOf(today.AddDate(0, 0, -60)),
 		To:   DateOf(today),
 	})

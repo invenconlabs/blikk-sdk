@@ -17,10 +17,11 @@ type CostCenterRef struct {
 	Code string `json:"code"`
 }
 
-type Tag struct {
-	ID    int    `json:"id"`
-	Title string `json:"title"`
-	Color string `json:"color"`
+type TagRef struct {
+	ID              int    `json:"id"`
+	Title           string `json:"title"`
+	Color           string `json:"color"`
+	InternalColorID int    `json:"internalColorId"`
 }
 
 type Address struct {
@@ -42,7 +43,7 @@ type Location struct {
 	CountryName   string  `json:"countryName"`
 }
 
-type ProjectStatus struct {
+type ProjectStatusRef struct {
 	ID                int    `json:"id"`
 	Name              string `json:"name"`
 	IsCompletedStatus bool   `json:"isCompletedStatus"`
@@ -52,6 +53,41 @@ type ProjectCategory struct {
 	ID    int    `json:"id"`
 	Name  string `json:"name"`
 	Color string `json:"color"`
+}
+
+type Tag struct {
+	ID          int       `json:"id"`
+	Title       string    `json:"title"`
+	Color       string    `json:"color"`
+	CreatedDate DateTime  `json:"createdDate"`
+	CreatedBy   *NameID   `json:"createdBy"`
+	UpdatedDate *DateTime `json:"updatedDate"`
+	UpdatedBy   *NameID   `json:"updatedBy"`
+}
+
+type Comment struct {
+	ID            int       `json:"id"`
+	Text          string    `json:"text"`
+	CreatedByUser *NameID   `json:"createdByUser"`
+	UpdatedByUser *NameID   `json:"updatedByUser"`
+	CreatedDate   *DateTime `json:"createdDate"`
+	UpdatedDate   *DateTime `json:"updatedDate"`
+}
+
+type VatCode struct {
+	ID        int       `json:"id"`
+	Name      string    `json:"name"`
+	Code      string    `json:"code"`
+	VAT       float64   `json:"vat"`
+	IsVatFree bool      `json:"isVatFree"`
+	CreatedBy *NameID   `json:"createdBy"`
+	UpdatedBy *NameID   `json:"updatedBy"`
+	Created   *DateTime `json:"created"`
+	Updated   *DateTime `json:"updated"`
+}
+
+type commentInput struct {
+	Text string `json:"text"`
 }
 
 func Ptr[T any](v T) *T { return &v }

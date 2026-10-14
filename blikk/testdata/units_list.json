@@ -1,0 +1,21 @@
+{
+  "objectName": "generic.pagedlist",
+  "page": 1,
+  "pageSize": 25,
+  "itemCount": 1,
+  "totalItemCount": 1,
+  "totalPages": 1,
+  "items": [
+    {
+      "objectName": "unit.detail",
+      "id": 5,
+      "name": "h",
+      "sortOrder": null,
+      "isStandard": false,
+      "createdBy": {"objectName": "generic.name_id", "id": 1, "name": "John Doe"},
+      "updatedBy": null,
+      "createdDate": "2026-10-09 09:40:57 +00:00",
+      "updatedDate": null
+    }
+  ]
+}

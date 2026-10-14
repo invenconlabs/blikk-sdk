@@ -1,0 +1,78 @@
+{
+  "objectName": "generic.pagedlist",
+  "page": 1,
+  "pageSize": 25,
+  "itemCount": 1,
+  "totalItemCount": 1,
+  "totalPages": 1,
+  "items": [
+    {
+      "objectName": "task.list",
+      "id": 1,
+      "title": "Uppgift 1",
+      "description": "En beskrivning om vad som denna uppgift handlar om.",
+      "completedDate": null,
+      "timeReportingEnabled": true,
+      "estimate": 10.5,
+      "startDate": null,
+      "startTime": null,
+      "endDate": null,
+      "endTime": null,
+      "numberOfComments": 5,
+      "numberOfAttachments": 3,
+      "numberOfChecklistPoints": 14,
+      "tags": [
+        {
+          "objectName": "generic.tag",
+          "id": 1,
+          "title": "2.8",
+          "color": "#41b18b"
+        },
+        {
+          "objectName": "generic.tag",
+          "id": 2,
+          "title": "GUI",
+          "color": "#41b18b"
+        }
+      ],
+      "members": [
+        {
+          "objectName": "task.member",
+          "userId": 1,
+          "userName": "John Doe"
+        },
+        {
+          "objectName": "task.member",
+          "userId": 2,
+          "userName": "Jane Doe"
+        }
+      ],
+      "boardColumn": {
+        "objectName": "generic.name_id",
+        "id": 1,
+        "name": "Att göra"
+      },
+      "board": {
+        "objectName": "generic.name_id",
+        "id": 1,
+        "name": "Sprint 2.8"
+      },
+      "project": {
+        "objectName": "project.name_id",
+        "id": 15,
+        "name": "Utvecklingsprojektet",
+        "number": "26"
+      },
+      "projectCollection": null,
+      "opportunity": null,
+      "createdByUser": {
+        "objectName": "generic.name_id",
+        "id": 1,
+        "name": "John Doe"
+      },
+      "createdDate": "2026-10-10 09:40:57 +00:00",
+      "updatedDate": null,
+      "archivedDate": null
+    }
+  ]
+}

@@ -1,0 +1,90 @@
+{
+  "objectName": "invoice.detail",
+  "id": 42,
+  "archived": false,
+  "cadastral": "BRF-123",
+  "createdDate": "2026-10-13T09:40:57.2897454+00:00",
+  "customer": {
+    "objectName": "generic.name_id",
+    "id": 92,
+    "name": "Söderåsens BRF"
+  },
+  "customerReferenceMarking": "ref-123",
+  "economySystemInvoiceNumber": "88-88",
+  "electronicInvoiceReferenceCode": "EFH12345",
+  "fromDate": "2026-10-13 09:40:57",
+  "invoiceDate": "2026-10-13 09:40:57",
+  "invoiceNumber": 1001,
+  "invoiceText": "Rent",
+  "invoiceReference": "Mr. Bean",
+  "maxTaxReduction": 10.00,
+  "ourReference": "Sr. Rodriguez",
+  "yourReference": "Mr. Bean",
+  "recipientName": "Söderåsens BRF",
+  "recipientStreetAddress": "Storgatan 1",
+  "recipientPostalCode": "12345",
+  "recipientCity": "Stockholm",
+  "recipientCountryId": 209,
+  "rotRutText": "Rot",
+  "sentToEconomySystem": "2026-10-13T09:40:57.289746+00:00",
+  "sum": 7800.00,
+  "taxReductionAmountInPercent": 10.00,
+  "taxReductionMethod": "Rut",
+  "tenantOrganisationalNumber": "123456-7890",
+  "toDate": "2026-10-13 09:40:57",
+  "rows": [
+    {
+      "objectName": "invoice.row",
+      "id": 1,
+      "article": "Article #4",
+      "articleNumber": "4",
+      "bookingProjectNumber": "1234",
+      "costCenter": {
+        "objectName": "costcenter.name_id",
+        "id": 1,
+        "name": "Cost center 1",
+        "code": "CC1"
+      },
+      "comment": "It's a comment",
+      "dateStr": "2026-10-13",
+      "discount": 10.00,
+      "header1": "Header 1",
+      "header2": "Header 2",
+      "header3": "Header 3",
+      "header4": "Header 4",
+      "header5": "Header 5",
+      "header6": "Header 6",
+      "header7": "Header 7",
+      "header8": "Header 8",
+      "header9": "Header 9",
+      "houseWorkType": {
+        "objectName": "generic.name_id",
+        "id": 1,
+        "name": "Garden work"
+      },
+      "indentLevel": 0,
+      "isHeader": false,
+      "isSumRow": false,
+      "sortOrder": 1,
+      "rate": 100.00,
+      "sum": 7500.00,
+      "type": "None",
+      "vatCode": {
+        "objectName": "generic.name_id",
+        "id": 1,
+        "name": "VAT code 1"
+      },
+      "value": 75.00,
+      "unit": "m2"
+    }
+  ],
+  "taxReductions": [
+    {
+      "objectName": "invoice.taxreduction",
+      "id": 1,
+      "name": "Rut",
+      "socialSecurityNumber": "123456-7890",
+      "taxReducation": 10.00
+    }
+  ]
+}

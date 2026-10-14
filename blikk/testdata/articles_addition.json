@@ -1,0 +1,31 @@
+{
+  "objectName": "article.addition",
+  "additionType": "Number",
+  "salaryCode": "1234",
+  "salaryCodeForHour": "1234",
+  "id": 42,
+  "articleNumber": "234",
+  "cost": 401.00,
+  "description": "Description of new addition 1",
+  "externalId": "EXT-123",
+  "isActive": true,
+  "name": "New Addition 1",
+  "price": 1101.00,
+  "unit": {"objectName": "generic.name_id", "id": 123, "name": "Unit 1"},
+  "vatCode": {
+    "objectName": "vat.code",
+    "id": 646,
+    "name": "VAT 25%",
+    "code": "25",
+    "vat": 25.00,
+    "isVatFree": false,
+    "createdBy": {"objectName": "generic.name_id", "id": 123, "name": "John Doe"},
+    "updatedBy": {"objectName": "generic.name_id", "id": 123, "name": "John Doe"},
+    "created": "2026-10-09 09:40:57 +00:00",
+    "updated": "2026-10-11 09:40:57 +00:00"
+  },
+  "createdBy": {"objectName": "generic.name_id", "id": 123, "name": "John Doe"},
+  "updatedBy": null,
+  "created": "2026-10-09 09:40:57 +00:00",
+  "updated": null
+}

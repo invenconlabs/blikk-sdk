@@ -1,0 +1,23 @@
+{
+  "objectName": "generic.pagedlist",
+  "page": 1,
+  "pageSize": 25,
+  "itemCount": 1,
+  "totalItemCount": 1,
+  "totalPages": 1,
+  "items": [
+    {
+      "objectName": "bookingproject.detail",
+      "id": 42,
+      "name": "Booking Project 1",
+      "bookingNumber": "XYZ",
+      "isActive": true,
+      "startDate": null,
+      "endDate": null,
+      "createdBy": {"objectName": "generic.name_id", "id": 1, "name": "John Doe"},
+      "updatedBy": {"objectName": "generic.name_id", "id": 2, "name": "Jane Doe"},
+      "created": "2026-09-28 09:40:57 +00:00",
+      "updated": "2026-10-02 09:40:57 +00:00"
+    }
+  ]
+}

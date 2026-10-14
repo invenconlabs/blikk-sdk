@@ -1,0 +1,42 @@
+{
+  "objectName": "generic.pagedlist",
+  "page": 1,
+  "pageSize": 25,
+  "itemCount": 2,
+  "totalItemCount": 2,
+  "totalPages": 1,
+  "items": [
+    {
+      "objectName": "article.list",
+      "id": 1,
+      "articleNumber": "A024",
+      "externalId": "EXT-001",
+      "name": "Lorem ipsum",
+      "price": 500.0,
+      "cost": 345.5,
+      "unit": {"objectName": "generic.name_id", "id": 1, "name": "st"},
+      "description": "Lorem ipsum dolar sit amet",
+      "isActive": true,
+      "createdBy": {"objectName": "generic.name_id", "id": 1, "name": "John Doe"},
+      "updatedBy": null,
+      "created": "2026-10-03 09:40:57 +00:00",
+      "updated": null
+    },
+    {
+      "objectName": "article.list",
+      "id": 2,
+      "articleNumber": "A025",
+      "externalId": null,
+      "name": "Ipsum lorem",
+      "price": 600.0,
+      "cost": null,
+      "unit": {"objectName": "generic.name_id", "id": 2, "name": "st"},
+      "description": "Lorem ipsum dolar sit amet",
+      "isActive": true,
+      "createdBy": {"objectName": "generic.name_id", "id": 2, "name": "Jane Doe"},
+      "updatedBy": null,
+      "created": "2026-10-04 09:40:57 +00:00",
+      "updated": null
+    }
+  ]
+}

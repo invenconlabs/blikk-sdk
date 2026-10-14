@@ -1,0 +1,22 @@
+{
+  "objectName": "generic.pagedlist",
+  "page": 1,
+  "pageSize": 25,
+  "itemCount": 1,
+  "totalItemCount": 1,
+  "totalPages": 1,
+  "items": [
+    {
+      "objectName": "activity.list",
+      "id": 1,
+      "name": "Lorem ipsum",
+      "isActive": true,
+      "preferredTimeCode": {"objectName": "generic.name_id", "id": 2, "name": "Dolar sit amet"},
+      "preferredTimeArticle": {"objectName": "generic.name_id", "id": 1, "name": "Lorem ipsum"},
+      "createdBy": {"objectName": "generic.name_id", "id": 1, "name": "John Doe"},
+      "updatedBy": null,
+      "created": "2026-10-03 09:40:57 +00:00",
+      "updated": null
+    }
+  ]
+}

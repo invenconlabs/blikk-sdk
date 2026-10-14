@@ -1,0 +1,43 @@
+{
+  "objectName": "generic.pagedlist",
+  "page": 1,
+  "pageSize": 25,
+  "itemCount": 1,
+  "totalItemCount": 1,
+  "totalPages": 1,
+  "items": [
+    {
+      "objectName": "offer.list",
+      "id": 1,
+      "offerNumber": 1,
+      "version": 1,
+      "title": "Lorem Ipsum",
+      "offerValue": 10000.0,
+      "hasPdf": true,
+      "user": {
+        "objectName": "generic.name_id",
+        "id": 1,
+        "name": "John Doe"
+      },
+      "customer": {
+        "objectName": "generic.name_id",
+        "id": 1,
+        "name": "Ipsum"
+      },
+      "opportunity": null,
+      "offerState": "SentToCustomer",
+      "updatedDate": "2026-10-13 09:40:57 +00:00",
+      "updatedByUser": {
+        "objectName": "generic.name_id",
+        "id": 1,
+        "name": "John Doe"
+      },
+      "createdDate": "2026-10-13 09:40:57 +00:00",
+      "createdByUser": {
+        "objectName": "generic.name_id",
+        "id": 1,
+        "name": "John Doe"
+      }
+    }
+  ]
+}

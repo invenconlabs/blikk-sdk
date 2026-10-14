@@ -120,7 +120,7 @@ type User struct {
 	TimeBankEnabled           bool           `json:"timeBankEnabled"`
 	CurrentTimeBank           float64        `json:"currentTimeBank"`
 	PlanningCapacityInPercent float64        `json:"planningCapacityInPercent"`
-	Tags                      []Tag          `json:"tags"`
+	Tags                      []TagRef       `json:"tags"`
 	Permissions               []string       `json:"permissions"`
 	CreatedBy                 *NameID        `json:"createdBy"`
 	UpdatedBy                 *NameID        `json:"updatedBy"`
@@ -133,7 +133,6 @@ func (s *UsersService) List(ctx context.Context, params UserListParams) (*Page[U
 	return listPage[UserListItem](ctx, s.client, usersPath, params)
 }
 
-// ListAll walks every page from params.Page onwards; on failure it yields a single error and stops.
 func (s *UsersService) ListAll(ctx context.Context, params UserListParams) iter.Seq2[UserListItem, error] {
 	return listAll[UserListItem](ctx, s.client, usersPath, params)
 }

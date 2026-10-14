@@ -1,0 +1,11 @@
+{
+  "objectName": "unit.detail",
+  "id": 42,
+  "name": "Unit 1",
+  "sortOrder": 1,
+  "isStandard": true,
+  "createdBy": {"objectName": "generic.name_id", "id": 123, "name": "John Doe"},
+  "updatedBy": {"objectName": "generic.name_id", "id": 123, "name": "John Doe"},
+  "createdDate": "2026-10-09 09:40:57 +00:00",
+  "updatedDate": "2026-10-11 09:40:57 +00:00"
+}

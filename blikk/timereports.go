@@ -2,7 +2,6 @@ package blikk
 
 import (
 	"context"
-	"errors"
 	"iter"
 	"strconv"
 )
@@ -117,67 +116,67 @@ type TimeReportListItem struct {
 }
 
 type TimeReport struct {
-	ID               int               `json:"id"`
-	Date             Date              `json:"date"`
-	ClockStart       string            `json:"clockStart"`
-	ClockEnd         string            `json:"clockEnd"`
-	Hours            float64           `json:"hours"`
-	InvoiceableHours float64           `json:"invoiceableHours"`
-	BreakMinutes     int               `json:"breakMinutes"`
-	Cost             float64           `json:"cost"`
-	Rate             float64           `json:"rate"`
-	Discount         float64           `json:"discount"`
-	Comment          string            `json:"comment"`
-	InternalComment  string            `json:"internalComment"`
-	SentToAttestDate *DateTime         `json:"sentToAttestDate"`
-	AttestedDate     *DateTime         `json:"attestedDate"`
-	AttestedByUser   *NameID           `json:"attestedByUser"`
-	User             NameID            `json:"user"`
-	Contact          NameID            `json:"contact"`
-	Project          *ProjectRef       `json:"project"`
-	InternalProject  *NameID           `json:"internalProject"`
-	AbsenceProject   *NameID           `json:"absenceProject"`
-	Activity         NameID            `json:"activity"`
-	TimeCode         NameID            `json:"timeCode"`
-	TimeArticle      NameID            `json:"timeArticle"`
-	CostCenter       *CostCenterRef    `json:"costCenter"`
-	BookingProject   *NameID           `json:"bookingProject"`
-	InvoiceID        int               `json:"invoiceId"`
-	InvoicedDate     *DateTime         `json:"invoicedDate"`
-	InvoiceDraftID   int               `json:"invoiceDraftId"`
-	Task             *NameID           `json:"task"`
-	TravelReport     *TravelReport     `json:"travelReport"`
-	AllowanceReport  *AllowanceReport  `json:"allowanceReport"`
-	Materials        []MaterialReport  `json:"materials"`
-	Equipments       []EquipmentReport `json:"equipments"`
-	Additions        []AdditionReport  `json:"additions"`
-	CreatedDate      DateTime          `json:"createdDate"`
-	UpdatedDate      *DateTime         `json:"updatedDate"`
+	ID               int                  `json:"id"`
+	Date             Date                 `json:"date"`
+	ClockStart       string               `json:"clockStart"`
+	ClockEnd         string               `json:"clockEnd"`
+	Hours            float64              `json:"hours"`
+	InvoiceableHours float64              `json:"invoiceableHours"`
+	BreakMinutes     int                  `json:"breakMinutes"`
+	Cost             float64              `json:"cost"`
+	Rate             float64              `json:"rate"`
+	Discount         float64              `json:"discount"`
+	Comment          string               `json:"comment"`
+	InternalComment  string               `json:"internalComment"`
+	SentToAttestDate *DateTime            `json:"sentToAttestDate"`
+	AttestedDate     *DateTime            `json:"attestedDate"`
+	AttestedByUser   *NameID              `json:"attestedByUser"`
+	User             NameID               `json:"user"`
+	Contact          NameID               `json:"contact"`
+	Project          *ProjectRef          `json:"project"`
+	InternalProject  *NameID              `json:"internalProject"`
+	AbsenceProject   *NameID              `json:"absenceProject"`
+	Activity         NameID               `json:"activity"`
+	TimeCode         NameID               `json:"timeCode"`
+	TimeArticle      NameID               `json:"timeArticle"`
+	CostCenter       *CostCenterRef       `json:"costCenter"`
+	BookingProject   *NameID              `json:"bookingProject"`
+	InvoiceID        int                  `json:"invoiceId"`
+	InvoicedDate     *DateTime            `json:"invoicedDate"`
+	InvoiceDraftID   int                  `json:"invoiceDraftId"`
+	Task             *NameID              `json:"task"`
+	TravelReport     *TravelReport        `json:"travelReport"`
+	AllowanceReport  *AllowanceReport     `json:"allowanceReport"`
+	Materials        []TimeReportMaterial `json:"materials"`
+	Equipments       []EquipmentReport    `json:"equipments"`
+	Additions        []AdditionReport     `json:"additions"`
+	CreatedDate      DateTime             `json:"createdDate"`
+	UpdatedDate      *DateTime            `json:"updatedDate"`
 }
 
 type TravelReport struct {
-	ID                  int            `json:"id"`
-	Place               string         `json:"place"`
-	InvoiceablePlace    string         `json:"invoicablePlace"`
-	Distance            float64        `json:"distance"`
-	InvoiceableDistance float64        `json:"invoicableDistance"`
-	ToSalary            bool           `json:"toSalary"`
-	ToBeInvoiced        bool           `json:"toBeInvoiced"`
-	Cost                float64        `json:"cost"`
-	Rate                float64        `json:"rate"`
-	Discount            float64        `json:"discount"`
-	SentToAttestDate    *DateTime      `json:"sentToAttestDate"`
-	AttestedDate        *DateTime      `json:"attestedDate"`
-	CostCenter          *CostCenterRef `json:"costCenter"`
-	BookingProject      *NameID        `json:"bookingProject"`
-	InvoiceID           int            `json:"invoiceId"`
-	InvoicedDate        *DateTime      `json:"invoicedDate"`
-	InvoiceDraftID      int            `json:"invoiceDraftId"`
-	CompanyCar          *CompanyCar    `json:"companyCar"`
-	Article             *NameID        `json:"article"`
+	ID                  int                     `json:"id"`
+	Place               string                  `json:"place"`
+	InvoiceablePlace    string                  `json:"invoicablePlace"`
+	Distance            float64                 `json:"distance"`
+	InvoiceableDistance float64                 `json:"invoicableDistance"`
+	ToSalary            bool                    `json:"toSalary"`
+	ToBeInvoiced        bool                    `json:"toBeInvoiced"`
+	Cost                float64                 `json:"cost"`
+	Rate                float64                 `json:"rate"`
+	Discount            float64                 `json:"discount"`
+	SentToAttestDate    *DateTime               `json:"sentToAttestDate"`
+	AttestedDate        *DateTime               `json:"attestedDate"`
+	CostCenter          *CostCenterRef          `json:"costCenter"`
+	BookingProject      *NameID                 `json:"bookingProject"`
+	InvoiceID           int                     `json:"invoiceId"`
+	InvoicedDate        *DateTime               `json:"invoicedDate"`
+	InvoiceDraftID      int                     `json:"invoiceDraftId"`
+	CompanyCar          *TravelReportCompanyCar `json:"companyCar"`
+	Article             *NameID                 `json:"article"`
 }
 
-type CompanyCar struct {
+type TravelReportCompanyCar struct {
 	ID           int     `json:"id"`
 	Name         string  `json:"name"`
 	TripStart    float64 `json:"tripStart"`
@@ -206,7 +205,7 @@ type AllowanceReport struct {
 	Article                  *NameID        `json:"article"`
 }
 
-type MaterialReport struct {
+type TimeReportMaterial struct {
 	ID                   int            `json:"id"`
 	Title                string         `json:"title"`
 	Units                float64        `json:"units"`
@@ -339,13 +338,13 @@ type EquipmentInput struct {
 type AdditionInput struct {
 	ID          int     `json:"id,omitempty"`
 	ArticleID   int     `json:"articleId"`
-	YesNo       bool    `json:"yesNo,omitempty"`
+	YesNo       bool    `json:"yesNo"`
 	NumberCount float64 `json:"numberCount,omitempty"`
 }
 
 const UserDayStatisticsSortByName = "name"
 
-type UserDayStatisticsParams struct {
+type UserDayStatisticsListParams struct {
 	ListOptions
 	From          Date  `query:"filter.from"`
 	To            Date  `query:"filter.to"`
@@ -389,15 +388,10 @@ func firstProjectName(project *ProjectRef, internalProject, absenceProject *Name
 	}
 }
 
-type createdResource struct {
-	ID int `json:"id"`
-}
-
 func (s *TimeReportsService) List(ctx context.Context, params TimeReportListParams) (*Page[TimeReportListItem], error) {
 	return listPage[TimeReportListItem](ctx, s.client, timeReportsPath, params)
 }
 
-// ListAll walks every page from params.Page onwards; on failure it yields a single error and stops.
 func (s *TimeReportsService) ListAll(ctx context.Context, params TimeReportListParams) iter.Seq2[TimeReportListItem, error] {
 	return listAll[TimeReportListItem](ctx, s.client, timeReportsPath, params)
 }
@@ -408,14 +402,7 @@ func (s *TimeReportsService) Get(ctx context.Context, id int) (*TimeReport, erro
 
 // Create returns the ID of the new time report.
 func (s *TimeReportsService) Create(ctx context.Context, input TimeReportInput) (int, error) {
-	created, err := createResource[createdResource](ctx, s.client, input, timeReportsPath)
-	if err != nil {
-		return 0, err
-	}
-	if created.ID == 0 {
-		return 0, errors.New("blikk: create time report response has no id")
-	}
-	return created.ID, nil
+	return createResourceID(ctx, s.client, input, timeReportsPath)
 }
 
 // Update replaces the whole time report; any field left unset in input is cleared.
@@ -428,11 +415,10 @@ func (s *TimeReportsService) Delete(ctx context.Context, id int) error {
 }
 
 // ListUserDayStatistics returns one page; the API rejects ranges longer than 31 days.
-func (s *TimeReportsService) ListUserDayStatistics(ctx context.Context, params UserDayStatisticsParams) (*Page[UserDayStatistics], error) {
+func (s *TimeReportsService) ListUserDayStatistics(ctx context.Context, params UserDayStatisticsListParams) (*Page[UserDayStatistics], error) {
 	return listPage[UserDayStatistics](ctx, s.client, userDayStatisticsPath, params)
 }
 
-// ListAllUserDayStatistics walks every page like ListAll; on failure it yields a single error and stops.
-func (s *TimeReportsService) ListAllUserDayStatistics(ctx context.Context, params UserDayStatisticsParams) iter.Seq2[UserDayStatistics, error] {
+func (s *TimeReportsService) ListAllUserDayStatistics(ctx context.Context, params UserDayStatisticsListParams) iter.Seq2[UserDayStatistics, error] {
 	return listAll[UserDayStatistics](ctx, s.client, userDayStatisticsPath, params)
 }

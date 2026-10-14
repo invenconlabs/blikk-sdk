@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"slices"
 	"sort"
 	"strings"
 )
@@ -91,9 +92,9 @@ func formatModelStateEntry(field string, messages []string) string {
 	return field + ": " + joined
 }
 
-const notFoundPhrase = "could not be found"
+var notFoundPhrases = []string{"could not be found", "could not find"}
 
-// IsNotFound is also true for a GET or DELETE 400 saying "could not be found"; on writes that 400 means a referenced entity is missing.
+// IsNotFound is also true for a GET or DELETE 400 saying "could not be found" or "could not find"; on writes that 400 means a referenced entity is missing.
 func IsNotFound(err error) bool {
 	var apiErr *Error
 	if !errors.As(err, &apiErr) {
@@ -124,7 +125,8 @@ func isReadOrDelete(method string) bool {
 }
 
 func mentionsNotFound(message string) bool {
-	return strings.Contains(strings.ToLower(message), notFoundPhrase)
+	lowered := strings.ToLower(message)
+	return slices.ContainsFunc(notFoundPhrases, func(phrase string) bool { return strings.Contains(lowered, phrase) })
 }
 
 func IsRateLimited(err error) bool { return hasStatus(err, http.StatusTooManyRequests) }

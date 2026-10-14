@@ -1,0 +1,50 @@
+{
+  "objectName": "materialreport.detail",
+  "id": 1,
+  "sortOrder": 0,
+  "articleNumber": "PP01",
+  "title": "My article",
+  "consumedUnits": 1.0,
+  "invoiceableUnits": 2.0,
+  "unitText": "pcs",
+  "costPerUnit": 200.0,
+  "pricePerUnit": 250.0,
+  "discountPercentage": 10.0,
+  "vatPercentage": 25.0,
+  "totalAmount": 450.0,
+  "toBeInvoiced": true,
+  "invoiceId": 560,
+  "invoicedDate": null,
+  "invoiceDraftId": null,
+  "timeReportId": null,
+  "isTextOnly": false,
+  "article": {
+    "objectName": "generic.name_id",
+    "id": 12,
+    "name": "My article"
+  },
+  "costCenter": {
+    "objectName": "generic.name_id",
+    "id": 1,
+    "name": "IT Department"
+  },
+  "bookingProject": {
+    "objectName": "generic.name_id",
+    "id": 1,
+    "name": "BP 1"
+  },
+  "project": {
+    "objectName": "project.name_id",
+    "id": 1,
+    "name": "My project",
+    "number": "123"
+  },
+  "createdDate": "2026-09-28 07:16:57 +00:00",
+  "createdBy": {
+    "objectName": "generic.name_id",
+    "id": 1,
+    "name": "John Doe"
+  },
+  "updatedDate": "2026-10-10 04:09:45 +00:00",
+  "updatedBy": null
+}

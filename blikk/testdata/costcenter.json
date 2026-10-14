@@ -1,0 +1,11 @@
+{
+  "objectName": "costcenter.list",
+  "id": 42,
+  "name": "Cost Center 1",
+  "code": "123",
+  "isActive": true,
+  "createdBy": {"objectName": "generic.name_id", "id": 1, "name": "John Doe"},
+  "updatedBy": {"objectName": "generic.name_id", "id": 1, "name": "John Doe"},
+  "created": "2026-10-09 09:40:57 +00:00",
+  "updated": "2026-10-11 09:40:57 +00:00"
+}

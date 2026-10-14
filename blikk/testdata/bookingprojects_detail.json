@@ -1,0 +1,13 @@
+{
+  "objectName": "bookingproject.detail",
+  "id": 42,
+  "name": "Booking Project 1",
+  "bookingNumber": "123",
+  "isActive": true,
+  "startDate": "2026-10-13 09:40:57",
+  "endDate": "2026-10-18T09:40:57",
+  "createdBy": {"objectName": "generic.name_id", "id": 1, "name": "John Doe"},
+  "updatedBy": null,
+  "created": "2026-10-13 09:40:57 +00:00",
+  "updated": null
+}

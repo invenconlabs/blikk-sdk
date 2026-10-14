@@ -2,15 +2,21 @@ package blikk
 
 import (
 	"bytes"
+	"cmp"
 	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
+	"maps"
 	"math"
+	"mime"
+	"mime/multipart"
 	"net"
 	"net/http"
+	"net/textproto"
 	"net/url"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
@@ -29,12 +35,46 @@ const (
 	defaultRetryAfter   = time.Second
 	maxErrorBodyBytes   = 64 << 10
 	jsonContentType     = "application/json"
+	anyContentType      = "*/*"
 )
 
 type Client struct {
-	Users       *UsersService
-	Projects    *ProjectsService
-	TimeReports *TimeReportsService
+	Contacts           *ContactsService
+	DeletedEntities    *DeletedEntitiesService
+	Invoices           *InvoicesService
+	Logs               *LogsService
+	MaterialReports    *MaterialReportsService
+	Offers             *OffersService
+	Opportunities      *OpportunitiesService
+	PaymentPlans       *PaymentPlansService
+	Planning           *PlanningService
+	ProjectCollections *ProjectCollectionsService
+	Projects           *ProjectsService
+	SupplierInvoices   *SupplierInvoicesService
+	TaskBoards         *TaskBoardsService
+	Tasks              *TasksService
+	TimeReports        *TimeReportsService
+	VacationRequests   *VacationRequestsService
+
+	AbsenceProjects     *AbsenceProjectsService
+	Activities          *ActivitiesService
+	Articles            *ArticlesService
+	BookingProjects     *BookingProjectsService
+	CompanyCars         *CompanyCarsService
+	ContactTags         *ContactTagsService
+	CostCenters         *CostCentersService
+	Countries           *CountriesService
+	Departments         *DepartmentsService
+	InternalProjects    *InternalProjectsService
+	OpportunityStatuses *OpportunityStatusesService
+	OpportunityTags     *OpportunityTagsService
+	ProjectCategories   *ProjectCategoriesService
+	ProjectStatuses     *ProjectStatusesService
+	ProjectTags         *ProjectTagsService
+	TimeCodes           *TimeCodesService
+	Units               *UnitsService
+	Users               *UsersService
+	VatCodes            *VatCodesService
 
 	baseURL     string
 	httpClient  *http.Client
@@ -96,10 +136,47 @@ func NewClient(appID, appSecret string, opts ...Option) (*Client, error) {
 		}
 		c.tokenSource = tokenSource
 	}
-	c.Users = &UsersService{client: c}
-	c.Projects = &ProjectsService{client: c}
-	c.TimeReports = &TimeReportsService{client: c}
+	c.registerServices()
 	return c, nil
+}
+
+func (c *Client) registerServices() {
+	c.Contacts = &ContactsService{client: c}
+	c.DeletedEntities = &DeletedEntitiesService{client: c}
+	c.Invoices = &InvoicesService{client: c}
+	c.Logs = &LogsService{client: c}
+	c.MaterialReports = &MaterialReportsService{client: c}
+	c.Offers = &OffersService{client: c}
+	c.Opportunities = &OpportunitiesService{client: c}
+	c.PaymentPlans = &PaymentPlansService{client: c}
+	c.Planning = &PlanningService{client: c}
+	c.ProjectCollections = &ProjectCollectionsService{client: c}
+	c.Projects = &ProjectsService{client: c}
+	c.SupplierInvoices = &SupplierInvoicesService{client: c}
+	c.TaskBoards = &TaskBoardsService{client: c}
+	c.Tasks = &TasksService{client: c}
+	c.TimeReports = &TimeReportsService{client: c}
+	c.VacationRequests = &VacationRequestsService{client: c}
+
+	c.AbsenceProjects = &AbsenceProjectsService{client: c}
+	c.Activities = &ActivitiesService{client: c}
+	c.Articles = &ArticlesService{client: c}
+	c.BookingProjects = &BookingProjectsService{client: c}
+	c.CompanyCars = &CompanyCarsService{client: c}
+	c.ContactTags = &ContactTagsService{client: c}
+	c.CostCenters = &CostCentersService{client: c}
+	c.Countries = &CountriesService{client: c}
+	c.Departments = &DepartmentsService{client: c}
+	c.InternalProjects = &InternalProjectsService{client: c}
+	c.OpportunityStatuses = &OpportunityStatusesService{client: c}
+	c.OpportunityTags = &OpportunityTagsService{client: c}
+	c.ProjectCategories = &ProjectCategoriesService{client: c}
+	c.ProjectStatuses = &ProjectStatusesService{client: c}
+	c.ProjectTags = &ProjectTagsService{client: c}
+	c.TimeCodes = &TimeCodesService{client: c}
+	c.Units = &UnitsService{client: c}
+	c.Users = &UsersService{client: c}
+	c.VatCodes = &VatCodesService{client: c}
 }
 
 func NewClientWithTokenSource(source TokenSource, opts ...Option) (*Client, error) {
@@ -159,13 +236,83 @@ func (c *Client) newAppTokenSource(appID, appSecret string) (*appTokenSource, er
 }
 
 func (c *Client) do(ctx context.Context, method, resourcePath string, query url.Values, body any, out any) error {
-	requestURL, err := c.buildURL(resourcePath, query)
+	encoded, err := encodeJSONBody(body)
 	if err != nil {
 		return err
 	}
-	payload, err := encodeBody(body)
+	return c.doEncoded(ctx, method, resourcePath, query, encoded, out)
+}
+
+type UploadFile struct {
+	FieldName   string
+	Filename    string
+	ContentType string
+	Content     io.Reader
+}
+
+func (c *Client) upload(ctx context.Context, resourcePath string, fields map[string]string, files []UploadFile, out any) error {
+	encoded, err := encodeMultipartBody(fields, files)
 	if err != nil {
 		return err
+	}
+	return c.doEncoded(ctx, http.MethodPost, resourcePath, nil, encoded, out)
+}
+
+func (c *Client) doEncoded(ctx context.Context, method, resourcePath string, query url.Values, body requestBody, out any) error {
+	resp, err := c.execute(ctx, method, resourcePath, query, body, jsonContentType)
+	if err != nil {
+		return err
+	}
+	responseBody, err := readBody(resp)
+	if err != nil {
+		return fmt.Errorf("blikk: reading response of %s %s: %w", method, resp.Request.URL.Path, err)
+	}
+	return decodeBody(method, resourcePath, responseBody, out)
+}
+
+type Download struct {
+	Content     io.ReadCloser
+	ContentType string
+	Filename    string
+}
+
+// download streams the body; the caller must close Content.
+func (c *Client) download(ctx context.Context, resourcePath string, query url.Values) (*Download, error) {
+	resp, err := c.execute(ctx, http.MethodGet, resourcePath, query, requestBody{}, anyContentType)
+	if err != nil {
+		return nil, err
+	}
+	return &Download{
+		Content:     resp.Body,
+		ContentType: resp.Header.Get("Content-Type"),
+		Filename:    filenameFromContentDisposition(resp.Header.Get("Content-Disposition")),
+	}, nil
+}
+
+func filenameFromContentDisposition(header string) string {
+	_, params, err := mime.ParseMediaType(header)
+	if err != nil {
+		return ""
+	}
+	return baseName(params["filename"])
+}
+
+// The name comes from the server, so drop any directory part before a caller writes it to disk.
+func baseName(filename string) string {
+	if i := strings.LastIndexAny(filename, `/\`); i >= 0 {
+		filename = filename[i+1:]
+	}
+	if filename == "." || filename == ".." {
+		return ""
+	}
+	return filename
+}
+
+// execute returns only successful responses, with the body still open for the caller to read and close.
+func (c *Client) execute(ctx context.Context, method, resourcePath string, query url.Values, body requestBody, accept string) (*http.Response, error) {
+	requestURL, err := c.buildURL(resourcePath, query)
+	if err != nil {
+		return nil, err
 	}
 
 	rateLimitRetries := 0
@@ -173,25 +320,30 @@ func (c *Client) do(ctx context.Context, method, resourcePath string, query url.
 	for {
 		token, err := c.tokenSource.Token(ctx)
 		if err != nil {
-			return err
+			return nil, err
 		}
-		statusCode, header, responseBody, err := c.send(ctx, method, requestURL, payload, token)
+		resp, err := c.send(ctx, method, requestURL, body, token, accept)
 		if err != nil {
-			return err
+			return nil, err
+		}
+		if isSuccess(resp.StatusCode) {
+			return resp, nil
+		}
+		errorBody, err := readBody(resp)
+		if err != nil {
+			return nil, fmt.Errorf("blikk: reading response of %s %s: %w", method, resp.Request.URL.Path, err)
 		}
 		switch {
-		case statusCode == http.StatusTooManyRequests && rateLimitRetries < maxRateLimitRetries:
+		case resp.StatusCode == http.StatusTooManyRequests && rateLimitRetries < maxRateLimitRetries:
 			rateLimitRetries++
-			if err := c.sleep(ctx, retryAfter(header, responseBody)); err != nil {
-				return err
+			if err := c.sleep(ctx, retryAfter(resp.Header, errorBody)); err != nil {
+				return nil, err
 			}
-		case statusCode == http.StatusUnauthorized && !tokenInvalidated:
+		case resp.StatusCode == http.StatusUnauthorized && !tokenInvalidated:
 			tokenInvalidated = true
 			c.tokenSource.Invalidate(token)
-		case isSuccess(statusCode):
-			return decodeBody(method, resourcePath, responseBody, out)
 		default:
-			return newError(method, "/"+resourcePath, statusCode, header, responseBody)
+			return nil, newError(method, "/"+resourcePath, resp.StatusCode, resp.Header, errorBody)
 		}
 	}
 }
@@ -207,23 +359,19 @@ func (c *Client) buildURL(resourcePath string, query url.Values) (string, error)
 	return requestURL, nil
 }
 
-func (c *Client) send(ctx context.Context, method, requestURL string, payload []byte, token string) (int, http.Header, []byte, error) {
+func (c *Client) send(ctx context.Context, method, requestURL string, body requestBody, token, accept string) (*http.Response, error) {
 	if err := c.waitForRateLimit(ctx); err != nil {
-		return 0, nil, nil, err
+		return nil, err
 	}
-	req, err := c.newRequest(ctx, method, requestURL, payload, token)
+	req, err := c.newRequest(ctx, method, requestURL, body, token, accept)
 	if err != nil {
-		return 0, nil, nil, err
+		return nil, err
 	}
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
-		return 0, nil, nil, fmt.Errorf("blikk: %s %s: %w", method, req.URL.Path, err)
+		return nil, fmt.Errorf("blikk: %s %s: %w", method, req.URL.Path, err)
 	}
-	statusCode, body, err := readResponse(resp)
-	if err != nil {
-		return 0, nil, nil, fmt.Errorf("blikk: reading response of %s %s: %w", method, req.URL.Path, err)
-	}
-	return statusCode, resp.Header, body, nil
+	return resp, nil
 }
 
 // rate.Limiter fails early with a plain error when the wait would outlast the deadline, before ctx is done.
@@ -239,43 +387,108 @@ func (c *Client) waitForRateLimit(ctx context.Context) error {
 	}
 }
 
-func (c *Client) newRequest(ctx context.Context, method, requestURL string, payload []byte, token string) (*http.Request, error) {
-	var body io.Reader
-	if payload != nil {
-		body = bytes.NewReader(payload)
+func (c *Client) newRequest(ctx context.Context, method, requestURL string, body requestBody, token, accept string) (*http.Request, error) {
+	var reader io.Reader
+	if body.payload != nil {
+		reader = bytes.NewReader(body.payload)
 	}
-	req, err := http.NewRequestWithContext(ctx, method, requestURL, body)
+	req, err := http.NewRequestWithContext(ctx, method, requestURL, reader)
 	if err != nil {
 		return nil, fmt.Errorf("blikk: creating request: %w", err)
 	}
 	req.Header.Set("Authorization", "Bearer "+token)
-	req.Header.Set("Accept", jsonContentType)
+	req.Header.Set("Accept", accept)
 	req.Header.Set("User-Agent", c.userAgent)
-	if payload != nil {
-		req.Header.Set("Content-Type", jsonContentType)
+	if body.payload != nil {
+		req.Header.Set("Content-Type", body.contentType)
 	}
 	return req, nil
 }
 
 func readResponse(resp *http.Response) (int, []byte, error) {
+	body, err := readBody(resp)
+	return resp.StatusCode, body, err
+}
+
+func readBody(resp *http.Response) ([]byte, error) {
 	defer resp.Body.Close()
 	reader := io.Reader(resp.Body)
 	if !isSuccess(resp.StatusCode) {
 		reader = io.LimitReader(resp.Body, maxErrorBodyBytes)
 	}
-	body, err := io.ReadAll(reader)
-	return resp.StatusCode, body, err
+	return io.ReadAll(reader)
 }
 
-func encodeBody(body any) ([]byte, error) {
+// The payload is held in memory so a retry after 429 or 401 can send it again.
+type requestBody struct {
+	payload     []byte
+	contentType string
+}
+
+func encodeJSONBody(body any) (requestBody, error) {
 	if body == nil {
-		return nil, nil
+		return requestBody{}, nil
 	}
 	payload, err := json.Marshal(body)
 	if err != nil {
-		return nil, fmt.Errorf("blikk: encoding request body: %w", err)
+		return requestBody{}, fmt.Errorf("blikk: encoding request body: %w", err)
 	}
-	return payload, nil
+	return requestBody{payload: payload, contentType: jsonContentType}, nil
+}
+
+func encodeMultipartBody(fields map[string]string, files []UploadFile) (requestBody, error) {
+	var buffer bytes.Buffer
+	writer := multipart.NewWriter(&buffer)
+	for _, name := range slices.Sorted(maps.Keys(fields)) {
+		if err := writer.WriteField(name, fields[name]); err != nil {
+			return requestBody{}, fmt.Errorf("blikk: encoding form field %q: %w", name, err)
+		}
+	}
+	for _, file := range files {
+		if err := writeFilePart(writer, file); err != nil {
+			return requestBody{}, err
+		}
+	}
+	if err := writer.Close(); err != nil {
+		return requestBody{}, fmt.Errorf("blikk: encoding multipart body: %w", err)
+	}
+	return requestBody{payload: buffer.Bytes(), contentType: writer.FormDataContentType()}, nil
+}
+
+func writeFilePart(writer *multipart.Writer, file UploadFile) error {
+	if file.Content == nil {
+		return fmt.Errorf("blikk: upload file %q has no content", file.Filename)
+	}
+	part, err := writer.CreatePart(filePartHeader(file))
+	if err != nil {
+		return fmt.Errorf("blikk: encoding file %q: %w", file.Filename, err)
+	}
+	if _, err := io.Copy(part, file.Content); err != nil {
+		return fmt.Errorf("blikk: reading file %q: %w", file.Filename, err)
+	}
+	return nil
+}
+
+var quoteEscaper = strings.NewReplacer(`\`, `\\`, `"`, `\"`)
+
+// Quoted like multipart.Writer.CreateFormFile, which cannot set the part's Content-Type.
+func filePartHeader(file UploadFile) textproto.MIMEHeader {
+	header := make(textproto.MIMEHeader)
+	header.Set("Content-Disposition", fmt.Sprintf(`form-data; name="%s"; filename="%s"`,
+		quoteEscaper.Replace(file.FieldName), quoteEscaper.Replace(file.Filename)))
+	header.Set("Content-Type", cmp.Or(file.ContentType, "application/octet-stream"))
+	return header
+}
+
+func setFieldIfNotEmpty(fields map[string]string, name, value string) {
+	if value != "" {
+		fields[name] = value
+	}
+}
+
+func withDefaultFieldName(file UploadFile, fieldName string) UploadFile {
+	file.FieldName = cmp.Or(file.FieldName, fieldName)
+	return file
 }
 
 func decodeBody(method, resourcePath string, body []byte, out any) error {

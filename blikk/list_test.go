@@ -2,6 +2,7 @@ package blikk
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -140,4 +141,69 @@ func TestListDefaultsPageToOneAndOmitsUnsetOptions(t *testing.T) {
 	assert.Equal(t, 2, page.ItemCount)
 	assert.Equal(t, 2, page.PageSize)
 	assert.Len(t, page.Items, 2)
+}
+
+type deletedEntityFilter struct {
+	EntityTypes []string `json:"entityTypes"`
+}
+
+func threeBodyPages(w http.ResponseWriter, r *http.Request) {
+	var body struct {
+		Page int `json:"page"`
+	}
+	_ = json.NewDecoder(r.Body).Decode(&body)
+	fmt.Fprintf(w, `{"objectName":"generic.pagedlist","page":%d,"pageSize":2,"itemCount":2,"totalItemCount":6,"totalPages":3,"items":[{"id":%d},{"id":%d}]}`, body.Page, body.Page*10+1, body.Page*10+2)
+}
+
+func TestListPageWithBodyPostsPagingInBody(t *testing.T) {
+	client, handler := newRecordingClient(t, routes(t, map[string]http.HandlerFunc{"POST /v1/Core/DeletedEntities": threeBodyPages}))
+
+	page, err := listPageWithBody[NameID](context.Background(), client, "v1/Core/DeletedEntities", pagedBody{Filter: deletedEntityFilter{EntityTypes: []string{"contact"}}})
+
+	require.NoError(t, err)
+	assert.Equal(t, []NameID{{ID: 11}, {ID: 12}}, page.Items)
+	assert.Equal(t, 3, page.TotalPages)
+	request := handler.last()
+	assert.Empty(t, request.Query)
+	assert.JSONEq(t, `{"filter":{"entityTypes":["contact"]},"page":1}`, string(request.Body))
+}
+
+func TestListPageWithBodyOmitsNilFilter(t *testing.T) {
+	client, handler := newRecordingClient(t, threeBodyPages)
+
+	_, err := listPageWithBody[NameID](context.Background(), client, "v1/Core/DeletedEntities", pagedBody{Page: 2, PageSize: 10})
+
+	require.NoError(t, err)
+	assert.JSONEq(t, `{"page":2,"pageSize":10}`, string(handler.last().Body))
+}
+
+func TestListAllWithBodyWalksEveryPage(t *testing.T) {
+	client, handler := newRecordingClient(t, threeBodyPages)
+	filter := deletedEntityFilter{EntityTypes: []string{"timereport"}}
+
+	var ids []int
+	for item, err := range listAllWithBody[NameID](context.Background(), client, "v1/Core/DeletedEntities", pagedBody{Filter: filter, Page: 2}) {
+		require.NoError(t, err)
+		ids = append(ids, item.ID)
+	}
+
+	assert.Equal(t, []int{21, 22, 31, 32}, ids)
+	requests := handler.all()
+	require.Len(t, requests, 2)
+	for i, request := range requests {
+		assert.Equal(t, http.MethodPost, request.Method)
+		assert.JSONEq(t, fmt.Sprintf(`{"filter":{"entityTypes":["timereport"]},"page":%d,"pageSize":%d}`, i+2, MaxPageSize), string(request.Body))
+	}
+}
+
+func TestListAllWithBodyStopsAtFirstError(t *testing.T) {
+	client := newTestClient(t, respondWith(http.StatusBadRequest, `{"message":"bad filter"}`))
+
+	var errs []error
+	for _, err := range listAllWithBody[NameID](context.Background(), client, "v1/Core/DeletedEntities", pagedBody{}) {
+		errs = append(errs, err)
+	}
+
+	require.Len(t, errs, 1)
+	assert.ErrorContains(t, errs[0], "bad filter")
 }

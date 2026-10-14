@@ -1,0 +1,31 @@
+{
+  "objectName": "projectcollection.list",
+  "id": 42,
+  "name": "42 Lorem ipsum",
+  "title": "Lorem ipsum",
+  "projectNumber": "42",
+  "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
+  "status": {
+    "objectName": "projectcollection.list.status",
+    "id": 1,
+    "name": "Active",
+    "isCompletedStatus": false
+  },
+  "type": "Normal",
+  "category": {
+    "objectName": "projectcollection.list.category",
+    "name": "Category 1",
+    "color": "Red"
+  },
+  "manager": {
+    "objectName": "generic.name_id",
+    "id": 1,
+    "name": "John Doe"
+  },
+  "customer": {
+    "objectName": "generic.name_id",
+    "id": 1,
+    "name": "ACME Inc."
+  },
+  "finishedDate": "2026-10-13"
+}

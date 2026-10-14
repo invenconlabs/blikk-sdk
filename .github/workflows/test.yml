@@ -27,9 +27,6 @@ jobs:
     runs-on: ubuntu-26.04
     permissions:
       contents: read
-      checks: write
-      pull-requests: write
-      issues: read
     steps:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -51,23 +48,18 @@ jobs:
       - name: Run Unit Tests
         run: gotestsum --format github-actions --junitfile unit.xml -- -race ./...
 
-      - name: Report Unit Tests
-        if: always() && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
-        uses: EnricoMi/publish-unit-test-result-action/linux@7622c5bf3d112a72ab4fa3951c2aa5723d8ab92d # v2.25.0
+      - name: Upload Unit Test Results
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          check_name: Unit Test Results
-          files: unit.xml
-          comment_mode: always
+          name: unit-results
+          path: unit.xml
 
   integration-test:
-    # Fork pull requests get no secrets and a read-only token, so they only run unit tests and post nothing.
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-26.04
     permissions:
       contents: read
-      checks: write
-      pull-requests: write
-      issues: read
     needs: unit-test
     steps:
       - name: Checkout code
@@ -91,12 +83,36 @@ jobs:
         env:
           BLIKK_APP_ID: ${{ secrets.BLIKK_APP_ID }}
           BLIKK_APP_SECRET: ${{ secrets.BLIKK_APP_SECRET }}
-        run: gotestsum --format github-actions --junitfile integration.xml -- -tags=integration ./...
+        run: gotestsum --format github-actions --junitfile integration.xml -- -tags=integration -run '^TestIntegration' ./...
 
-      - name: Report Integration Tests
+      - name: Upload Integration Test Results
         if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: integration-results
+          path: integration.xml
+
+  report:
+    # Fork pull requests get no secrets and a read-only token, so they only run unit tests and post nothing.
+    if: always() && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
+    needs: [unit-test, integration-test]
+    runs-on: ubuntu-26.04
+    permissions:
+      contents: read
+      checks: write
+      pull-requests: write
+      issues: read
+    steps:
+      - name: Download Test Results
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          pattern: '*-results'
+          path: results
+          merge-multiple: true
+
+      - name: Report Test Results
         uses: EnricoMi/publish-unit-test-result-action/linux@7622c5bf3d112a72ab4fa3951c2aa5723d8ab92d # v2.25.0
         with:
-          check_name: Integration Test Results
-          files: integration.xml
+          check_name: Test Results
+          files: results/*.xml
           comment_mode: always

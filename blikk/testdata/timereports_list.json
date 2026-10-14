@@ -1,0 +1,85 @@
+{
+  "objectName": "generic.pagedlist",
+  "page": 1,
+  "pageSize": 25,
+  "itemCount": 1,
+  "totalItemCount": 1,
+  "totalPages": 1,
+  "items": [
+    {
+      "objectName": "timereport.list",
+      "id": 270,
+      "date": "2021-08-30",
+      "clockStart": "07:00",
+      "clockEnd": "17:00",
+      "hours": 8,
+      "invoiceableHours": 7,
+      "breakMinutes": 60,
+      "cost": 200,
+      "rate": 500,
+      "discount": null,
+      "comment": "A comment that is visible on the invoice",
+      "internalComment": "A comment that is not visible on the invoice",
+      "sentToAttestDate": "2021-09-15 07:02:16 +00:00",
+      "attestedDate": "2021-09-15 07:10:18 +00:00",
+      "user": {
+        "objectName": "generic.name_id",
+        "id": 1,
+        "name": "John Doe"
+      },
+      "project": {
+        "objectName": "project.name_id",
+        "id": 19,
+        "name": "Maintenance",
+        "number": "12"
+      },
+      "internalProject": null,
+      "absenceProject": null,
+      "contact": {
+        "objectName": "generic.name_id",
+        "id": 87,
+        "name": "Microsoft"
+      },
+      "activity": {
+        "objectName": "generic.name_id",
+        "id": 34,
+        "name": "Project management"
+      },
+      "timeCode": {
+        "objectName": "generic.name_id",
+        "id": 16,
+        "name": "Normal"
+      },
+      "timeArticle": {
+        "objectName": "generic.name_id",
+        "id": 49,
+        "name": "Work hours"
+      },
+      "costCenter": {
+        "objectName": "generic.name_id",
+        "id": 460,
+        "name": "Center"
+      },
+      "invoiceId": 16012,
+      "invoicedDate": null,
+      "invoiceDraftId": null,
+      "travelReportId": 15747,
+      "allowanceReportId": 314,
+      "createdDate": "2021-09-15 05:02:04 +00:00",
+      "updatedDate": "2021-10-09 12:44:07 +00:00",
+      "hasAdditions": false,
+      "hasEquipment": true,
+      "createdBy": {
+        "objectName": "generic.name_id",
+        "id": 6,
+        "name": "John Doe"
+      },
+      "updatedBy": {
+        "objectName": "generic.name_id",
+        "id": 1416,
+        "name": "Derek Johnson"
+      },
+      "taskId": null
+    }
+  ]
+}

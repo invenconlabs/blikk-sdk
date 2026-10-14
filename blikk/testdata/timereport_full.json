@@ -1,0 +1,227 @@
+{
+  "objectName": "timereport.detail",
+  "id": 270,
+  "date": "2021-08-30",
+  "clockStart": null,
+  "clockEnd": null,
+  "hours": 8,
+  "invoiceableHours": 7,
+  "breakMinutes": null,
+  "cost": 200,
+  "rate": 500,
+  "discount": null,
+  "comment": "A comment that is visible on the invoice",
+  "internalComment": "A comment that is not visible on the invoice",
+  "sentToAttestDate": "2021-09-15 07:02:16 +00:00",
+  "attestedDate": "2021-09-15 07:10:18 +00:00",
+  "attestedByUser": null,
+  "user": {
+    "objectName": "generic.name_id",
+    "id": 1,
+    "name": "John Doe"
+  },
+  "contact": {
+    "objectName": "generic.name_id",
+    "id": 87,
+    "name": "Microsoft"
+  },
+  "project": {
+    "objectName": "project.name_id",
+    "id": 19,
+    "name": "Maintenance",
+    "number": "12"
+  },
+  "internalProject": null,
+  "absenceProject": null,
+  "activity": {
+    "objectName": "generic.name_id",
+    "id": 34,
+    "name": "Project management"
+  },
+  "timeCode": {
+    "objectName": "generic.name_id",
+    "id": 16,
+    "name": "Normal"
+  },
+  "timeArticle": {
+    "objectName": "generic.name_id",
+    "id": 49,
+    "name": "Work hours"
+  },
+  "costCenter": null,
+  "bookingProject": null,
+  "invoiceId": null,
+  "invoicedDate": null,
+  "invoiceDraftId": null,
+  "task": null,
+  "travelReport": {
+    "objectName": "timereport.detail.travelreport",
+    "id": 270,
+    "place": "piteå-luleå-piteå",
+    "invoicablePlace": "piteå-luleå-piteå",
+    "distance": 100,
+    "invoicableDistance": 150,
+    "toSalary": true,
+    "toBeInvoiced": true,
+    "cost": 10,
+    "rate": 15,
+    "discount": null,
+    "sentToAttestDate": null,
+    "attestedDate": null,
+    "costCenter": {
+      "objectName": "generic.name_id",
+      "id": 3,
+      "name": "Cost center 3"
+    },
+    "bookingProject": {
+      "objectName": "generic.name_id",
+      "id": 2,
+      "name": "BP 2"
+    },
+    "invoiceId": null,
+    "invoicedDate": null,
+    "invoiceDraftId": null,
+    "companyCar": {
+      "objectName": "timereport.detail.travelreport.companycar",
+      "id": 12,
+      "name": "Company car #1",
+      "tripStart": 15000,
+      "tripEnd": 15250,
+      "addressStart": "My street 123, My city",
+      "addressGoal": "My street 321, Another city",
+      "addressEnd": "My street 123, My city"
+    },
+    "article": null
+  },
+  "allowanceReport": {
+    "objectName": "timereport.detail.allowancereport",
+    "id": 12,
+    "description": "Lunch",
+    "cost": 200,
+    "amount": 250,
+    "invoicableAmount": 250,
+    "discount": null,
+    "invoicableSpecification": "Whole day",
+    "toBeInvoiced": false,
+    "sentToAttestDate": null,
+    "attestedDate": null,
+    "costCenter": {
+      "objectName": "generic.name_id",
+      "id": 3,
+      "name": "Cost center 3"
+    },
+    "bookingProject": {
+      "objectName": "generic.name_id",
+      "id": 2,
+      "name": "BP 2"
+    },
+    "invoiceId": null,
+    "invoicedDate": null,
+    "invoiceDraftId": null,
+    "article": null
+  },
+  "materials": [
+    {
+      "objectName": "timereport.detail.materialreport",
+      "id": 12,
+      "title": "Breaker bar",
+      "units": 2,
+      "costPerUnit": 100,
+      "discountInPercent": null,
+      "invoicableUnits": null,
+      "unitPrice": 125,
+      "invoicableUnitPrice": 125,
+      "taxPercent": 25,
+      "amount": 250,
+      "invoicableAmount": 250,
+      "cost": 200,
+      "calculatedUnits": null,
+      "tax": 62.5,
+      "toBeInvoiced": true,
+      "article": {
+        "objectName": "generic.name_id",
+        "id": 24,
+        "name": "Breaker bar"
+      },
+      "unitText": "pcs",
+      "invoicableUnitText": "pcs",
+      "isRotRut": false,
+      "invoiceId": null,
+      "invoicedDate": null,
+      "invoiceDraftId": null,
+      "articleNumber": "0012",
+      "costCenter": {
+        "objectName": "generic.name_id",
+        "id": 3,
+        "name": "Cost center 3"
+      },
+      "bookingProject": {
+        "objectName": "generic.name_id",
+        "id": 2,
+        "name": "BP 2"
+      }
+    }
+  ],
+  "equipments": [
+    {
+      "objectName": "timereport.detail.equipmentreport",
+      "id": 12,
+      "hours": 5,
+      "cost": 20,
+      "rate": 30,
+      "invoicableRate": 40,
+      "invoicableHours": 5,
+      "article": {
+        "objectName": "generic.name_id",
+        "id": 45,
+        "name": "Jackhammer"
+      },
+      "invoiceId": null,
+      "invoicedDate": null,
+      "invoiceDraftId": null,
+      "discount": null,
+      "comment": "Used the jackhammer to obliterate a concrete slab.",
+      "costCenter": {
+        "objectName": "generic.name_id",
+        "id": 3,
+        "name": "Cost center 3"
+      },
+      "bookingProject": {
+        "objectName": "generic.name_id",
+        "id": 2,
+        "name": "BP 2"
+      }
+    }
+  ],
+  "additions": [
+    {
+      "objectName": "timereport.detail.additionreport",
+      "id": 12,
+      "salaryCount": 2,
+      "invoicableCount": 2,
+      "cost": 20,
+      "invoicablePrice": 400,
+      "discount": null,
+      "invoiceId": null,
+      "invoicedDate": null,
+      "invoiceDraftId": null,
+      "article": {
+        "objectName": "generic.name_id",
+        "id": 78,
+        "name": "Night time"
+      },
+      "costCenter": {
+        "objectName": "generic.name_id",
+        "id": 3,
+        "name": "Cost center 3"
+      },
+      "bookingProject": {
+        "objectName": "generic.name_id",
+        "id": 2,
+        "name": "BP 2"
+      }
+    }
+  ],
+  "createdDate": "2021-09-15 05:02:04 +00:00",
+  "updatedDate": null
+}

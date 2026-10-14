@@ -1,0 +1,46 @@
+{
+  "objectName": "generic.pagedlist",
+  "page": 1,
+  "pageSize": 25,
+  "itemCount": 1,
+  "totalItemCount": 1,
+  "totalPages": 1,
+  "items": [
+    {
+      "objectName": "user.list",
+      "id": 2,
+      "firstName": "John",
+      "lastName": "Doe",
+      "email": null,
+      "startDate": "2021-02-01",
+      "endDate": "2022-02-15",
+      "employeeNumber": "123456",
+      "timeReportingProfile": {
+        "objectName": "generic.name_id",
+        "id": 5,
+        "name": "Default profile"
+      },
+      "department": {
+        "objectName": "generic.name_id",
+        "id": 1,
+        "name": "Developers"
+      },
+      "license": "total",
+      "permissions": [
+        "administrator",
+        "sales"
+      ],
+      "createdBy": {
+        "objectName": "generic.name_id",
+        "id": 1,
+        "name": "Jane Doe"
+      },
+      "updatedBy": null,
+      "createdDate": "2026-09-23 09:40:57 +00:00",
+      "updatedDate": null,
+      "salaryType": 0,
+      "costCenter": null,
+      "isRestricted": false
+    }
+  ]
+}

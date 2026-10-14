@@ -1,0 +1,106 @@
+{
+  "date": "2021-11-10 00:00:00",
+  "clockStart": "10:00",
+  "clockEnd": "18:00",
+  "hours": 7.75,
+  "invoiceableHours": 9,
+  "breakMinutes": 15,
+  "comment": "Lorem ipsum dolar sit amet",
+  "internalComment": "Lorem ipsum dolar sit amet",
+  "userId": 1,
+  "projectId": 1,
+  "internalProjectId": null,
+  "absenceProjectId": null,
+  "activityId": 1,
+  "timeCodeId": 1,
+  "timeArticleId": 1,
+  "taskId": null,
+  "travelReport": {
+    "place": "Piteå-Luleå-Piteå",
+    "distance": 100,
+    "invoiceableDistance": 120,
+    "toSalary": true,
+    "companyCar": {
+      "id": 1,
+      "tripStart": 15000,
+      "tripEnd": 15100,
+      "addressStart": "Generalgatan 1",
+      "addressGoal": "Generalgatan 2",
+      "addressEnd": "Generalgatan 1"
+    }
+  },
+  "allowanceReport": {
+    "allowanceTypeId": 1,
+    "description": "Lorem ipsum dolar sit amet",
+    "toBeInvoiced": true
+  },
+  "materials": [
+    {
+      "id": null,
+      "articleId": 55,
+      "articleNumber": "A12",
+      "title": "Lorem ipsum",
+      "unitPrice": 600,
+      "invoiceableUnitPrice": 650,
+      "units": 4,
+      "invoiceableUnits": 5,
+      "calculatedUnits": 4,
+      "unitText": "st",
+      "cost": 500,
+      "discountInPercent": 0,
+      "isTextOnly": false
+    },
+    {
+      "id": null,
+      "articleId": null,
+      "articleNumber": "E01",
+      "title": "Article not in registry",
+      "unitPrice": 300,
+      "invoiceableUnitPrice": 300,
+      "units": 1,
+      "invoiceableUnits": 2,
+      "calculatedUnits": 1,
+      "unitText": "meter",
+      "cost": 100,
+      "discountInPercent": 10,
+      "isTextOnly": false
+    },
+    {
+      "id": null,
+      "articleId": null,
+      "articleNumber": null,
+      "title": "Lorem ipsum dolar sit amet...",
+      "unitPrice": 0,
+      "invoiceableUnitPrice": null,
+      "units": 0,
+      "invoiceableUnits": null,
+      "calculatedUnits": null,
+      "unitText": null,
+      "cost": null,
+      "discountInPercent": null,
+      "isTextOnly": true
+    }
+  ],
+  "equipments": [
+    {
+      "id": null,
+      "hours": 4.5,
+      "articleId": 10,
+      "comment": "Lorem ipsum dolar sit amet"
+    }
+  ],
+  "additions": [
+    {
+      "id": null,
+      "articleId": 14,
+      "yesNo": null,
+      "numberCount": 3
+    },
+    {
+      "id": null,
+      "articleId": 15,
+      "yesNo": true,
+      "numberCount": null
+    }
+  ]
+}

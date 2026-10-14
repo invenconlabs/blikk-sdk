@@ -1,0 +1,79 @@
+{
+  "objectName": "generic.pagedlist",
+  "page": 1,
+  "pageSize": 25,
+  "itemCount": 1,
+  "totalItemCount": 1,
+  "totalPages": 1,
+  "items": [
+    {
+      "objectName": "project.list",
+      "id": 1,
+      "orderNumber": "26",
+      "title": "Lorem ipsum",
+      "status": {
+        "objectName": "project.list.status",
+        "id": 1,
+        "name": "Ongoing",
+        "isCompletedStatus": false
+      },
+      "category": {
+        "objectName": "project.list.category",
+        "id": 1,
+        "name": "Lorem ipsum",
+        "color": "#e3168a"
+      },
+      "salesResponsible": null,
+      "startDate": "2021-02-01",
+      "endDate": "2022-02-15",
+      "invoiceType": "Ongoing",
+      "location": {
+        "objectName": "project.list.location",
+        "longitude": 21.48181104660036,
+        "latitude": 65.3175658912035,
+        "streetAddress": "Some street 123",
+        "postalCode": "94100",
+        "city": "Washington",
+        "countryName": "USA"
+      },
+      "projectManager": {
+        "objectName": "generic.name_id",
+        "id": 1,
+        "name": "John Doe"
+      },
+      "customer": {
+        "objectName": "generic.name_id",
+        "id": 1,
+        "name": "Ipsum"
+      },
+      "projectCollection": {
+        "objectName": "projectcollection.name_id",
+        "id": 14,
+        "name": "Dolar sit amet",
+        "number": "P012"
+      },
+      "tags": [
+        {
+          "objectName": "generic.tag",
+          "id": 1,
+          "title": "Ipsum",
+          "color": "#41b18b"
+        }
+      ],
+      "costCenter": {
+        "objectName": "costcenter.name_id",
+        "id": 123,
+        "name": "Cost Center 123",
+        "code": "CC123"
+      },
+      "createdBy": {
+        "objectName": "generic.name_id",
+        "id": 1,
+        "name": "John Doe"
+      },
+      "updatedBy": null,
+      "created": "2026-09-28 09:40:57 +00:00",
+      "updated": null
+    }
+  ]
+}

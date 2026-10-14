@@ -1,0 +1,38 @@
+{
+  "objectName": "generic.pagedlist",
+  "page": 1,
+  "pageSize": 25,
+  "itemCount": 1,
+  "totalItemCount": 1,
+  "totalPages": 1,
+  "items": [
+    {
+      "objectName": "timereport.userdaystatistics",
+      "userId": 1,
+      "name": "John Doe",
+      "department": {
+        "objectName": "generic.name_id",
+        "id": 1,
+        "name": "Developers"
+      },
+      "dates": [
+        {
+          "objectName": "timereport.userdaystatistics.datedata",
+          "date": "2021-10-01",
+          "reportedHours": 8.5,
+          "scheduledHours": 8.0,
+          "lockedDate": "2026-10-13 09:40:57 +00:00",
+          "attestedDate": null
+        },
+        {
+          "objectName": "timereport.userdaystatistics.datedata",
+          "date": "2021-10-02",
+          "reportedHours": 4.25,
+          "scheduledHours": 8.0,
+          "lockedDate": null,
+          "attestedDate": null
+        }
+      ]
+    }
+  ]
+}

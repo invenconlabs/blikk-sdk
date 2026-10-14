@@ -1,0 +1,27 @@
+{
+  "objectName": "generic.pagedlist",
+  "page": 1,
+  "pageSize": 25,
+  "itemCount": 1,
+  "totalItemCount": 1,
+  "totalPages": 1,
+  "items": [
+    {
+      "objectName": "vacationrequest.list",
+      "id": 1,
+      "user": {"objectName": "generic.name_id", "id": 1, "name": "John Doe"},
+      "fromDate": "2026-10-13",
+      "toDate": "2026-10-14",
+      "hours": 8.0,
+      "description": null,
+      "absenceProject": {"objectName": "generic.name_id", "id": 1, "name": "Semester"},
+      "attestedDate": "2026-10-13 09:40:57 +00:00",
+      "attestedByUser": {"objectName": "generic.name_id", "id": 1, "name": "John Doe"},
+      "deniedDate": null,
+      "deniedByUser": null,
+      "updatedDate": "2026-10-13 09:40:57 +00:00",
+      "updatedByUser": {"objectName": "generic.name_id", "id": 1, "name": "John Doe"},
+      "createdDate": "2026-10-13 09:40:57 +00:00"
+    }
+  ]
+}

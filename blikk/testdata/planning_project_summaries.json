@@ -1,0 +1,30 @@
+{
+  "objectName": "generic.pagedlist",
+  "page": 1,
+  "pageSize": 25,
+  "itemCount": 2,
+  "totalItemCount": 2,
+  "totalPages": 1,
+  "items": [
+    {
+      "objectName": "planning.summary.project",
+      "projectId": 101,
+      "fromDate": "2026-01-01",
+      "toDate": "2026-12-31",
+      "projectName": "Website Redesign",
+      "plannedHours": 160.0,
+      "expectedInvoiceableAmount": 152000.00,
+      "expectedCost": 80000.00
+    },
+    {
+      "objectName": "planning.summary.project",
+      "projectId": 102,
+      "fromDate": "2026-01-01",
+      "toDate": "2026-12-31",
+      "projectName": "Mobile App Development",
+      "plannedHours": 80.5,
+      "expectedInvoiceableAmount": 76475.00,
+      "expectedCost": null
+    }
+  ]
+}

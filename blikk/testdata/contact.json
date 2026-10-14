@@ -1,0 +1,73 @@
+{
+  "objectName": "contact.detail",
+  "id": 32,
+  "name": "Lotta Larsson",
+  "customerNumber": "111",
+  "contactType": "Person",
+  "organizationalOrSocialSecurityNumber": "860311-7063",
+  "company": null,
+  "externalId": "12345",
+  "parentCompany": null,
+  "isActive": true,
+  "email": "lotta@familjenlarsson.se",
+  "invoiceEmail": "",
+  "phoneNumber": "075-9902281",
+  "cellPhoneNumber": "0707788994",
+  "importantInformation": "",
+  "isSupplier": false,
+  "isWholeSale": false,
+  "isRetailer": false,
+  "isSubContractor": false,
+  "isPartner": false,
+  "isCustomer": false,
+  "useReverseBuildTax": false,
+  "vatNumber": "SE556677889901",
+  "invoicingNotes": "Mark the invoice with the project number",
+  "vatType": "Sweden",
+  "electronicInvoiceReferenceCode": "REF-4711",
+  "responsible": {
+    "objectName": "generic.name_id",
+    "id": 5,
+    "name": "Jonas lindberg"
+  },
+  "contactPersons": [],
+  "tags": [],
+  "visitingAddress": {
+    "objectName": "generic.address",
+    "streetAddress": "Solberga",
+    "additionalAddress": null,
+    "postalCode": "92372",
+    "city": null,
+    "state": null,
+    "countryId": 1,
+    "countryName": "Sverige"
+  },
+  "deliveryAddress": {
+    "objectName": "generic.address",
+    "streetAddress": "",
+    "additionalAddress": null,
+    "postalCode": "",
+    "city": null,
+    "state": null,
+    "countryId": 1,
+    "countryName": "Sverige"
+  },
+  "invoiceAddress": {
+    "objectName": "generic.address",
+    "streetAddress": "",
+    "additionalAddress": "",
+    "postalCode": "",
+    "city": null,
+    "state": null,
+    "countryId": 1,
+    "countryName": "Sverige"
+  },
+  "created": "2021-06-17 05:43:54 +00:00",
+  "createdBy": {
+    "objectName": "generic.name_id",
+    "id": 5,
+    "name": "Jonas lindberg"
+  },
+  "lastUpdated": null,
+  "lastUpdatedBy": null
+}

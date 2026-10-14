@@ -1,0 +1,48 @@
+{
+  "objectName": "generic.pagedlist",
+  "page": 1,
+  "pageSize": 25,
+  "itemCount": 2,
+  "totalItemCount": 1,
+  "totalPages": 1,
+  "items": [
+    {
+      "objectName": "log.list",
+      "id": 1,
+      "text": "Changed status to Finished",
+      "note": null,
+      "logType": "Project_Changed_Status",
+      "entity": {
+        "entityType": "Project",
+        "objectName": "generic.name_id",
+        "id": 24,
+        "name": "My project"
+      },
+      "createdBy": {
+        "objectName": "generic.name_id",
+        "id": 1,
+        "name": "John Doe"
+      },
+      "createdDate": "2026-10-01 07:16:57 +00:00"
+    },
+    {
+      "objectName": "log.list",
+      "id": 2,
+      "text": null,
+      "note": "@johndoe you're up!",
+      "logType": "Project_Changed_Status",
+      "entity": {
+        "entityType": "Project",
+        "objectName": "generic.name_id",
+        "id": 24,
+        "name": "My project"
+      },
+      "createdBy": {
+        "objectName": "generic.name_id",
+        "id": 2,
+        "name": "Jane Doe"
+      },
+      "createdDate": "2026-09-28 04:52:57 +00:00"
+    }
+  ]
+}

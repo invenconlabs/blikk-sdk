@@ -1,0 +1,25 @@
+{
+  "objectName": "generic.pagedlist",
+  "page": 1,
+  "pageSize": 25,
+  "itemCount": 1,
+  "totalItemCount": 1,
+  "totalPages": 1,
+  "items": [
+    {
+      "objectName": "invoice.list",
+      "createdDate": "2026-10-13T09:40:57.2895726+00:00",
+      "id": 42,
+      "invoiceDate": "2026-10-13 09:40:57",
+      "customer": {
+        "objectName": "generic.name_id",
+        "id": 123,
+        "name": "Toyota"
+      },
+      "fromDate": "2026-10-13",
+      "sum": 1200.50,
+      "sentToEconomySystem": "2026-10-13T09:40:57.2895742+00:00",
+      "toDate": "2026-10-13"
+    }
+  ]
+}

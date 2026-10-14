@@ -1,0 +1,14 @@
+{
+  "projectId": 1,
+  "date": "2026-08-01 00:00:00",
+  "amount": null,
+  "description": null,
+  "articleRows": [
+    {
+      "articleNumber": "PP01",
+      "description": "Installation + material",
+      "quantity": 1,
+      "unitPrice": 12000
+    }
+  ]
+}

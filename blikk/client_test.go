@@ -2,8 +2,11 @@ package blikk
 
 import (
 	"context"
+	"io"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
+	"reflect"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -252,5 +255,133 @@ func TestPathParametersWithSlashesAndDotsStayOneSegment(t *testing.T) {
 		_, err := client.Projects.GetByOrderNumber(context.Background(), orderNumber)
 		require.NoError(t, err)
 		assert.Equal(t, wantPath, handler.last().Path, "order number %q", orderNumber)
+	}
+}
+
+func TestDownloadStreamsBodyWithContentTypeAndFilename(t *testing.T) {
+	disposition := `attachment; filename=offer.pdf; filename*=UTF-8''off%C3%A9r%201.pdf`
+	client, handler := newRecordingClient(t, routes(t, map[string]http.HandlerFunc{"GET /v1/Core/Offers/1/Download": serveFile("application/pdf", disposition, []byte("%PDF-1.7"))}))
+
+	download, err := client.download(context.Background(), "v1/Core/Offers/1/Download", url.Values{"lang": {"sv"}})
+
+	require.NoError(t, err)
+	defer download.Content.Close()
+	content, err := io.ReadAll(download.Content)
+	require.NoError(t, err)
+	assert.Equal(t, "%PDF-1.7", string(content))
+	assert.Equal(t, "application/pdf", download.ContentType)
+	assert.Equal(t, "offér 1.pdf", download.Filename)
+	request := handler.last()
+	assert.Equal(t, map[string][]string{"lang": {"sv"}}, request.Query)
+	assert.Equal(t, "*/*", request.Header.Get("Accept"))
+	assert.Equal(t, "Bearer "+testToken, request.Header.Get("Authorization"))
+}
+
+func TestDownloadWithoutContentDispositionHasNoFilename(t *testing.T) {
+	client := newTestClient(t, serveFile("image/png", "", []byte{0x89, 'P', 'N', 'G'}))
+
+	download, err := client.download(context.Background(), "v1/Core/Tasks/1/Attachments/2/Download", nil)
+
+	require.NoError(t, err)
+	defer download.Content.Close()
+	assert.Equal(t, "image/png", download.ContentType)
+	assert.Empty(t, download.Filename)
+}
+
+func TestContentDispositionFilenameDropsDirectories(t *testing.T) {
+	for header, want := range map[string]string{
+		`attachment; filename="report.pdf"`:       "report.pdf",
+		`attachment; filename="../../etc/passwd"`: "passwd",
+		`attachment; filename="C:\\temp\\a.pdf"`:  "a.pdf",
+		`attachment; filename=".."`:               "",
+		`attachment`:                              "",
+		`not a disposition;;`:                     "",
+		``:                                        "",
+	} {
+		assert.Equal(t, want, filenameFromContentDisposition(header), "header %q", header)
+	}
+}
+
+func TestDownloadReturnsBeforeTheBodyIsComplete(t *testing.T) {
+	release := make(chan struct{})
+	client := newTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		_, _ = w.Write([]byte("first"))
+		w.(http.Flusher).Flush()
+		<-release
+		_, _ = w.Write([]byte("second"))
+	})
+
+	download, err := client.download(context.Background(), "v1/core/invoices/42/attachments/1/download", nil)
+	require.NoError(t, err)
+	defer download.Content.Close()
+	first := make([]byte, len("first"))
+	_, err = io.ReadFull(download.Content, first)
+	require.NoError(t, err)
+	close(release)
+	rest, err := io.ReadAll(download.Content)
+
+	require.NoError(t, err)
+	assert.Equal(t, "first", string(first))
+	assert.Equal(t, "second", string(rest))
+}
+
+func TestDownloadRetriesTooManyRequests(t *testing.T) {
+	handler := &recordingHandler{respond: rateLimitedThen(2, "0.01", serveFile("application/pdf", "", []byte("pdf")))}
+	client := newTestClient(t, handler.ServeHTTP)
+	sleeps := &recordedSleeps{}
+	client.sleep = sleeps.sleep
+
+	download, err := client.download(context.Background(), "v1/Core/Offers/1/Download", nil)
+
+	require.NoError(t, err)
+	defer download.Content.Close()
+	content, err := io.ReadAll(download.Content)
+	require.NoError(t, err)
+	assert.Equal(t, "pdf", string(content))
+	assert.Len(t, handler.requests, 3)
+	assert.Len(t, sleeps.durations, 2)
+}
+
+func TestDownloadRefreshesRejectedToken(t *testing.T) {
+	fake := &fakeBlikk{tokenExpiry: time.Now().Add(time.Hour), rejectedTokens: map[string]bool{"token-1": true}}
+	client, _ := newAppCredentialClient(t, fake)
+
+	download, err := client.download(context.Background(), "v1/Core/Offers/1/Download", nil)
+
+	require.NoError(t, err)
+	defer download.Content.Close()
+	content, err := io.ReadAll(download.Content)
+	require.NoError(t, err)
+	assert.Contains(t, string(content), "token-2")
+	assert.EqualValues(t, 2, fake.apiRequests.Load())
+}
+
+func TestDownloadErrorIsAnAPIError(t *testing.T) {
+	client := newTestClient(t, respondWith(http.StatusNotFound, `{"message":"Attachment could not be found"}`))
+
+	download, err := client.download(context.Background(), "v1/core/invoices/42/attachments/9/download", nil)
+
+	assert.Nil(t, download)
+	var apiErr *Error
+	require.ErrorAs(t, err, &apiErr)
+	assert.Equal(t, "/v1/core/invoices/42/attachments/9/download", apiErr.Path)
+	assert.Equal(t, "Attachment could not be found", apiErr.Message)
+	assert.True(t, IsNotFound(err))
+}
+
+func TestEveryServiceIsWiredToTheClient(t *testing.T) {
+	client := newTestClient(t, respondWith(http.StatusOK, `{}`))
+
+	clientValue := reflect.ValueOf(client).Elem()
+	for i := range clientValue.NumField() {
+		field := clientValue.Type().Field(i)
+		if !field.IsExported() || field.Type.Kind() != reflect.Pointer {
+			continue
+		}
+		service := clientValue.Field(i)
+		require.False(t, service.IsNil(), "service %s is nil", field.Name)
+		backReference := service.Elem().FieldByName("client")
+		require.True(t, backReference.IsValid(), "service %s has no client field", field.Name)
+		assert.Equal(t, client, (*Client)(backReference.UnsafePointer()), "service %s", field.Name)
 	}
 }

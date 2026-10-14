@@ -2,7 +2,6 @@ package blikk
 
 import (
 	"context"
-	"errors"
 	"iter"
 	"strconv"
 )
@@ -389,10 +388,6 @@ func firstProjectName(project *ProjectRef, internalProject, absenceProject *Name
 	}
 }
 
-type createdResource struct {
-	ID int `json:"id"`
-}
-
 func (s *TimeReportsService) List(ctx context.Context, params TimeReportListParams) (*Page[TimeReportListItem], error) {
 	return listPage[TimeReportListItem](ctx, s.client, timeReportsPath, params)
 }
@@ -408,14 +403,7 @@ func (s *TimeReportsService) Get(ctx context.Context, id int) (*TimeReport, erro
 
 // Create returns the ID of the new time report.
 func (s *TimeReportsService) Create(ctx context.Context, input TimeReportInput) (int, error) {
-	created, err := createResource[createdResource](ctx, s.client, input, timeReportsPath)
-	if err != nil {
-		return 0, err
-	}
-	if created.ID == 0 {
-		return 0, errors.New("blikk: create time report response has no id")
-	}
-	return created.ID, nil
+	return createResourceID(ctx, s.client, input, timeReportsPath)
 }
 
 // Update replaces the whole time report; any field left unset in input is cleared.

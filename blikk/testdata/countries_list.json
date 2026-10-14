@@ -1,0 +1,12 @@
+{
+  "objectName": "generic.pagedlist",
+  "page": 1,
+  "pageSize": 25,
+  "itemCount": 2,
+  "totalItemCount": 2,
+  "totalPages": 1,
+  "items": [
+    {"objectName": "country.list", "id": 1, "name": "Barbados", "alpha3Code": "BRB", "alpha2Code": "BB"},
+    {"objectName": "country.list", "id": 2, "name": "Belgien", "alpha3Code": "BEL", "alpha2Code": "BE"}
+  ]
+}

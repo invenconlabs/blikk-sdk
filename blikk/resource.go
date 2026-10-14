@@ -45,14 +45,23 @@ type createdResource struct {
 
 // encoding/json matches keys case-insensitively, so this also reads the {"Id": 42} some endpoints return.
 func createResourceID(ctx context.Context, c *Client, input any, base string, pathParams ...string) (int, error) {
-	created, err := createResource[createdResource](ctx, c, input, base, pathParams...)
+	created, err := createResource[*createdResource](ctx, c, input, base, pathParams...)
 	if err != nil {
 		return 0, err
 	}
-	if created.ID == 0 {
+	return createdID(*created, base)
+}
+
+// A nil response means the API answered the create with an empty body; the create still succeeded.
+func createdID(created *createdResource, base string) (int, error) {
+	switch {
+	case created == nil:
+		return 0, nil
+	case created.ID == 0:
 		return 0, fmt.Errorf("blikk: create response of %s has no id", base)
+	default:
+		return created.ID, nil
 	}
-	return created.ID, nil
 }
 
 func updateResource(ctx context.Context, c *Client, input any, base string, pathParams ...string) error {

@@ -37,13 +37,22 @@ func TestCreateResourceIDAcceptsLowerAndUpperCaseID(t *testing.T) {
 	}
 }
 
-func TestCreateResourceIDRejectsResponseWithoutID(t *testing.T) {
-	for _, body := range []string{`{}`, ``} {
+func TestCreateResourceIDRejectsObjectWithoutID(t *testing.T) {
+	client := newTestClient(t, respondWith(http.StatusOK, `{}`))
+
+	_, err := createResourceID(context.Background(), client, struct{}{}, "v1/Admin/ContactTags")
+
+	assert.ErrorContains(t, err, "has no id")
+}
+
+func TestCreateResourceIDReturnsZeroForEmptyBody(t *testing.T) {
+	for _, body := range []string{``, " \n", `null`} {
 		client := newTestClient(t, respondWith(http.StatusOK, body))
 
-		_, err := createResourceID(context.Background(), client, struct{}{}, "v1/Admin/ContactTags")
+		id, err := createResourceID(context.Background(), client, struct{}{}, "v1/Core/MaterialReports")
 
-		assert.ErrorContains(t, err, "has no id", "body %q", body)
+		require.NoError(t, err, "body %q", body)
+		assert.Zero(t, id, "body %q", body)
 	}
 }
 

@@ -241,7 +241,7 @@ func TestTimeReportsCreateSendsBodyAndReturnsID(t *testing.T) {
 }
 
 func TestTimeReportsCreateWithoutIDInResponseIsAnError(t *testing.T) {
-	for _, body := range []string{"", `{}`, `{"id":0}`} {
+	for _, body := range []string{`{}`, `{"id":0}`} {
 		client := newTestClient(t, respondWith(http.StatusOK, body))
 
 		id, err := client.TimeReports.Create(context.Background(), TimeReportInput{Date: NewDate(2021, time.November, 10)})

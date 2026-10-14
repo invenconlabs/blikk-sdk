@@ -61,7 +61,6 @@ func (s *DeletedEntitiesService) List(ctx context.Context, params DeletedEntityL
 	return listPageWithBody[DeletedEntity](ctx, s.client, deletedEntitiesPath, params.pagedBody())
 }
 
-// ListAll walks every page from params.Page onwards; on failure it yields a single error and stops.
 func (s *DeletedEntitiesService) ListAll(ctx context.Context, params DeletedEntityListParams) iter.Seq2[DeletedEntity, error] {
 	return listAllWithBody[DeletedEntity](ctx, s.client, deletedEntitiesPath, params.pagedBody())
 }

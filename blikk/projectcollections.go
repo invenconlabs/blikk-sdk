@@ -60,7 +60,6 @@ func (s *ProjectCollectionsService) List(ctx context.Context, params ProjectColl
 	return listPage[ProjectCollection](ctx, s.client, projectCollectionsPath, params)
 }
 
-// ListAll walks every page from params.Page onwards; on failure it yields a single error and stops.
 func (s *ProjectCollectionsService) ListAll(ctx context.Context, params ProjectCollectionListParams) iter.Seq2[ProjectCollection, error] {
 	return listAll[ProjectCollection](ctx, s.client, projectCollectionsPath, params)
 }

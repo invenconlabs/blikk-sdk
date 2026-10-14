@@ -22,7 +22,7 @@ const (
 	PlanningGroupByMonth = "month"
 )
 
-type PlanningProjectsParams struct {
+type PlanningProjectListParams struct {
 	ListOptions
 	FromDate        Date `query:"fromDate"`
 	ToDate          Date `query:"toDate"`
@@ -31,8 +31,8 @@ type PlanningProjectsParams struct {
 	ExcludeInternal bool `query:"excludeInternal"`
 }
 
-// PlanningUsersParams uses *bool because the API excludes deleted and restricted users unless told false.
-type PlanningUsersParams struct {
+// PlanningUserListParams uses *bool because the API excludes deleted and restricted users unless told false.
+type PlanningUserListParams struct {
 	ListOptions
 	FromDate          Date  `query:"fromDate"`
 	ToDate            Date  `query:"toDate"`
@@ -40,7 +40,7 @@ type PlanningUsersParams struct {
 	ExcludeRestricted *bool `query:"excludeRestricted"`
 }
 
-type PlanningProjectSummaryParams struct {
+type PlanningProjectSummaryListParams struct {
 	ListOptions
 	UserID          int    `query:"userId"`
 	FromDate        Date   `query:"fromDate"`
@@ -51,7 +51,7 @@ type PlanningProjectSummaryParams struct {
 	GroupBy         string `query:"groupBy"`
 }
 
-type PlanningUserSummaryParams struct {
+type PlanningUserSummaryListParams struct {
 	ListOptions
 	ProjectID int    `query:"projectId"`
 	FromDate  Date   `query:"fromDate"`
@@ -92,38 +92,34 @@ type PlanningUserSummary struct {
 	ExpectedCost              *float64 `json:"expectedCost"`
 }
 
-func (s *PlanningService) ProjectsWithPlanning(ctx context.Context, params PlanningProjectsParams) (*Page[PlanningProject], error) {
+func (s *PlanningService) ListProjectsWithPlanning(ctx context.Context, params PlanningProjectListParams) (*Page[PlanningProject], error) {
 	return listPage[PlanningProject](ctx, s.client, projectsWithPlanningPath, params)
 }
 
-// ListAllProjectsWithPlanning walks every page from params.Page onwards; on failure it yields a single error and stops.
-func (s *PlanningService) ListAllProjectsWithPlanning(ctx context.Context, params PlanningProjectsParams) iter.Seq2[PlanningProject, error] {
+func (s *PlanningService) ListAllProjectsWithPlanning(ctx context.Context, params PlanningProjectListParams) iter.Seq2[PlanningProject, error] {
 	return listAll[PlanningProject](ctx, s.client, projectsWithPlanningPath, params)
 }
 
-func (s *PlanningService) UsersWithPlanning(ctx context.Context, params PlanningUsersParams) (*Page[PlanningUser], error) {
+func (s *PlanningService) ListUsersWithPlanning(ctx context.Context, params PlanningUserListParams) (*Page[PlanningUser], error) {
 	return listPage[PlanningUser](ctx, s.client, usersWithPlanningPath, params)
 }
 
-// ListAllUsersWithPlanning walks every page from params.Page onwards; on failure it yields a single error and stops.
-func (s *PlanningService) ListAllUsersWithPlanning(ctx context.Context, params PlanningUsersParams) iter.Seq2[PlanningUser, error] {
+func (s *PlanningService) ListAllUsersWithPlanning(ctx context.Context, params PlanningUserListParams) iter.Seq2[PlanningUser, error] {
 	return listAll[PlanningUser](ctx, s.client, usersWithPlanningPath, params)
 }
 
-func (s *PlanningService) ProjectSummariesForUser(ctx context.Context, params PlanningProjectSummaryParams) (*Page[PlanningProjectSummary], error) {
+func (s *PlanningService) ListProjectSummariesForUser(ctx context.Context, params PlanningProjectSummaryListParams) (*Page[PlanningProjectSummary], error) {
 	return listPage[PlanningProjectSummary](ctx, s.client, planningProjectSummariesPath, params)
 }
 
-// ListAllProjectSummariesForUser walks every page from params.Page onwards; on failure it yields a single error and stops.
-func (s *PlanningService) ListAllProjectSummariesForUser(ctx context.Context, params PlanningProjectSummaryParams) iter.Seq2[PlanningProjectSummary, error] {
+func (s *PlanningService) ListAllProjectSummariesForUser(ctx context.Context, params PlanningProjectSummaryListParams) iter.Seq2[PlanningProjectSummary, error] {
 	return listAll[PlanningProjectSummary](ctx, s.client, planningProjectSummariesPath, params)
 }
 
-func (s *PlanningService) UserSummariesForProject(ctx context.Context, params PlanningUserSummaryParams) (*Page[PlanningUserSummary], error) {
+func (s *PlanningService) ListUserSummariesForProject(ctx context.Context, params PlanningUserSummaryListParams) (*Page[PlanningUserSummary], error) {
 	return listPage[PlanningUserSummary](ctx, s.client, planningUserSummariesPath, params)
 }
 
-// ListAllUserSummariesForProject walks every page from params.Page onwards; on failure it yields a single error and stops.
-func (s *PlanningService) ListAllUserSummariesForProject(ctx context.Context, params PlanningUserSummaryParams) iter.Seq2[PlanningUserSummary, error] {
+func (s *PlanningService) ListAllUserSummariesForProject(ctx context.Context, params PlanningUserSummaryListParams) iter.Seq2[PlanningUserSummary, error] {
 	return listAll[PlanningUserSummary](ctx, s.client, planningUserSummariesPath, params)
 }

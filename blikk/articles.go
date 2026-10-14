@@ -234,7 +234,6 @@ func (s *ArticlesService) List(ctx context.Context, params ArticleListParams) (*
 	return listPage[ArticleListItem](ctx, s.client, articlesPath, params)
 }
 
-// ListAll walks every page from params.Page onwards; on failure it yields a single error and stops.
 func (s *ArticlesService) ListAll(ctx context.Context, params ArticleListParams) iter.Seq2[ArticleListItem, error] {
 	return listAll[ArticleListItem](ctx, s.client, articlesPath, params)
 }

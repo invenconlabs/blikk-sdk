@@ -71,7 +71,6 @@ func (s *PaymentPlansService) List(ctx context.Context, params PaymentPlanListPa
 	return listPage[PaymentPlan](ctx, s.client, paymentPlansPath, params)
 }
 
-// ListAll walks every page from params.Page onwards; on failure it yields a single error and stops.
 func (s *PaymentPlansService) ListAll(ctx context.Context, params PaymentPlanListParams) iter.Seq2[PaymentPlan, error] {
 	return listAll[PaymentPlan](ctx, s.client, paymentPlansPath, params)
 }

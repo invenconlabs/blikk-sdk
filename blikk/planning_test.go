@@ -14,7 +14,7 @@ import (
 func TestPlanningProjectsWithPlanningEncodesParamsAndDecodesFixture(t *testing.T) {
 	client, handler := newRecordingClient(t, serveFixture(t, "planning_projects.json"))
 
-	page, err := client.Planning.ProjectsWithPlanning(context.Background(), PlanningProjectsParams{
+	page, err := client.Planning.ListProjectsWithPlanning(context.Background(), PlanningProjectListParams{
 		ListOptions:     ListOptions{PageSize: 50},
 		FromDate:        NewDate(2026, time.January, 1),
 		ToDate:          NewDate(2026, time.December, 31),
@@ -42,7 +42,7 @@ func TestPlanningProjectsWithPlanningEncodesParamsAndDecodesFixture(t *testing.T
 func TestPlanningUsersWithPlanningSendsExplicitFalse(t *testing.T) {
 	client, handler := newRecordingClient(t, serveFixture(t, "planning_users.json"))
 
-	page, err := client.Planning.UsersWithPlanning(context.Background(), PlanningUsersParams{
+	page, err := client.Planning.ListUsersWithPlanning(context.Background(), PlanningUserListParams{
 		FromDate:          NewDate(2026, time.January, 1),
 		ToDate:            NewDate(2026, time.January, 7),
 		ExcludeDeleted:    Ptr(false),
@@ -66,7 +66,7 @@ func TestPlanningUsersWithPlanningSendsExplicitFalse(t *testing.T) {
 func TestPlanningProjectSummariesForUserEncodesParamsAndDecodesFixture(t *testing.T) {
 	client, handler := newRecordingClient(t, serveFixture(t, "planning_project_summaries.json"))
 
-	page, err := client.Planning.ProjectSummariesForUser(context.Background(), PlanningProjectSummaryParams{
+	page, err := client.Planning.ListProjectSummariesForUser(context.Background(), PlanningProjectSummaryListParams{
 		UserID:          1,
 		FromDate:        NewDate(2026, time.January, 1),
 		ToDate:          NewDate(2026, time.December, 31),
@@ -104,7 +104,7 @@ func TestPlanningProjectSummariesForUserEncodesParamsAndDecodesFixture(t *testin
 func TestPlanningUserSummariesForProjectEncodesParamsAndDecodesFixture(t *testing.T) {
 	client, handler := newRecordingClient(t, serveFixture(t, "planning_user_summaries.json"))
 
-	page, err := client.Planning.UserSummariesForProject(context.Background(), PlanningUserSummaryParams{
+	page, err := client.Planning.ListUserSummariesForProject(context.Background(), PlanningUserSummaryListParams{
 		ProjectID: 42,
 		FromDate:  NewDate(2026, time.January, 1),
 		ToDate:    NewDate(2026, time.December, 31),
@@ -142,10 +142,10 @@ func TestPlanningListAllVariantsWalkPages(t *testing.T) {
 		"GET /v1/Core/Planning/GetPlanningSummaries/Users":    serveFixture(t, "planning_user_summaries.json"),
 	}))
 
-	assert.Len(t, collectPlanningItems(t, client.Planning.ListAllProjectsWithPlanning(ctx, PlanningProjectsParams{})), 3)
-	assert.Len(t, collectPlanningItems(t, client.Planning.ListAllUsersWithPlanning(ctx, PlanningUsersParams{})), 3)
-	assert.Len(t, collectPlanningItems(t, client.Planning.ListAllProjectSummariesForUser(ctx, PlanningProjectSummaryParams{})), 2)
-	assert.Len(t, collectPlanningItems(t, client.Planning.ListAllUserSummariesForProject(ctx, PlanningUserSummaryParams{})), 2)
+	assert.Len(t, collectPlanningItems(t, client.Planning.ListAllProjectsWithPlanning(ctx, PlanningProjectListParams{})), 3)
+	assert.Len(t, collectPlanningItems(t, client.Planning.ListAllUsersWithPlanning(ctx, PlanningUserListParams{})), 3)
+	assert.Len(t, collectPlanningItems(t, client.Planning.ListAllProjectSummariesForUser(ctx, PlanningProjectSummaryListParams{})), 2)
+	assert.Len(t, collectPlanningItems(t, client.Planning.ListAllUserSummariesForProject(ctx, PlanningUserSummaryListParams{})), 2)
 }
 
 func collectPlanningItems[T any](t *testing.T, seq iter.Seq2[T, error]) []T {

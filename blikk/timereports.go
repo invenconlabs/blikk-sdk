@@ -392,7 +392,6 @@ func (s *TimeReportsService) List(ctx context.Context, params TimeReportListPara
 	return listPage[TimeReportListItem](ctx, s.client, timeReportsPath, params)
 }
 
-// ListAll walks every page from params.Page onwards; on failure it yields a single error and stops.
 func (s *TimeReportsService) ListAll(ctx context.Context, params TimeReportListParams) iter.Seq2[TimeReportListItem, error] {
 	return listAll[TimeReportListItem](ctx, s.client, timeReportsPath, params)
 }
@@ -420,7 +419,6 @@ func (s *TimeReportsService) ListUserDayStatistics(ctx context.Context, params U
 	return listPage[UserDayStatistics](ctx, s.client, userDayStatisticsPath, params)
 }
 
-// ListAllUserDayStatistics walks every page like ListAll; on failure it yields a single error and stops.
 func (s *TimeReportsService) ListAllUserDayStatistics(ctx context.Context, params UserDayStatisticsListParams) iter.Seq2[UserDayStatistics, error] {
 	return listAll[UserDayStatistics](ctx, s.client, userDayStatisticsPath, params)
 }

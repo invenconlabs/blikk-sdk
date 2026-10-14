@@ -92,7 +92,6 @@ func (s *MaterialReportsService) List(ctx context.Context, params MaterialReport
 	return listPage[MaterialReport](ctx, s.client, materialReportsPath, params)
 }
 
-// ListAll walks every page from params.Page onwards; on failure it yields a single error and stops.
 func (s *MaterialReportsService) ListAll(ctx context.Context, params MaterialReportListParams) iter.Seq2[MaterialReport, error] {
 	return listAll[MaterialReport](ctx, s.client, materialReportsPath, params)
 }

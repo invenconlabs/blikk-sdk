@@ -43,7 +43,6 @@ func (s *ProjectStatusesService) List(ctx context.Context, params ProjectStatusL
 	return listPage[ProjectStatus](ctx, s.client, projectStatusesPath, params)
 }
 
-// ListAll walks every page from params.Page onwards; on failure it yields a single error and stops.
 func (s *ProjectStatusesService) ListAll(ctx context.Context, params ProjectStatusListParams) iter.Seq2[ProjectStatus, error] {
 	return listAll[ProjectStatus](ctx, s.client, projectStatusesPath, params)
 }

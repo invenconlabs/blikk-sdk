@@ -143,7 +143,6 @@ func (s *InvoicesService) List(ctx context.Context, params InvoiceListParams) (*
 	return listPage[InvoiceListItem](ctx, s.client, invoicesPath, params)
 }
 
-// ListAll walks every page from params.Page onwards; on failure it yields a single error and stops.
 func (s *InvoicesService) ListAll(ctx context.Context, params InvoiceListParams) iter.Seq2[InvoiceListItem, error] {
 	return listAll[InvoiceListItem](ctx, s.client, invoicesPath, params)
 }
@@ -161,7 +160,6 @@ func (s *InvoicesService) ListAttachments(ctx context.Context, invoiceID int, pa
 	return listInvoiceAttachments(ctx, s.client, invoiceID, params)
 }
 
-// ListAllAttachments walks every page from params.Page onwards; on failure it yields a single error and stops.
 func (s *InvoicesService) ListAllAttachments(ctx context.Context, invoiceID int, params ListOptions) iter.Seq2[InvoiceAttachment, error] {
 	return listAllInvoiceAttachments(ctx, s.client, invoiceID, params)
 }

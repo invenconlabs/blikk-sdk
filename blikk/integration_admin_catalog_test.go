@@ -21,20 +21,20 @@ func TestIntegrationPlanning(t *testing.T) {
 	require.NotEmpty(t, users.Items)
 	userID := users.Items[0].ID
 
-	projects, err := client.Planning.ProjectsWithPlanning(ctx, PlanningProjectsParams{FromDate: from, ToDate: to})
+	projects, err := client.Planning.ListProjectsWithPlanning(ctx, PlanningProjectListParams{FromDate: from, ToDate: to})
 	skipIfPlanningForbidden(t, err)
 	require.NoError(t, err)
 	for _, project := range projects.Items {
 		assert.NotZero(t, project.ID)
 	}
 
-	planningUsers, err := client.Planning.UsersWithPlanning(ctx, PlanningUsersParams{FromDate: from, ToDate: to, ExcludeDeleted: Ptr(false)})
+	planningUsers, err := client.Planning.ListUsersWithPlanning(ctx, PlanningUserListParams{FromDate: from, ToDate: to, ExcludeDeleted: Ptr(false)})
 	require.NoError(t, err)
 	for _, user := range planningUsers.Items {
 		assert.NotZero(t, user.ID)
 	}
 
-	projectSummaries, err := client.Planning.ProjectSummariesForUser(ctx, PlanningProjectSummaryParams{UserID: userID, FromDate: from, ToDate: to, GroupBy: PlanningGroupByDay})
+	projectSummaries, err := client.Planning.ListProjectSummariesForUser(ctx, PlanningProjectSummaryListParams{UserID: userID, FromDate: from, ToDate: to, GroupBy: PlanningGroupByDay})
 	require.NoError(t, err)
 	for _, summary := range projectSummaries.Items {
 		assert.NotZero(t, summary.ProjectID)
@@ -45,7 +45,7 @@ func TestIntegrationPlanning(t *testing.T) {
 	if len(projects.Items) == 0 {
 		t.Skip("no projects with resource planning in the coming week")
 	}
-	userSummaries, err := client.Planning.UserSummariesForProject(ctx, PlanningUserSummaryParams{ProjectID: projects.Items[0].ID, FromDate: from, ToDate: to})
+	userSummaries, err := client.Planning.ListUserSummariesForProject(ctx, PlanningUserSummaryListParams{ProjectID: projects.Items[0].ID, FromDate: from, ToDate: to})
 	require.NoError(t, err)
 	require.NotEmpty(t, userSummaries.Items)
 	assert.NotZero(t, userSummaries.Items[0].UserID)

@@ -40,7 +40,6 @@ func (s *OpportunityStatusesService) List(ctx context.Context, params Opportunit
 	return listPage[OpportunityStatus](ctx, s.client, opportunityStatusesPath, params)
 }
 
-// ListAll walks every page from params.Page onwards; on failure it yields a single error and stops.
 func (s *OpportunityStatusesService) ListAll(ctx context.Context, params OpportunityStatusListParams) iter.Seq2[OpportunityStatus, error] {
 	return listAll[OpportunityStatus](ctx, s.client, opportunityStatusesPath, params)
 }

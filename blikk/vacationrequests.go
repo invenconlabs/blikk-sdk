@@ -68,7 +68,6 @@ func (s *VacationRequestsService) List(ctx context.Context, params VacationReque
 	return listPage[VacationRequest](ctx, s.client, vacationRequestsPath, params)
 }
 
-// ListAll walks every page from params.Page onwards; on failure it yields a single error and stops.
 func (s *VacationRequestsService) ListAll(ctx context.Context, params VacationRequestListParams) iter.Seq2[VacationRequest, error] {
 	return listAll[VacationRequest](ctx, s.client, vacationRequestsPath, params)
 }

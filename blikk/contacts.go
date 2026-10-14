@@ -172,7 +172,6 @@ func (s *ContactsService) List(ctx context.Context, params ContactListParams) (*
 	return listPage[ContactListItem](ctx, s.client, contactsPath, params)
 }
 
-// ListAll walks every page from params.Page onwards; on failure it yields a single error and stops.
 func (s *ContactsService) ListAll(ctx context.Context, params ContactListParams) iter.Seq2[ContactListItem, error] {
 	return listAll[ContactListItem](ctx, s.client, contactsPath, params)
 }

@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"iter"
-	"net/http"
 	"strconv"
 )
 
@@ -196,7 +195,6 @@ func (s *ProjectsService) List(ctx context.Context, params ProjectListParams) (*
 	return listPage[ProjectListItem](ctx, s.client, projectsPath, params)
 }
 
-// ListAll walks every page from params.Page onwards; on failure it yields a single error and stops.
 func (s *ProjectsService) ListAll(ctx context.Context, params ProjectListParams) iter.Seq2[ProjectListItem, error] {
 	return listAll[ProjectListItem](ctx, s.client, projectsPath, params)
 }
@@ -229,24 +227,31 @@ func (s *ProjectsService) NextProjectNumber(ctx context.Context) (string, error)
 }
 
 func (s *ProjectsService) ListComments(ctx context.Context, projectID int, params ProjectCommentListParams) (*Page[Comment], error) {
-	return listPage[Comment](ctx, s.client, projectCommentsPath(projectID), params)
+	path, err := projectCommentsPath(projectID)
+	if err != nil {
+		return nil, err
+	}
+	return listPage[Comment](ctx, s.client, path, params)
 }
 
-// ListAllComments walks every page from params.Page onwards; on failure it yields a single error and stops.
 func (s *ProjectsService) ListAllComments(ctx context.Context, projectID int, params ProjectCommentListParams) iter.Seq2[Comment, error] {
-	return listAll[Comment](ctx, s.client, projectCommentsPath(projectID), params)
+	path, err := projectCommentsPath(projectID)
+	if err != nil {
+		return failedSeq[Comment](err)
+	}
+	return listAll[Comment](ctx, s.client, path, params)
 }
 
 func (s *ProjectsService) CreateComment(ctx context.Context, projectID int, text string) (int, error) {
-	return createResourceID(ctx, s.client, commentInput{Text: text}, projectCommentsPath(projectID))
+	return createResourceID(ctx, s.client, commentInput{Text: text}, projectsPath, strconv.Itoa(projectID), "Comments")
 }
 
 func (s *ProjectsService) UpdateComment(ctx context.Context, projectID, commentID int, text string) error {
-	return updateResource(ctx, s.client, commentInput{Text: text}, projectCommentsPath(projectID), strconv.Itoa(commentID))
+	return updateResource(ctx, s.client, commentInput{Text: text}, projectsPath, strconv.Itoa(projectID), "Comments", strconv.Itoa(commentID))
 }
 
 func (s *ProjectsService) DeleteComment(ctx context.Context, projectID, commentID int) error {
-	return deleteResource(ctx, s.client, projectCommentsPath(projectID), strconv.Itoa(commentID))
+	return deleteResource(ctx, s.client, projectsPath, strconv.Itoa(projectID), "Comments", strconv.Itoa(commentID))
 }
 
 func (s *ProjectsService) TimeCalculation(ctx context.Context, projectID int) (*ProjectTimeCalculation, error) {
@@ -255,17 +260,13 @@ func (s *ProjectsService) TimeCalculation(ctx context.Context, projectID int) (*
 
 // AddMember fails with a 409 when the user already is a member.
 func (s *ProjectsService) AddMember(ctx context.Context, projectID, userID int) error {
-	return s.client.do(ctx, http.MethodPost, projectMemberPath(projectID, userID), nil, nil, nil)
+	return postResource(ctx, s.client, nil, projectsPath, strconv.Itoa(projectID), "members", strconv.Itoa(userID))
 }
 
 func (s *ProjectsService) RemoveMember(ctx context.Context, projectID, userID int) error {
-	return deleteResource(ctx, s.client, projectMemberPath(projectID, userID))
+	return deleteResource(ctx, s.client, projectsPath, strconv.Itoa(projectID), "members", strconv.Itoa(userID))
 }
 
-func projectCommentsPath(projectID int) string {
-	return projectsPath + "/" + strconv.Itoa(projectID) + "/Comments"
-}
-
-func projectMemberPath(projectID, userID int) string {
-	return projectsPath + "/" + strconv.Itoa(projectID) + "/members/" + strconv.Itoa(userID)
+func projectCommentsPath(projectID int) (string, error) {
+	return resourcePath(projectsPath, strconv.Itoa(projectID), "Comments")
 }

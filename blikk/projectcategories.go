@@ -21,7 +21,6 @@ func (s *ProjectCategoriesService) List(ctx context.Context, params ProjectCateg
 	return listPage[ProjectCategory](ctx, s.client, projectCategoriesPath, params)
 }
 
-// ListAll walks every page from params.Page onwards; on failure it yields a single error and stops.
 func (s *ProjectCategoriesService) ListAll(ctx context.Context, params ProjectCategoryListParams) iter.Seq2[ProjectCategory, error] {
 	return listAll[ProjectCategory](ctx, s.client, projectCategoriesPath, params)
 }

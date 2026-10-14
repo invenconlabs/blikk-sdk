@@ -67,7 +67,6 @@ func (s *OffersService) List(ctx context.Context, params OfferListParams) (*Page
 	return listPage[Offer](ctx, s.client, offersPath, params)
 }
 
-// ListAll walks every page from params.Page onwards; on failure it yields a single error and stops.
 func (s *OffersService) ListAll(ctx context.Context, params OfferListParams) iter.Seq2[Offer, error] {
 	return listAll[Offer](ctx, s.client, offersPath, params)
 }

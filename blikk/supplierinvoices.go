@@ -153,7 +153,6 @@ func (s *SupplierInvoicesService) List(ctx context.Context, params SupplierInvoi
 	return listPage[SupplierInvoiceListItem](ctx, s.client, supplierInvoicesPath, params)
 }
 
-// ListAll walks every page from params.Page onwards; on failure it yields a single error and stops.
 func (s *SupplierInvoicesService) ListAll(ctx context.Context, params SupplierInvoiceListParams) iter.Seq2[SupplierInvoiceListItem, error] {
 	return listAll[SupplierInvoiceListItem](ctx, s.client, supplierInvoicesPath, params)
 }

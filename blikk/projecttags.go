@@ -24,7 +24,6 @@ func (s *ProjectTagsService) List(ctx context.Context, params ProjectTagListPara
 	return listPage[Tag](ctx, s.client, projectTagsPath, params)
 }
 
-// ListAll walks every page from params.Page onwards; on failure it yields a single error and stops.
 func (s *ProjectTagsService) ListAll(ctx context.Context, params ProjectTagListParams) iter.Seq2[Tag, error] {
 	return listAll[Tag](ctx, s.client, projectTagsPath, params)
 }

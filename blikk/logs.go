@@ -64,7 +64,6 @@ func (s *LogsService) List(ctx context.Context, params LogListParams) (*Page[Log
 	return listPage[Log](ctx, s.client, logsPath, params)
 }
 
-// ListAll walks every page from params.Page onwards; on failure it yields a single error and stops.
 func (s *LogsService) ListAll(ctx context.Context, params LogListParams) iter.Seq2[Log, error] {
 	return listAll[Log](ctx, s.client, logsPath, params)
 }

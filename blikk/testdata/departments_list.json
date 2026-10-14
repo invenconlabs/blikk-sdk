@@ -1,0 +1,19 @@
+{
+  "objectName": "generic.pagedlist",
+  "page": 1,
+  "pageSize": 25,
+  "itemCount": 1,
+  "totalItemCount": 1,
+  "totalPages": 1,
+  "items": [
+    {
+      "objectName": "department.list",
+      "id": 1,
+      "name": "Lorem ipsum",
+      "createdBy": {"objectName": "generic.name_id", "id": 1, "name": "John Doe"},
+      "created": "2026-10-03 09:40:57 +00:00",
+      "updatedBy": {"objectName": "generic.name_id", "id": 1, "name": "John Doe"},
+      "updated": "2026-10-08 09:40:57 +00:00"
+    }
+  ]
+}

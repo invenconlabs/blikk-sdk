@@ -1,0 +1,22 @@
+{
+  "objectName": "generic.pagedlist",
+  "page": 1,
+  "pageSize": 25,
+  "itemCount": 1,
+  "totalItemCount": 1,
+  "totalPages": 1,
+  "items": [
+    {
+      "objectName": "timecode.list",
+      "id": 1,
+      "name": "Lorem ipsum",
+      "description": "Lorem ipsum dolar sit amet",
+      "isActive": true,
+      "isStandard": false,
+      "createdBy": {"objectName": "generic.name_id", "id": 1, "name": "John Doe"},
+      "updatedBy": null,
+      "created": "2026-10-03 09:40:57 +00:00",
+      "updated": null
+    }
+  ]
+}

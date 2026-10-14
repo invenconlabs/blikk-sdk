@@ -1,0 +1,22 @@
+{
+  "objectName": "generic.pagedlist",
+  "page": 1,
+  "pageSize": 25,
+  "itemCount": 1,
+  "totalItemCount": 1,
+  "totalPages": 1,
+  "items": [
+    {
+      "objectName": "vat.code",
+      "id": 42,
+      "name": "VAT 1",
+      "code": "XYZ",
+      "vat": 12.00,
+      "isVatFree": false,
+      "createdBy": {"objectName": "generic.name_id", "id": 123, "name": "John Doe"},
+      "updatedBy": null,
+      "created": "2026-10-09 09:40:57 +00:00",
+      "updated": null
+    }
+  ]
+}

@@ -267,33 +267,50 @@ func TestArticlesCreatePerKindSendsKindPathAndKeys(t *testing.T) {
 	}
 }
 
-func TestArticlesUpdatePerKindSendsPutToKindPath(t *testing.T) {
+func TestArticlesUpdatePerKindSendsKindSpecificBodyToKindPath(t *testing.T) {
 	minimal := ArticleInput{Name: "Article", UnitID: 1, VatCodeID: 2}
 	tests := []struct {
 		name   string
 		update func(*ArticlesService) (int, error)
 		path   string
+		body   string
 	}{
 		{"addition", func(s *ArticlesService) (int, error) {
-			updated, err := s.UpdateAddition(context.Background(), 42, AdditionArticleInput{ArticleInput: minimal, AdditionType: AdditionTypeIDBoolean})
+			updated, err := s.UpdateAddition(context.Background(), 42, AdditionArticleInput{
+				ArticleInput: minimal, AdditionType: AdditionTypeIDBoolean, SalaryCode: "S1", SalaryCodeForHour: "S1H",
+			})
 			return articleIDOf(updated, err, func(a *AdditionArticle) int { return a.ID })
-		}, "/v1/admin/articles/addition/42"},
+		}, "/v1/admin/articles/addition/42",
+			`{"name":"Article","unitId":1,"vatCodeId":2,"additionType":2,"salaryCode":"S1","salaryCodeForHour":"S1H"}`},
 		{"allowance", func(s *ArticlesService) (int, error) {
-			updated, err := s.UpdateAllowance(context.Background(), 42, AllowanceArticleInput{ArticleInput: minimal})
+			updated, err := s.UpdateAllowance(context.Background(), 42, AllowanceArticleInput{
+				ArticleInput: minimal, SalaryCode: "S2", SalaryCodeForHour: "S2H",
+			})
 			return articleIDOf(updated, err, func(a *AllowanceArticle) int { return a.ID })
-		}, "/v1/admin/articles/allowance/42"},
+		}, "/v1/admin/articles/allowance/42",
+			`{"name":"Article","unitId":1,"vatCodeId":2,"salaryCode":"S2","salaryCodeForHour":"S2H"}`},
 		{"equipment", func(s *ArticlesService) (int, error) {
-			updated, err := s.UpdateEquipment(context.Background(), 42, EquipmentArticleInput{ArticleInput: minimal})
+			updated, err := s.UpdateEquipment(context.Background(), 42, EquipmentArticleInput{
+				ArticleInput: minimal, EquipmentTypeID: 33, Model: "Model 23", SerialNumber: "SN-123", YearOfPurchase: 2019,
+			})
 			return articleIDOf(updated, err, func(a *EquipmentArticle) int { return a.ID })
-		}, "/v1/admin/articles/equipment/42"},
+		}, "/v1/admin/articles/equipment/42",
+			`{"name":"Article","unitId":1,"vatCodeId":2,"equipmentTypeId":33,"model":"Model 23","serialNumber":"SN-123","yearOfPurchase":2019}`},
 		{"material", func(s *ArticlesService) (int, error) {
-			updated, err := s.UpdateMaterial(context.Background(), 42, MaterialArticleInput{ArticleInput: minimal})
+			updated, err := s.UpdateMaterial(context.Background(), 42, MaterialArticleInput{
+				ArticleInput: minimal, ArticleGroupID: 56, EAN: "7310000000000", IsFavorite: true,
+				Manufacturer: "Acme", ManufacturerArticleNumber: "AC-1", SupplierID: 7,
+			})
 			return articleIDOf(updated, err, func(a *MaterialArticle) int { return a.ID })
-		}, "/v1/admin/articles/material/42"},
+		}, "/v1/admin/articles/material/42",
+			`{"name":"Article","unitId":1,"vatCodeId":2,"articleGroupId":56,"ean":"7310000000000","isFavorite":true,"manufacturer":"Acme","manufacturerArticleNumber":"AC-1","supplierId":7}`},
 		{"time", func(s *ArticlesService) (int, error) {
-			updated, err := s.UpdateTime(context.Background(), 42, TimeArticleInput{ArticleInput: minimal})
+			updated, err := s.UpdateTime(context.Background(), 42, TimeArticleInput{
+				ArticleInput: minimal, SalaryCode: "S3", SalaryCodeForHour: "S3H",
+			})
 			return articleIDOf(updated, err, func(a *TimeArticle) int { return a.ID })
-		}, "/v1/admin/articles/time/42"},
+		}, "/v1/admin/articles/time/42",
+			`{"name":"Article","unitId":1,"vatCodeId":2,"salaryCode":"S3","salaryCodeForHour":"S3H"}`},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
@@ -306,7 +323,7 @@ func TestArticlesUpdatePerKindSendsPutToKindPath(t *testing.T) {
 			request := handler.last()
 			assert.Equal(t, http.MethodPut, request.Method)
 			assert.Equal(t, tc.path, request.Path)
-			assert.Equal(t, "Article", request.jsonBody(t)["name"])
+			assert.JSONEq(t, tc.body, string(request.Body))
 		})
 	}
 }

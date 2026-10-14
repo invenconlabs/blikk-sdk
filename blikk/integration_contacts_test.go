@@ -40,12 +40,19 @@ func TestIntegrationContacts(t *testing.T) {
 
 func TestIntegrationContactsFilterByType(t *testing.T) {
 	client := integrationClient(t)
+	ctx := integrationContext(t)
 
-	page, err := client.Contacts.List(integrationContext(t), ContactListParams{ListOptions: ListOptions{PageSize: 10}, ContactType: ContactTypeCompany})
-
+	everyone, err := client.Contacts.List(ctx, ContactListParams{ListOptions: ListOptions{PageSize: 1}})
 	require.NoError(t, err)
-	for _, contact := range page.Items {
-		assert.Equal(t, ContactTypeCompany, contact.ContactType)
+	persons, err := client.Contacts.List(ctx, ContactListParams{ListOptions: ListOptions{PageSize: 10}, ContactType: ContactTypePerson})
+	require.NoError(t, err)
+
+	if len(persons.Items) == 0 {
+		t.Skip("no person contacts in the tenant")
+	}
+	assert.Less(t, persons.TotalItemCount, everyone.TotalItemCount)
+	for _, contact := range persons.Items {
+		assert.Equal(t, ContactTypePerson, contact.ContactType)
 	}
 }
 
@@ -53,21 +60,25 @@ func TestIntegrationContactByExternalID(t *testing.T) {
 	client := integrationClient(t)
 	ctx := integrationContext(t)
 
-	var externalID string
-	for contact, err := range client.Contacts.ListAll(ctx, ContactListParams{}) {
-		require.NoError(t, err)
-		if contact.ExternalID != "" {
-			externalID = contact.ExternalID
-			break
-		}
-	}
+	page, err := client.Contacts.List(ctx, ContactListParams{ListOptions: ListOptions{PageSize: MaxPageSize}})
+	require.NoError(t, err)
+	externalID := firstContactExternalID(page.Items)
 	if externalID == "" {
-		t.Skip("no contact with an external id in the tenant")
+		t.Skip("no contact with an external id among the first 100")
 	}
 
 	contact, err := client.Contacts.GetByExternalID(ctx, externalID)
 	require.NoError(t, err)
 	assert.Equal(t, externalID, contact.ExternalID)
+}
+
+func firstContactExternalID(contacts []ContactListItem) string {
+	for _, contact := range contacts {
+		if contact.ExternalID != "" {
+			return contact.ExternalID
+		}
+	}
+	return ""
 }
 
 func TestIntegrationContactTags(t *testing.T) {

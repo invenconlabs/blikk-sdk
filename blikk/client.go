@@ -2,16 +2,21 @@ package blikk
 
 import (
 	"bytes"
+	"cmp"
 	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
+	"maps"
 	"math"
 	"mime"
+	"mime/multipart"
 	"net"
 	"net/http"
+	"net/textproto"
 	"net/url"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
@@ -231,6 +236,29 @@ func (c *Client) newAppTokenSource(appID, appSecret string) (*appTokenSource, er
 }
 
 func (c *Client) do(ctx context.Context, method, resourcePath string, query url.Values, body any, out any) error {
+	encoded, err := encodeJSONBody(body)
+	if err != nil {
+		return err
+	}
+	return c.doEncoded(ctx, method, resourcePath, query, encoded, out)
+}
+
+type UploadFile struct {
+	FieldName   string
+	Filename    string
+	ContentType string
+	Content     io.Reader
+}
+
+func (c *Client) upload(ctx context.Context, resourcePath string, fields map[string]string, files []UploadFile, out any) error {
+	encoded, err := encodeMultipartBody(fields, files)
+	if err != nil {
+		return err
+	}
+	return c.doEncoded(ctx, http.MethodPost, resourcePath, nil, encoded, out)
+}
+
+func (c *Client) doEncoded(ctx context.Context, method, resourcePath string, query url.Values, body requestBody, out any) error {
 	resp, err := c.execute(ctx, method, resourcePath, query, body, jsonContentType)
 	if err != nil {
 		return err
@@ -250,7 +278,7 @@ type Download struct {
 
 // download streams the body; the caller must close Content.
 func (c *Client) download(ctx context.Context, resourcePath string, query url.Values) (*Download, error) {
-	resp, err := c.execute(ctx, http.MethodGet, resourcePath, query, nil, anyContentType)
+	resp, err := c.execute(ctx, http.MethodGet, resourcePath, query, requestBody{}, anyContentType)
 	if err != nil {
 		return nil, err
 	}
@@ -281,12 +309,8 @@ func baseName(filename string) string {
 }
 
 // execute returns only successful responses, with the body still open for the caller to read and close.
-func (c *Client) execute(ctx context.Context, method, resourcePath string, query url.Values, body any, accept string) (*http.Response, error) {
+func (c *Client) execute(ctx context.Context, method, resourcePath string, query url.Values, body requestBody, accept string) (*http.Response, error) {
 	requestURL, err := c.buildURL(resourcePath, query)
-	if err != nil {
-		return nil, err
-	}
-	payload, err := encodeBody(body)
 	if err != nil {
 		return nil, err
 	}
@@ -298,7 +322,7 @@ func (c *Client) execute(ctx context.Context, method, resourcePath string, query
 		if err != nil {
 			return nil, err
 		}
-		resp, err := c.send(ctx, method, requestURL, payload, token, accept)
+		resp, err := c.send(ctx, method, requestURL, body, token, accept)
 		if err != nil {
 			return nil, err
 		}
@@ -335,11 +359,11 @@ func (c *Client) buildURL(resourcePath string, query url.Values) (string, error)
 	return requestURL, nil
 }
 
-func (c *Client) send(ctx context.Context, method, requestURL string, payload []byte, token, accept string) (*http.Response, error) {
+func (c *Client) send(ctx context.Context, method, requestURL string, body requestBody, token, accept string) (*http.Response, error) {
 	if err := c.waitForRateLimit(ctx); err != nil {
 		return nil, err
 	}
-	req, err := c.newRequest(ctx, method, requestURL, payload, token, accept)
+	req, err := c.newRequest(ctx, method, requestURL, body, token, accept)
 	if err != nil {
 		return nil, err
 	}
@@ -363,20 +387,20 @@ func (c *Client) waitForRateLimit(ctx context.Context) error {
 	}
 }
 
-func (c *Client) newRequest(ctx context.Context, method, requestURL string, payload []byte, token, accept string) (*http.Request, error) {
-	var body io.Reader
-	if payload != nil {
-		body = bytes.NewReader(payload)
+func (c *Client) newRequest(ctx context.Context, method, requestURL string, body requestBody, token, accept string) (*http.Request, error) {
+	var reader io.Reader
+	if body.payload != nil {
+		reader = bytes.NewReader(body.payload)
 	}
-	req, err := http.NewRequestWithContext(ctx, method, requestURL, body)
+	req, err := http.NewRequestWithContext(ctx, method, requestURL, reader)
 	if err != nil {
 		return nil, fmt.Errorf("blikk: creating request: %w", err)
 	}
 	req.Header.Set("Authorization", "Bearer "+token)
 	req.Header.Set("Accept", accept)
 	req.Header.Set("User-Agent", c.userAgent)
-	if payload != nil {
-		req.Header.Set("Content-Type", jsonContentType)
+	if body.payload != nil {
+		req.Header.Set("Content-Type", body.contentType)
 	}
 	return req, nil
 }
@@ -395,15 +419,76 @@ func readBody(resp *http.Response) ([]byte, error) {
 	return io.ReadAll(reader)
 }
 
-func encodeBody(body any) ([]byte, error) {
+// The payload is held in memory so a retry after 429 or 401 can send it again.
+type requestBody struct {
+	payload     []byte
+	contentType string
+}
+
+func encodeJSONBody(body any) (requestBody, error) {
 	if body == nil {
-		return nil, nil
+		return requestBody{}, nil
 	}
 	payload, err := json.Marshal(body)
 	if err != nil {
-		return nil, fmt.Errorf("blikk: encoding request body: %w", err)
+		return requestBody{}, fmt.Errorf("blikk: encoding request body: %w", err)
 	}
-	return payload, nil
+	return requestBody{payload: payload, contentType: jsonContentType}, nil
+}
+
+func encodeMultipartBody(fields map[string]string, files []UploadFile) (requestBody, error) {
+	var buffer bytes.Buffer
+	writer := multipart.NewWriter(&buffer)
+	for _, name := range slices.Sorted(maps.Keys(fields)) {
+		if err := writer.WriteField(name, fields[name]); err != nil {
+			return requestBody{}, fmt.Errorf("blikk: encoding form field %q: %w", name, err)
+		}
+	}
+	for _, file := range files {
+		if err := writeFilePart(writer, file); err != nil {
+			return requestBody{}, err
+		}
+	}
+	if err := writer.Close(); err != nil {
+		return requestBody{}, fmt.Errorf("blikk: encoding multipart body: %w", err)
+	}
+	return requestBody{payload: buffer.Bytes(), contentType: writer.FormDataContentType()}, nil
+}
+
+func writeFilePart(writer *multipart.Writer, file UploadFile) error {
+	if file.Content == nil {
+		return fmt.Errorf("blikk: upload file %q has no content", file.Filename)
+	}
+	part, err := writer.CreatePart(filePartHeader(file))
+	if err != nil {
+		return fmt.Errorf("blikk: encoding file %q: %w", file.Filename, err)
+	}
+	if _, err := io.Copy(part, file.Content); err != nil {
+		return fmt.Errorf("blikk: reading file %q: %w", file.Filename, err)
+	}
+	return nil
+}
+
+var quoteEscaper = strings.NewReplacer(`\`, `\\`, `"`, `\"`)
+
+// Quoted like multipart.Writer.CreateFormFile, which cannot set the part's Content-Type.
+func filePartHeader(file UploadFile) textproto.MIMEHeader {
+	header := make(textproto.MIMEHeader)
+	header.Set("Content-Disposition", fmt.Sprintf(`form-data; name="%s"; filename="%s"`,
+		quoteEscaper.Replace(file.FieldName), quoteEscaper.Replace(file.Filename)))
+	header.Set("Content-Type", cmp.Or(file.ContentType, "application/octet-stream"))
+	return header
+}
+
+func setFieldIfNotEmpty(fields map[string]string, name, value string) {
+	if value != "" {
+		fields[name] = value
+	}
+}
+
+func withDefaultFieldName(file UploadFile, fieldName string) UploadFile {
+	file.FieldName = cmp.Or(file.FieldName, fieldName)
+	return file
 }
 
 func decodeBody(method, resourcePath string, body []byte, out any) error {

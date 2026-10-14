@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
+	"strings"
 	"testing"
 	"time"
 
@@ -331,7 +332,7 @@ func TestTasksDownloadAttachmentStreamsFile(t *testing.T) {
 	assert.Equal(t, "MyImage.png", download.Filename)
 }
 
-func TestTasksCreateAttachmentSendsFullInput(t *testing.T) {
+func TestTasksCreateAttachmentSendsLinkAsMultipartFields(t *testing.T) {
 	client, handler := newRecordingClient(t, respondWith(http.StatusOK, `{"id":5}`))
 
 	id, err := client.Tasks.CreateAttachment(context.Background(), 1, TaskAttachmentInput{
@@ -342,21 +343,53 @@ func TestTasksCreateAttachmentSendsFullInput(t *testing.T) {
 
 	require.NoError(t, err)
 	assert.Equal(t, 5, id)
-	assertTaskRequest(t, handler.last(), http.MethodPost, "/v1/Core/Tasks/1/Attachments")
-	assert.Equal(t, map[string]any{
+	request := handler.last()
+	assertTaskRequest(t, request, http.MethodPost, "/v1/Core/Tasks/1/Attachments")
+	assert.True(t, strings.HasPrefix(request.Header.Get("Content-Type"), "multipart/form-data; boundary="))
+	form := request.multipartForm(t)
+	assert.Equal(t, map[string]string{
 		"name":            "Our external library",
 		"externalUrl":     "https://example.com",
 		"externalUrlType": "OneDrive",
-	}, handler.last().jsonBody(t))
+	}, formValues(form))
+	assert.Empty(t, form.File)
 }
 
-func TestTasksCreateAttachmentSendsMinimalInput(t *testing.T) {
+func TestTasksCreateAttachmentLinkOmitsEmptyFields(t *testing.T) {
 	client, handler := newRecordingClient(t, respondWith(http.StatusOK, `{"id":5}`))
 
 	_, err := client.Tasks.CreateAttachment(context.Background(), 1, TaskAttachmentInput{ExternalURL: "https://example.com"})
 
 	require.NoError(t, err)
-	assert.Equal(t, map[string]any{"externalUrl": "https://example.com"}, handler.last().jsonBody(t))
+	assert.Equal(t, map[string]string{"externalUrl": "https://example.com"}, formValues(handler.last().multipartForm(t)))
+}
+
+func TestTasksCreateAttachmentUploadsFileWithName(t *testing.T) {
+	client, handler := newRecordingClient(t, respondWith(http.StatusOK, `{"id":6}`))
+
+	id, err := client.Tasks.CreateAttachment(context.Background(), 1, TaskAttachmentInput{
+		Name:        "My image",
+		ExternalURL: "https://example.com/ignored",
+		File:        &UploadFile{Filename: "myimage.png", ContentType: "image/png", Content: strings.NewReader("\x89PNG bytes")},
+	})
+
+	require.NoError(t, err)
+	assert.Equal(t, 6, id)
+	form := handler.last().multipartForm(t)
+	assert.Equal(t, map[string]string{"name": "My image"}, formValues(form))
+	assert.Equal(t, []uploadedPart{{Filename: "myimage.png", ContentType: "image/png", Content: "\x89PNG bytes"}}, uploadedParts(t, form, "file"))
+	assert.Len(t, form.File, 1)
+}
+
+func TestTasksCreateAttachmentAcceptsEmptyResponse(t *testing.T) {
+	client, _ := newRecordingClient(t, respondWith(http.StatusOK, ""))
+
+	id, err := client.Tasks.CreateAttachment(context.Background(), 1, TaskAttachmentInput{
+		File: &UploadFile{Filename: "myimage.png", Content: strings.NewReader("png")},
+	})
+
+	require.NoError(t, err)
+	assert.Zero(t, id)
 }
 
 func TestTasksAttachmentWritesSendName(t *testing.T) {

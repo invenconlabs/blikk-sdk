@@ -155,10 +155,31 @@ type TaskAttachment struct {
 	UpdatedDate     *DateTime          `json:"updatedDate"`
 }
 
+// With File set the attachment is an uploaded file and the link fields are not sent.
 type TaskAttachmentInput struct {
-	Name            string          `json:"name,omitempty"`
-	ExternalURL     string          `json:"externalUrl,omitempty"`
-	ExternalURLType ExternalURLType `json:"externalUrlType,omitempty"`
+	Name            string
+	ExternalURL     string
+	ExternalURLType ExternalURLType
+	File            *UploadFile
+}
+
+const taskAttachmentFileField = "file"
+
+func (input TaskAttachmentInput) formFields() map[string]string {
+	fields := map[string]string{}
+	setFieldIfNotEmpty(fields, "name", input.Name)
+	if input.File == nil {
+		setFieldIfNotEmpty(fields, "externalUrl", input.ExternalURL)
+		setFieldIfNotEmpty(fields, "externalUrlType", string(input.ExternalURLType))
+	}
+	return fields
+}
+
+func (input TaskAttachmentInput) uploadFiles() []UploadFile {
+	if input.File == nil {
+		return nil
+	}
+	return []UploadFile{withDefaultFieldName(*input.File, taskAttachmentFileField)}
 }
 
 type taskAttachmentNameInput struct {
@@ -240,9 +261,9 @@ func (s *TasksService) DownloadAttachment(ctx context.Context, taskID, attachmen
 	return downloadTaskAttachment(ctx, s.client, taskID, attachmentID)
 }
 
-// CreateAttachment adds a link attachment; uploading a file needs a multipart request, which the client does not send.
+// CreateAttachment uploads input.File, which must be a .png, .jpg, .jpeg, .gif or .bmp image, or else adds a link attachment.
 func (s *TasksService) CreateAttachment(ctx context.Context, taskID int, input TaskAttachmentInput) (int, error) {
-	return createResourceID(ctx, s.client, input, tasksPath, strconv.Itoa(taskID), "Attachments")
+	return uploadResourceID(ctx, s.client, input.formFields(), input.uploadFiles(), tasksPath, strconv.Itoa(taskID), "Attachments")
 }
 
 func (s *TasksService) UpdateAttachment(ctx context.Context, taskID, attachmentID int, name string) error {

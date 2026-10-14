@@ -4,6 +4,7 @@ import (
 	"context"
 	"iter"
 	"strconv"
+	"strings"
 )
 
 const supplierInvoicesPath = "v1/core/supplierinvoices"
@@ -82,14 +83,56 @@ type SupplierInvoice struct {
 }
 
 type SupplierInvoiceUnhandledInput struct {
-	Title                string   `json:"title"`
-	InvoiceDate          DateTime `json:"invoiceDate"`
-	Amount               float64  `json:"amount"`
-	SourceSystemID       string   `json:"sourceSystemId"`
-	Description          string   `json:"description,omitempty"`
-	SupplierName         string   `json:"supplierName,omitempty"`
-	BookingProjectNumber string   `json:"bookingProjectNumber,omitempty"`
-	InvoiceNumber        string   `json:"invoiceNumber,omitempty"`
+	Title                string
+	InvoiceDate          Date
+	Amount               float64
+	SourceSystemID       string
+	Description          string
+	SupplierName         string
+	BookingProjectNumber string
+	InvoiceNumber        string
+	Files                []UploadFile
+}
+
+const supplierInvoiceFilesField = "files"
+
+func (input SupplierInvoiceUnhandledInput) formFields() map[string]string {
+	fields := map[string]string{
+		"title":          input.Title,
+		"invoiceDate":    input.InvoiceDate.String(),
+		"amount":         formatDecimal(input.Amount),
+		"sourceSystemId": input.SourceSystemID,
+	}
+	setFieldIfNotEmpty(fields, "description", input.Description)
+	setFieldIfNotEmpty(fields, "supplierName", input.SupplierName)
+	setFieldIfNotEmpty(fields, "bookingProjectNumber", input.BookingProjectNumber)
+	setFieldIfNotEmpty(fields, "invoiceNumber", input.InvoiceNumber)
+	return fields
+}
+
+func (input SupplierInvoiceUnhandledInput) uploadFiles() []UploadFile {
+	files := make([]UploadFile, len(input.Files))
+	for i, file := range input.Files {
+		files[i] = withDefaultFieldName(file, supplierInvoiceFilesField)
+	}
+	return files
+}
+
+// The documented example sends "500.00"; more decimals are kept rather than rounded away.
+func formatDecimal(value float64) string {
+	formatted := strconv.FormatFloat(value, 'f', -1, 64)
+	if decimalPlaces(formatted) < 2 {
+		return strconv.FormatFloat(value, 'f', 2, 64)
+	}
+	return formatted
+}
+
+func decimalPlaces(formatted string) int {
+	point := strings.IndexByte(formatted, '.')
+	if point < 0 {
+		return 0
+	}
+	return len(formatted) - point - 1
 }
 
 type SupplierInvoiceUpdateInput struct {
@@ -121,7 +164,7 @@ func (s *SupplierInvoicesService) Get(ctx context.Context, id int) (*SupplierInv
 
 // AddUnhandled returns the ID of the new supplier invoice.
 func (s *SupplierInvoicesService) AddUnhandled(ctx context.Context, input SupplierInvoiceUnhandledInput) (int, error) {
-	return createResourceID(ctx, s.client, input, supplierInvoicesPath, "addunhandled")
+	return uploadResourceID(ctx, s.client, input.formFields(), input.uploadFiles(), supplierInvoicesPath, "addunhandled")
 }
 
 func (s *SupplierInvoicesService) Update(ctx context.Context, id int, input SupplierInvoiceUpdateInput) error {

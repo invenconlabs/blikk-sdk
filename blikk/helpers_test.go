@@ -4,11 +4,13 @@ import (
 	"bytes"
 	"encoding/json"
 	"io"
+	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
 	"os"
 	"path/filepath"
 	"slices"
+	"strings"
 	"sync"
 	"testing"
 
@@ -132,6 +134,42 @@ func serveFile(contentType, contentDisposition string, content []byte) http.Hand
 func (r recordedRequest) decodeBody(t *testing.T, out any) {
 	t.Helper()
 	require.NoError(t, json.Unmarshal(r.Body, out), "request body: %s", r.Body)
+}
+
+func (r recordedRequest) multipartForm(t *testing.T) *multipart.Form {
+	t.Helper()
+	request := httptest.NewRequest(r.Method, r.Path, bytes.NewReader(r.Body))
+	request.Header = r.Header.Clone()
+	require.NoError(t, request.ParseMultipartForm(1<<20), "request body: %s", r.Body)
+	return request.MultipartForm
+}
+
+func formValues(form *multipart.Form) map[string]string {
+	values := make(map[string]string, len(form.Value))
+	for name, fieldValues := range form.Value {
+		values[name] = strings.Join(fieldValues, ",")
+	}
+	return values
+}
+
+type uploadedPart struct {
+	Filename    string
+	ContentType string
+	Content     string
+}
+
+func uploadedParts(t *testing.T, form *multipart.Form, fieldName string) []uploadedPart {
+	t.Helper()
+	parts := make([]uploadedPart, 0, len(form.File[fieldName]))
+	for _, header := range form.File[fieldName] {
+		file, err := header.Open()
+		require.NoError(t, err)
+		content, err := io.ReadAll(file)
+		require.NoError(t, err)
+		require.NoError(t, file.Close())
+		parts = append(parts, uploadedPart{Filename: header.Filename, ContentType: header.Header.Get("Content-Type"), Content: string(content)})
+	}
+	return parts
 }
 
 func (r recordedRequest) jsonBody(t *testing.T) map[string]any {

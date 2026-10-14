@@ -3,6 +3,7 @@ package blikk
 import (
 	"context"
 	"net/http"
+	"strings"
 	"testing"
 	"time"
 
@@ -105,18 +106,22 @@ func TestSupplierInvoicesGetDecodesFixture(t *testing.T) {
 	assert.Equal(t, &NameID{ID: 1, Name: "Project 1"}, invoice.BookingProject)
 }
 
-func TestSupplierInvoicesAddUnhandledSendsFullBody(t *testing.T) {
+func TestSupplierInvoicesAddUnhandledSendsEveryFieldAndFile(t *testing.T) {
 	client, handler := newRecordingClient(t, respondWith(http.StatusCreated, `{"Id":1451}`))
 
 	id, err := client.SupplierInvoices.AddUnhandled(context.Background(), SupplierInvoiceUnhandledInput{
 		Title:                "Solar Sverige",
-		InvoiceDate:          DateTimeOf(time.Date(2026, 6, 30, 0, 0, 0, 0, time.UTC)),
+		InvoiceDate:          NewDate(2026, time.June, 30),
 		Amount:               805.42,
 		SourceSystemID:       "erp-113",
 		Description:          "Cables",
 		SupplierName:         "Solar Sverige Aktiebolag",
 		BookingProjectNumber: "1269",
 		InvoiceNumber:        "2511980411",
+		Files: []UploadFile{
+			{Filename: "invoice-506.pdf", ContentType: "application/pdf", Content: strings.NewReader("%PDF-1.7")},
+			{Filename: "logo.jpeg", ContentType: "image/jpeg", Content: strings.NewReader("jpeg bytes")},
+		},
 	})
 
 	require.NoError(t, err)
@@ -124,36 +129,51 @@ func TestSupplierInvoicesAddUnhandledSendsFullBody(t *testing.T) {
 	request := handler.last()
 	assert.Equal(t, http.MethodPost, request.Method)
 	assert.Equal(t, "/v1/core/supplierinvoices/addunhandled", request.Path)
-	assert.Equal(t, map[string]any{
+	assert.True(t, strings.HasPrefix(request.Header.Get("Content-Type"), "multipart/form-data; boundary="))
+	form := request.multipartForm(t)
+	assert.Equal(t, map[string]string{
 		"title":                "Solar Sverige",
-		"invoiceDate":          "2026-06-30 00:00:00",
-		"amount":               805.42,
+		"invoiceDate":          "2026-06-30",
+		"amount":               "805.42",
 		"sourceSystemId":       "erp-113",
 		"description":          "Cables",
 		"supplierName":         "Solar Sverige Aktiebolag",
 		"bookingProjectNumber": "1269",
 		"invoiceNumber":        "2511980411",
-	}, request.jsonBody(t))
+	}, formValues(form))
+	assert.Equal(t, []uploadedPart{
+		{Filename: "invoice-506.pdf", ContentType: "application/pdf", Content: "%PDF-1.7"},
+		{Filename: "logo.jpeg", ContentType: "image/jpeg", Content: "jpeg bytes"},
+	}, uploadedParts(t, form, "files"))
 }
 
-func TestSupplierInvoicesAddUnhandledMinimalBodyOmitsOptionalFields(t *testing.T) {
+func TestSupplierInvoicesAddUnhandledMinimalFormOmitsOptionalFields(t *testing.T) {
 	client, handler := newRecordingClient(t, respondWith(http.StatusCreated, `{"id":1451}`))
 
 	id, err := client.SupplierInvoices.AddUnhandled(context.Background(), SupplierInvoiceUnhandledInput{
 		Title:          "Solar Sverige",
-		InvoiceDate:    DateTimeOf(time.Date(2026, 6, 30, 0, 0, 0, 0, time.UTC)),
-		Amount:         805.42,
+		InvoiceDate:    NewDate(2026, time.June, 30),
+		Amount:         500,
 		SourceSystemID: "erp-113",
 	})
 
 	require.NoError(t, err)
 	assert.Equal(t, 1451, id)
-	assert.Equal(t, map[string]any{
+	form := handler.last().multipartForm(t)
+	assert.Equal(t, map[string]string{
 		"title":          "Solar Sverige",
-		"invoiceDate":    "2026-06-30 00:00:00",
-		"amount":         805.42,
+		"invoiceDate":    "2026-06-30",
+		"amount":         "500.00",
 		"sourceSystemId": "erp-113",
-	}, handler.last().jsonBody(t))
+	}, formValues(form))
+	assert.Empty(t, form.File)
+}
+
+func TestFormatDecimalKeepsTwoDecimalsWithoutRounding(t *testing.T) {
+	assert.Equal(t, "500.00", formatDecimal(500))
+	assert.Equal(t, "805.40", formatDecimal(805.4))
+	assert.Equal(t, "0.125", formatDecimal(0.125))
+	assert.Equal(t, "-12.50", formatDecimal(-12.5))
 }
 
 func TestSupplierInvoicesUpdatePatchesFullBody(t *testing.T) {

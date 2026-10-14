@@ -64,6 +64,18 @@ func createdID(created *createdResource, base string) (int, error) {
 	}
 }
 
+func uploadResourceID(ctx context.Context, c *Client, fields map[string]string, files []UploadFile, base string, pathParams ...string) (int, error) {
+	path, err := resourcePath(base, pathParams...)
+	if err != nil {
+		return 0, err
+	}
+	var created *createdResource
+	if err := c.upload(ctx, path, fields, files, &created); err != nil {
+		return 0, err
+	}
+	return createdID(created, base)
+}
+
 func updateResource(ctx context.Context, c *Client, input any, base string, pathParams ...string) error {
 	path, err := resourcePath(base, pathParams...)
 	if err != nil {

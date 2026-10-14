@@ -385,3 +385,43 @@ func TestEveryServiceIsWiredToTheClient(t *testing.T) {
 		assert.Equal(t, client, (*Client)(backReference.UnsafePointer()), "service %s", field.Name)
 	}
 }
+
+func TestUploadResendsTheSameMultipartBodyAfterTooManyRequests(t *testing.T) {
+	handler := &recordingHandler{respond: rateLimitedThen(1, "0", respondWith(http.StatusCreated, `{"id":7}`))}
+	client := newTestClient(t, handler.ServeHTTP)
+	client.sleep = (&recordedSleeps{}).sleep
+	var created createdResource
+
+	err := client.upload(context.Background(), "v1/uploads", map[string]string{"title": "Invoice"},
+		[]UploadFile{{FieldName: "files", Filename: "a.pdf", Content: strings.NewReader("pdf")}}, &created)
+
+	require.NoError(t, err)
+	assert.Equal(t, 7, created.ID)
+	requests := handler.all()
+	require.Len(t, requests, 2)
+	assert.Equal(t, requests[0].Body, requests[1].Body)
+	form := requests[1].multipartForm(t)
+	assert.Equal(t, map[string]string{"title": "Invoice"}, formValues(form))
+	assert.Equal(t, []uploadedPart{{Filename: "a.pdf", ContentType: "application/octet-stream", Content: "pdf"}}, uploadedParts(t, form, "files"))
+}
+
+func TestUploadQuotesFieldAndFileNames(t *testing.T) {
+	client, handler := newRecordingClient(t, respondWith(http.StatusOK, ""))
+
+	err := client.upload(context.Background(), "v1/uploads", nil,
+		[]UploadFile{{FieldName: "file", Filename: `räkning "maj".pdf`, Content: strings.NewReader("pdf")}}, nil)
+
+	require.NoError(t, err)
+	parts := uploadedParts(t, handler.last().multipartForm(t), "file")
+	require.Len(t, parts, 1)
+	assert.Equal(t, `räkning "maj".pdf`, parts[0].Filename)
+}
+
+func TestUploadWithoutContentFailsBeforeSending(t *testing.T) {
+	client, handler := newRecordingClient(t, respondWith(http.StatusOK, ""))
+
+	err := client.upload(context.Background(), "v1/uploads", nil, []UploadFile{{FieldName: "file", Filename: "a.png"}}, nil)
+
+	require.ErrorContains(t, err, `upload file "a.png" has no content`)
+	assert.Empty(t, handler.all())
+}

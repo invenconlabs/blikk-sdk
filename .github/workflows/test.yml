@@ -29,7 +29,6 @@ jobs:
       contents: read
       checks: write
       pull-requests: write
-      issues: read
     steps:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -52,12 +51,14 @@ jobs:
         run: gotestsum --format github-actions --junitfile unit.xml -- -race ./...
 
       - name: Report Unit Tests
-        if: always() && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
-        uses: EnricoMi/publish-unit-test-result-action/linux@7622c5bf3d112a72ab4fa3951c2aa5723d8ab92d # v2.25.0
+        if: failure() && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
+        uses: mikepenz/action-junit-report@6ef3fdcfcd5f0b5d14df3e659ef19b8c6820f93d # v6.6.1
         with:
+          report_paths: unit.xml
           check_name: Unit Test Results
-          files: unit.xml
-          comment_mode: failures
+          comment: true
+          detailed_summary: true
+          failed_summary_logs: true
 
   integration-test:
     # Fork pull requests get no secrets and a read-only token, so they only run unit tests and post nothing.
@@ -67,7 +68,6 @@ jobs:
       contents: read
       checks: write
       pull-requests: write
-      issues: read
     needs: unit-test
     steps:
       - name: Checkout code
@@ -94,9 +94,11 @@ jobs:
         run: gotestsum --format github-actions --junitfile integration.xml -- -tags=integration ./...
 
       - name: Report Integration Tests
-        if: always()
-        uses: EnricoMi/publish-unit-test-result-action/linux@7622c5bf3d112a72ab4fa3951c2aa5723d8ab92d # v2.25.0
+        if: failure()
+        uses: mikepenz/action-junit-report@6ef3fdcfcd5f0b5d14df3e659ef19b8c6820f93d # v6.6.1
         with:
+          report_paths: integration.xml
           check_name: Integration Test Results
-          files: integration.xml
-          comment_mode: failures
+          comment: true
+          detailed_summary: true
+          failed_summary_logs: true

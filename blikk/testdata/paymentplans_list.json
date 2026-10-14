@@ -1,0 +1,62 @@
+{
+  "objectName": "generic.pagedlist",
+  "page": 1,
+  "pageSize": 25,
+  "itemCount": 2,
+  "totalItemCount": 1,
+  "totalPages": 1,
+  "items": [
+    {
+      "objectName": "paymentplan.list",
+      "id": 1,
+      "articleNumber": "PP01",
+      "description": "Installation + material",
+      "price": 12000.0,
+      "units": 1.0,
+      "batchId": "c5816c0a-6145-4de2-9e7d-ea8187eb3a43",
+      "date": "2026-10-11",
+      "invoiceId": 560,
+      "invoicedDate": null,
+      "invoiceDraftId": null,
+      "article": {
+        "objectName": "generic.name_id",
+        "id": 12,
+        "name": "My article"
+      },
+      "project": {
+        "objectName": "project.name_id",
+        "id": 1,
+        "name": "My project",
+        "number": "123"
+      },
+      "createdDate": "2026-09-28 07:16:57 +00:00",
+      "createdBy": null,
+      "updatedDate": "2026-10-10 04:09:45 +00:00",
+      "updatedBy": null
+    },
+    {
+      "objectName": "paymentplan.list",
+      "id": 2,
+      "articleNumber": "PP01",
+      "description": "Additional installations",
+      "price": 9000.0,
+      "units": 1.0,
+      "batchId": "2d526da5-a909-3549-204e-ad38335ffb85",
+      "date": "2026-11-27",
+      "invoiceId": null,
+      "invoicedDate": null,
+      "invoiceDraftId": null,
+      "article": null,
+      "project": {
+        "objectName": "project.name_id",
+        "id": 1,
+        "name": "My project",
+        "number": "123"
+      },
+      "createdDate": "2026-09-24 09:40:57 +00:00",
+      "createdBy": null,
+      "updatedDate": null,
+      "updatedBy": null
+    }
+  ]
+}

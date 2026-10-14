@@ -1,0 +1,47 @@
+{
+  "objectName": "supplierInvoice.detail",
+  "id": 42,
+  "title": "Supplier invoice 1",
+  "description": "Description of supplier invoice 1",
+  "supplier": {
+    "objectName": "generic.name_id",
+    "id": 1,
+    "name": "Supplier 1"
+  },
+  "invoiceNumber": "123",
+  "invoiceDate": "2026-08-13",
+  "projectCost": 200.0,
+  "addition": 100.0,
+  "totalAmount": 300.0,
+  "toBeInvoiced": true,
+  "invoiceId": 1,
+  "project": {
+    "objectName": "project.name_id",
+    "id": 1,
+    "name": "Project 1",
+    "number": "123"
+  },
+  "createdBy": {
+    "objectName": "generic.name_id",
+    "id": 1,
+    "name": "User 1"
+  },
+  "updatedBy": {
+    "objectName": "generic.name_id",
+    "id": 2,
+    "name": "User 2"
+  },
+  "createdDate": "2026-07-13 09:40:57 +00:00",
+  "updatedDate": "2026-08-13 09:40:57 +00:00",
+  "invoicedDate": "2026-09-13 09:40:57 +00:00",
+  "costCenter": {
+    "objectName": "generic.name_id",
+    "id": 1,
+    "name": "Cost center 1"
+  },
+  "bookingProject": {
+    "objectName": "generic.name_id",
+    "id": 1,
+    "name": "Project 1"
+  }
+}

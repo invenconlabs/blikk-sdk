@@ -116,42 +116,42 @@ type TimeReportListItem struct {
 }
 
 type TimeReport struct {
-	ID               int               `json:"id"`
-	Date             Date              `json:"date"`
-	ClockStart       string            `json:"clockStart"`
-	ClockEnd         string            `json:"clockEnd"`
-	Hours            float64           `json:"hours"`
-	InvoiceableHours float64           `json:"invoiceableHours"`
-	BreakMinutes     int               `json:"breakMinutes"`
-	Cost             float64           `json:"cost"`
-	Rate             float64           `json:"rate"`
-	Discount         float64           `json:"discount"`
-	Comment          string            `json:"comment"`
-	InternalComment  string            `json:"internalComment"`
-	SentToAttestDate *DateTime         `json:"sentToAttestDate"`
-	AttestedDate     *DateTime         `json:"attestedDate"`
-	AttestedByUser   *NameID           `json:"attestedByUser"`
-	User             NameID            `json:"user"`
-	Contact          NameID            `json:"contact"`
-	Project          *ProjectRef       `json:"project"`
-	InternalProject  *NameID           `json:"internalProject"`
-	AbsenceProject   *NameID           `json:"absenceProject"`
-	Activity         NameID            `json:"activity"`
-	TimeCode         NameID            `json:"timeCode"`
-	TimeArticle      NameID            `json:"timeArticle"`
-	CostCenter       *CostCenterRef    `json:"costCenter"`
-	BookingProject   *NameID           `json:"bookingProject"`
-	InvoiceID        int               `json:"invoiceId"`
-	InvoicedDate     *DateTime         `json:"invoicedDate"`
-	InvoiceDraftID   int               `json:"invoiceDraftId"`
-	Task             *NameID           `json:"task"`
-	TravelReport     *TravelReport     `json:"travelReport"`
-	AllowanceReport  *AllowanceReport  `json:"allowanceReport"`
-	Materials        []MaterialReport  `json:"materials"`
-	Equipments       []EquipmentReport `json:"equipments"`
-	Additions        []AdditionReport  `json:"additions"`
-	CreatedDate      DateTime          `json:"createdDate"`
-	UpdatedDate      *DateTime         `json:"updatedDate"`
+	ID               int                  `json:"id"`
+	Date             Date                 `json:"date"`
+	ClockStart       string               `json:"clockStart"`
+	ClockEnd         string               `json:"clockEnd"`
+	Hours            float64              `json:"hours"`
+	InvoiceableHours float64              `json:"invoiceableHours"`
+	BreakMinutes     int                  `json:"breakMinutes"`
+	Cost             float64              `json:"cost"`
+	Rate             float64              `json:"rate"`
+	Discount         float64              `json:"discount"`
+	Comment          string               `json:"comment"`
+	InternalComment  string               `json:"internalComment"`
+	SentToAttestDate *DateTime            `json:"sentToAttestDate"`
+	AttestedDate     *DateTime            `json:"attestedDate"`
+	AttestedByUser   *NameID              `json:"attestedByUser"`
+	User             NameID               `json:"user"`
+	Contact          NameID               `json:"contact"`
+	Project          *ProjectRef          `json:"project"`
+	InternalProject  *NameID              `json:"internalProject"`
+	AbsenceProject   *NameID              `json:"absenceProject"`
+	Activity         NameID               `json:"activity"`
+	TimeCode         NameID               `json:"timeCode"`
+	TimeArticle      NameID               `json:"timeArticle"`
+	CostCenter       *CostCenterRef       `json:"costCenter"`
+	BookingProject   *NameID              `json:"bookingProject"`
+	InvoiceID        int                  `json:"invoiceId"`
+	InvoicedDate     *DateTime            `json:"invoicedDate"`
+	InvoiceDraftID   int                  `json:"invoiceDraftId"`
+	Task             *NameID              `json:"task"`
+	TravelReport     *TravelReport        `json:"travelReport"`
+	AllowanceReport  *AllowanceReport     `json:"allowanceReport"`
+	Materials        []TimeReportMaterial `json:"materials"`
+	Equipments       []EquipmentReport    `json:"equipments"`
+	Additions        []AdditionReport     `json:"additions"`
+	CreatedDate      DateTime             `json:"createdDate"`
+	UpdatedDate      *DateTime            `json:"updatedDate"`
 }
 
 type TravelReport struct {
@@ -205,7 +205,7 @@ type AllowanceReport struct {
 	Article                  *NameID        `json:"article"`
 }
 
-type MaterialReport struct {
+type TimeReportMaterial struct {
 	ID                   int            `json:"id"`
 	Title                string         `json:"title"`
 	Units                float64        `json:"units"`

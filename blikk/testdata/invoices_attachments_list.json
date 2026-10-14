@@ -1,0 +1,44 @@
+{
+  "objectName": "generic.pagedlist",
+  "page": 1,
+  "pageSize": 25,
+  "itemCount": 2,
+  "totalItemCount": 2,
+  "totalPages": 1,
+  "items": [
+    {
+      "objectName": "invoice.attachment.list",
+      "id": 1,
+      "name": "Drawing.pdf",
+      "contentType": "application/pdf",
+      "sizeInBytes": 245760,
+      "contactId": 92,
+      "workOrderId": null,
+      "isTimeJournal": false,
+      "sortIndex": 1,
+      "createdByUser": {
+        "objectName": "generic.name_id",
+        "id": 1,
+        "name": "John Doe"
+      },
+      "createdDate": "2026-10-11 09:40:57 +00:00"
+    },
+    {
+      "objectName": "invoice.attachment.list",
+      "id": 2,
+      "name": "TimeJournal.pdf",
+      "contentType": "application/pdf",
+      "sizeInBytes": 102400,
+      "contactId": null,
+      "workOrderId": 17,
+      "isTimeJournal": true,
+      "sortIndex": 2,
+      "createdByUser": {
+        "objectName": "generic.name_id",
+        "id": 1,
+        "name": "John Doe"
+      },
+      "createdDate": "2026-10-12 09:40:57 +00:00"
+    }
+  ]
+}

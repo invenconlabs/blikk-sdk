@@ -1,0 +1,50 @@
+{
+  "objectName": "generic.pagedlist",
+  "page": 1,
+  "pageSize": 25,
+  "itemCount": 1,
+  "totalItemCount": 1,
+  "totalPages": 1,
+  "items": [
+    {
+      "objectName": "supplierInvoice.list",
+      "id": 1,
+      "invoiceNumber": "11232",
+      "invoiceDate": "2026-09-30",
+      "title": "Construction time spent",
+      "description": "A brief description.",
+      "externalHours": 2.0,
+      "totalAmount": 1100.0,
+      "invoiceCostAddition": 100.0,
+      "cost": 1000.0,
+      "ocrNumber": "1234567890",
+      "toBeInvoiced": true,
+      "invoiceId": null,
+      "invoicedDate": null,
+      "invoiceDraftId": null,
+      "supplier": {
+        "objectName": "generic.name_id",
+        "id": 44,
+        "name": "Builders Inc."
+      },
+      "project": {
+        "objectName": "project.name_id",
+        "id": 123,
+        "name": "My project",
+        "number": "213"
+      },
+      "createdBy": {
+        "objectName": "generic.name_id",
+        "id": 1,
+        "name": "John Doe"
+      },
+      "updatedBy": {
+        "objectName": "generic.name_id",
+        "id": 2,
+        "name": "Jane Doe"
+      },
+      "createdDate": "2026-10-01 07:16:57 +00:00",
+      "updatedDate": "2026-10-12 04:09:45 +00:00"
+    }
+  ]
+}

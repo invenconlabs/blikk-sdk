@@ -1,0 +1,13 @@
+{
+  "objectName": "generic.pagedlist",
+  "page": 1,
+  "pageSize": 25,
+  "itemCount": 3,
+  "totalItemCount": 3,
+  "totalPages": 1,
+  "items": [
+    {"objectName": "planning.hasresourceplanning.user", "id": 1, "employmentNumber": "1001", "firstName": "Ingvar", "lastName": "Carlsson"},
+    {"objectName": "planning.hasresourceplanning.user", "id": 2, "employmentNumber": "1002", "firstName": "Olof", "lastName": "Palme"},
+    {"objectName": "planning.hasresourceplanning.user", "id": 3, "employmentNumber": "1003", "firstName": "Thorbjörn", "lastName": "Fälldin"}
+  ]
+}

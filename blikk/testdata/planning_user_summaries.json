@@ -1,0 +1,30 @@
+{
+  "objectName": "generic.pagedlist",
+  "page": 1,
+  "pageSize": 25,
+  "itemCount": 2,
+  "totalItemCount": 2,
+  "totalPages": 1,
+  "items": [
+    {
+      "objectName": "planning.summary.user",
+      "userId": 1,
+      "fromDate": "2026-01-01",
+      "toDate": "2026-12-31",
+      "userName": "Ingvar Carlsson",
+      "plannedHours": 100.1,
+      "expectedInvoiceableAmount": 90090.00,
+      "expectedCost": 45045.00
+    },
+    {
+      "objectName": "planning.summary.user",
+      "userId": 2,
+      "fromDate": "2026-01-01",
+      "toDate": "2026-12-31",
+      "userName": "Olof Palme",
+      "plannedHours": 85.5,
+      "expectedInvoiceableAmount": 76950.00,
+      "expectedCost": null
+    }
+  ]
+}

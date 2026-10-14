@@ -1,0 +1,32 @@
+{
+  "objectName": "article.equipment",
+  "equipmentTypeId": 33,
+  "model": "Model 23",
+  "serialNumber": "SN-123",
+  "yearOfPurchase": 2019,
+  "id": 42,
+  "articleNumber": "234",
+  "cost": 401.00,
+  "description": "Description of new equipment 1",
+  "externalId": "EXT-123",
+  "isActive": true,
+  "name": "New Equipment 1",
+  "price": 1101.00,
+  "unit": {"objectName": "generic.name_id", "id": 817, "name": "Unit 1"},
+  "vatCode": {
+    "objectName": "vat.code",
+    "id": 646,
+    "name": "VAT 25%",
+    "code": "25",
+    "vat": 25.00,
+    "isVatFree": false,
+    "createdBy": null,
+    "updatedBy": null,
+    "created": null,
+    "updated": null
+  },
+  "createdBy": {"objectName": "generic.name_id", "id": 123, "name": "John Doe"},
+  "updatedBy": null,
+  "created": "2026-10-09 09:40:57 +00:00",
+  "updated": null
+}

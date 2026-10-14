@@ -120,7 +120,7 @@ type User struct {
 	TimeBankEnabled           bool           `json:"timeBankEnabled"`
 	CurrentTimeBank           float64        `json:"currentTimeBank"`
 	PlanningCapacityInPercent float64        `json:"planningCapacityInPercent"`
-	Tags                      []Tag          `json:"tags"`
+	Tags                      []TagRef       `json:"tags"`
 	Permissions               []string       `json:"permissions"`
 	CreatedBy                 *NameID        `json:"createdBy"`
 	UpdatedBy                 *NameID        `json:"updatedBy"`

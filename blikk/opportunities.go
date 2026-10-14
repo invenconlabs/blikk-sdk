@@ -63,7 +63,7 @@ type OpportunityListItem struct {
 	UpdatedByUser        *NameID          `json:"updatedByUser"`
 	CreatedDate          DateTime         `json:"createdDate"`
 	CreatedByUser        *NameID          `json:"createdByUser"`
-	Tags                 []Tag            `json:"tags"`
+	Tags                 []TagRef         `json:"tags"`
 }
 
 type Opportunity struct {
@@ -86,7 +86,7 @@ type Opportunity struct {
 	UpdatedByUser        *NameID          `json:"updatedByUser"`
 	CreatedDate          DateTime         `json:"createdDate"`
 	CreatedByUser        *NameID          `json:"createdByUser"`
-	Tags                 []Tag            `json:"tags"`
+	Tags                 []TagRef         `json:"tags"`
 }
 
 type OpportunityCreateInput struct {

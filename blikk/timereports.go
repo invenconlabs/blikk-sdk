@@ -155,28 +155,28 @@ type TimeReport struct {
 }
 
 type TravelReport struct {
-	ID                  int            `json:"id"`
-	Place               string         `json:"place"`
-	InvoiceablePlace    string         `json:"invoicablePlace"`
-	Distance            float64        `json:"distance"`
-	InvoiceableDistance float64        `json:"invoicableDistance"`
-	ToSalary            bool           `json:"toSalary"`
-	ToBeInvoiced        bool           `json:"toBeInvoiced"`
-	Cost                float64        `json:"cost"`
-	Rate                float64        `json:"rate"`
-	Discount            float64        `json:"discount"`
-	SentToAttestDate    *DateTime      `json:"sentToAttestDate"`
-	AttestedDate        *DateTime      `json:"attestedDate"`
-	CostCenter          *CostCenterRef `json:"costCenter"`
-	BookingProject      *NameID        `json:"bookingProject"`
-	InvoiceID           int            `json:"invoiceId"`
-	InvoicedDate        *DateTime      `json:"invoicedDate"`
-	InvoiceDraftID      int            `json:"invoiceDraftId"`
-	CompanyCar          *CompanyCar    `json:"companyCar"`
-	Article             *NameID        `json:"article"`
+	ID                  int                     `json:"id"`
+	Place               string                  `json:"place"`
+	InvoiceablePlace    string                  `json:"invoicablePlace"`
+	Distance            float64                 `json:"distance"`
+	InvoiceableDistance float64                 `json:"invoicableDistance"`
+	ToSalary            bool                    `json:"toSalary"`
+	ToBeInvoiced        bool                    `json:"toBeInvoiced"`
+	Cost                float64                 `json:"cost"`
+	Rate                float64                 `json:"rate"`
+	Discount            float64                 `json:"discount"`
+	SentToAttestDate    *DateTime               `json:"sentToAttestDate"`
+	AttestedDate        *DateTime               `json:"attestedDate"`
+	CostCenter          *CostCenterRef          `json:"costCenter"`
+	BookingProject      *NameID                 `json:"bookingProject"`
+	InvoiceID           int                     `json:"invoiceId"`
+	InvoicedDate        *DateTime               `json:"invoicedDate"`
+	InvoiceDraftID      int                     `json:"invoiceDraftId"`
+	CompanyCar          *TravelReportCompanyCar `json:"companyCar"`
+	Article             *NameID                 `json:"article"`
 }
 
-type CompanyCar struct {
+type TravelReportCompanyCar struct {
 	ID           int     `json:"id"`
 	Name         string  `json:"name"`
 	TripStart    float64 `json:"tripStart"`
@@ -344,7 +344,7 @@ type AdditionInput struct {
 
 const UserDayStatisticsSortByName = "name"
 
-type UserDayStatisticsParams struct {
+type UserDayStatisticsListParams struct {
 	ListOptions
 	From          Date  `query:"filter.from"`
 	To            Date  `query:"filter.to"`
@@ -416,11 +416,11 @@ func (s *TimeReportsService) Delete(ctx context.Context, id int) error {
 }
 
 // ListUserDayStatistics returns one page; the API rejects ranges longer than 31 days.
-func (s *TimeReportsService) ListUserDayStatistics(ctx context.Context, params UserDayStatisticsParams) (*Page[UserDayStatistics], error) {
+func (s *TimeReportsService) ListUserDayStatistics(ctx context.Context, params UserDayStatisticsListParams) (*Page[UserDayStatistics], error) {
 	return listPage[UserDayStatistics](ctx, s.client, userDayStatisticsPath, params)
 }
 
 // ListAllUserDayStatistics walks every page like ListAll; on failure it yields a single error and stops.
-func (s *TimeReportsService) ListAllUserDayStatistics(ctx context.Context, params UserDayStatisticsParams) iter.Seq2[UserDayStatistics, error] {
+func (s *TimeReportsService) ListAllUserDayStatistics(ctx context.Context, params UserDayStatisticsListParams) iter.Seq2[UserDayStatistics, error] {
 	return listAll[UserDayStatistics](ctx, s.client, userDayStatisticsPath, params)
 }

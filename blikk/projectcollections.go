@@ -39,7 +39,7 @@ type ProjectCollection struct {
 	Title         string                     `json:"title"`
 	ProjectNumber string                     `json:"projectNumber"`
 	Description   string                     `json:"description"`
-	Status        *ProjectStatus             `json:"status"`
+	Status        *ProjectStatusRef          `json:"status"`
 	Type          ProjectCollectionType      `json:"type"`
 	Category      *ProjectCollectionCategory `json:"category"`
 	Manager       *NameID                    `json:"manager"`

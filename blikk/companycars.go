@@ -21,7 +21,7 @@ type CompanyCarListParams struct {
 	ListOptions
 }
 
-type CompanyCarListItem struct {
+type CompanyCar struct {
 	ID                 int       `json:"id"`
 	Name               string    `json:"name"`
 	IsActive           bool      `json:"isActive"`
@@ -34,10 +34,10 @@ type CompanyCarListItem struct {
 	Updated            *DateTime `json:"updated"`
 }
 
-func (s *CompanyCarsService) List(ctx context.Context, params CompanyCarListParams) (*Page[CompanyCarListItem], error) {
-	return listPage[CompanyCarListItem](ctx, s.client, companyCarsPath, params)
+func (s *CompanyCarsService) List(ctx context.Context, params CompanyCarListParams) (*Page[CompanyCar], error) {
+	return listPage[CompanyCar](ctx, s.client, companyCarsPath, params)
 }
 
-func (s *CompanyCarsService) ListAll(ctx context.Context, params CompanyCarListParams) iter.Seq2[CompanyCarListItem, error] {
-	return listAll[CompanyCarListItem](ctx, s.client, companyCarsPath, params)
+func (s *CompanyCarsService) ListAll(ctx context.Context, params CompanyCarListParams) iter.Seq2[CompanyCar, error] {
+	return listAll[CompanyCar](ctx, s.client, companyCarsPath, params)
 }

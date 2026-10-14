@@ -75,7 +75,7 @@ func TestTasksListDecodesFixture(t *testing.T) {
 	assert.Equal(t, 5, task.NumberOfComments)
 	assert.Equal(t, 3, task.NumberOfAttachments)
 	assert.Equal(t, 14, task.NumberOfChecklistPoints)
-	assert.Equal(t, []Tag{{ID: 1, Title: "2.8", Color: "#41b18b"}, {ID: 2, Title: "GUI", Color: "#41b18b"}}, task.Tags)
+	assert.Equal(t, []TagRef{{ID: 1, Title: "2.8", Color: "#41b18b"}, {ID: 2, Title: "GUI", Color: "#41b18b"}}, task.Tags)
 	assert.Equal(t, []TaskMember{{UserID: 1, UserName: "John Doe"}, {UserID: 2, UserName: "Jane Doe"}}, task.Members)
 	assert.Equal(t, &NameID{ID: 1, Name: "Att göra"}, task.BoardColumn)
 	assert.Equal(t, &NameID{ID: 1, Name: "Sprint 2.8"}, task.Board)

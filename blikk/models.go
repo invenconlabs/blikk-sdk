@@ -17,7 +17,7 @@ type CostCenterRef struct {
 	Code string `json:"code"`
 }
 
-type Tag struct {
+type TagRef struct {
 	ID    int    `json:"id"`
 	Title string `json:"title"`
 	Color string `json:"color"`
@@ -42,7 +42,7 @@ type Location struct {
 	CountryName   string  `json:"countryName"`
 }
 
-type ProjectStatus struct {
+type ProjectStatusRef struct {
 	ID                int    `json:"id"`
 	Name              string `json:"name"`
 	IsCompletedStatus bool   `json:"isCompletedStatus"`
@@ -54,7 +54,7 @@ type ProjectCategory struct {
 	Color string `json:"color"`
 }
 
-type TagListItem struct {
+type Tag struct {
 	ID          int       `json:"id"`
 	Title       string    `json:"title"`
 	Color       string    `json:"color"`
@@ -83,6 +83,10 @@ type VatCode struct {
 	UpdatedBy *NameID   `json:"updatedBy"`
 	Created   *DateTime `json:"created"`
 	Updated   *DateTime `json:"updated"`
+}
+
+type commentInput struct {
+	Text string `json:"text"`
 }
 
 func Ptr[T any](v T) *T { return &v }

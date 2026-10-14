@@ -20,7 +20,7 @@ func TestProjectCategoriesListEncodesSortingAndDecodesFixture(t *testing.T) {
 		"sortBy":    {"name"},
 		"sortOrder": {"descending"},
 	}, handler.last().Query)
-	assert.Equal(t, []ProjectCategoryListItem{{ID: 1, Name: "Lorem ipsum", Color: "#e3168a"}}, page.Items)
+	assert.Equal(t, []ProjectCategory{{ID: 1, Name: "Lorem ipsum", Color: "#e3168a"}}, page.Items)
 }
 
 func TestProjectCategoriesListAllWalksPages(t *testing.T) {

@@ -38,7 +38,7 @@ func TestTaskBoardsListDecodesFixture(t *testing.T) {
 	assert.Equal(t, 1, board.ID)
 	assert.Equal(t, "Sprint 2.8", board.Name)
 	assert.Equal(t, &ProjectRef{ID: 15, Name: "Utvecklingsprojektet", Number: "26"}, board.Project)
-	assert.Equal(t, []Tag{{ID: 1, Color: "#41b18b"}, {ID: 2, Title: "Bug", Color: "#f2d600"}}, board.Tags)
+	assert.Equal(t, []TagRef{{ID: 1, Color: "#41b18b"}, {ID: 2, Title: "Bug", Color: "#f2d600"}}, board.Tags)
 	assert.Equal(t, []NameID{{ID: 1, Name: "John Doe"}, {ID: 2, Name: "Jane Doe"}}, board.Members)
 	assert.Equal(t, &NameID{ID: 1, Name: "John Doe"}, board.CreatedByUser)
 	assert.Nil(t, board.UpdatedByUser)

@@ -28,8 +28,8 @@ func TestCommentDecodesDocsExample(t *testing.T) {
 	assert.Nil(t, comment.UpdatedDate)
 }
 
-func TestTagListItemDecodesDocsExample(t *testing.T) {
-	var tag TagListItem
+func TestTagDecodesDocsExample(t *testing.T) {
+	var tag Tag
 	require.NoError(t, json.Unmarshal([]byte(`{
 		"objectName": "tag.list",
 		"id": 1,

@@ -26,7 +26,7 @@ type ProjectStatusListParams struct {
 	UpdatedDateTo   DateTime `query:"filter.updatedDateTo"`
 }
 
-type ProjectStatusListItem struct {
+type ProjectStatus struct {
 	ID          int       `json:"id"`
 	Name        string    `json:"name"`
 	Color       string    `json:"color"`
@@ -39,11 +39,11 @@ type ProjectStatusListItem struct {
 	CreatedBy   *NameID   `json:"createdBy"`
 }
 
-func (s *ProjectStatusesService) List(ctx context.Context, params ProjectStatusListParams) (*Page[ProjectStatusListItem], error) {
-	return listPage[ProjectStatusListItem](ctx, s.client, projectStatusesPath, params)
+func (s *ProjectStatusesService) List(ctx context.Context, params ProjectStatusListParams) (*Page[ProjectStatus], error) {
+	return listPage[ProjectStatus](ctx, s.client, projectStatusesPath, params)
 }
 
 // ListAll walks every page from params.Page onwards; on failure it yields a single error and stops.
-func (s *ProjectStatusesService) ListAll(ctx context.Context, params ProjectStatusListParams) iter.Seq2[ProjectStatusListItem, error] {
-	return listAll[ProjectStatusListItem](ctx, s.client, projectStatusesPath, params)
+func (s *ProjectStatusesService) ListAll(ctx context.Context, params ProjectStatusListParams) iter.Seq2[ProjectStatus, error] {
+	return listAll[ProjectStatus](ctx, s.client, projectStatusesPath, params)
 }

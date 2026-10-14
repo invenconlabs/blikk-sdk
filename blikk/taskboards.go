@@ -23,11 +23,11 @@ type TaskBoardListParams struct {
 	ProjectIDs []int  `query:"filter.projectIds"`
 }
 
-type TaskBoardListItem struct {
+type TaskBoard struct {
 	ID            int               `json:"id"`
 	Name          string            `json:"name"`
 	Project       *ProjectRef       `json:"project"`
-	Tags          []Tag             `json:"tags"`
+	Tags          []TagRef          `json:"tags"`
 	Columns       []TaskBoardColumn `json:"columns"`
 	Members       []NameID          `json:"members"`
 	CreatedByUser *NameID           `json:"createdByUser"`
@@ -46,10 +46,10 @@ type TaskBoardColumn struct {
 	UpdatedDate   *DateTime `json:"updatedDate"`
 }
 
-func (s *TaskBoardsService) List(ctx context.Context, params TaskBoardListParams) (*Page[TaskBoardListItem], error) {
-	return listPage[TaskBoardListItem](ctx, s.client, taskBoardsPath, params)
+func (s *TaskBoardsService) List(ctx context.Context, params TaskBoardListParams) (*Page[TaskBoard], error) {
+	return listPage[TaskBoard](ctx, s.client, taskBoardsPath, params)
 }
 
-func (s *TaskBoardsService) ListAll(ctx context.Context, params TaskBoardListParams) iter.Seq2[TaskBoardListItem, error] {
-	return listAll[TaskBoardListItem](ctx, s.client, taskBoardsPath, params)
+func (s *TaskBoardsService) ListAll(ctx context.Context, params TaskBoardListParams) iter.Seq2[TaskBoard, error] {
+	return listAll[TaskBoard](ctx, s.client, taskBoardsPath, params)
 }

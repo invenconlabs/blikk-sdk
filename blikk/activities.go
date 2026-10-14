@@ -21,7 +21,7 @@ type ActivityListParams struct {
 	ListOptions
 }
 
-type ActivityListItem struct {
+type Activity struct {
 	ID                   int       `json:"id"`
 	Name                 string    `json:"name"`
 	IsActive             bool      `json:"isActive"`
@@ -33,10 +33,10 @@ type ActivityListItem struct {
 	Updated              *DateTime `json:"updated"`
 }
 
-func (s *ActivitiesService) List(ctx context.Context, params ActivityListParams) (*Page[ActivityListItem], error) {
-	return listPage[ActivityListItem](ctx, s.client, activitiesPath, params)
+func (s *ActivitiesService) List(ctx context.Context, params ActivityListParams) (*Page[Activity], error) {
+	return listPage[Activity](ctx, s.client, activitiesPath, params)
 }
 
-func (s *ActivitiesService) ListAll(ctx context.Context, params ActivityListParams) iter.Seq2[ActivityListItem, error] {
-	return listAll[ActivityListItem](ctx, s.client, activitiesPath, params)
+func (s *ActivitiesService) ListAll(ctx context.Context, params ActivityListParams) iter.Seq2[Activity, error] {
+	return listAll[Activity](ctx, s.client, activitiesPath, params)
 }

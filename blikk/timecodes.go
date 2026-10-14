@@ -21,7 +21,7 @@ type TimeCodeListParams struct {
 	ListOptions
 }
 
-type TimeCodeListItem struct {
+type TimeCode struct {
 	ID          int       `json:"id"`
 	Name        string    `json:"name"`
 	Description string    `json:"description"`
@@ -33,10 +33,10 @@ type TimeCodeListItem struct {
 	Updated     *DateTime `json:"updated"`
 }
 
-func (s *TimeCodesService) List(ctx context.Context, params TimeCodeListParams) (*Page[TimeCodeListItem], error) {
-	return listPage[TimeCodeListItem](ctx, s.client, timeCodesPath, params)
+func (s *TimeCodesService) List(ctx context.Context, params TimeCodeListParams) (*Page[TimeCode], error) {
+	return listPage[TimeCode](ctx, s.client, timeCodesPath, params)
 }
 
-func (s *TimeCodesService) ListAll(ctx context.Context, params TimeCodeListParams) iter.Seq2[TimeCodeListItem, error] {
-	return listAll[TimeCodeListItem](ctx, s.client, timeCodesPath, params)
+func (s *TimeCodesService) ListAll(ctx context.Context, params TimeCodeListParams) iter.Seq2[TimeCode, error] {
+	return listAll[TimeCode](ctx, s.client, timeCodesPath, params)
 }

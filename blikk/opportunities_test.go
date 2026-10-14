@@ -73,7 +73,7 @@ func TestOpportunitiesListDecodesFixture(t *testing.T) {
 	assert.Nil(t, item.EstimatedClosingDate)
 	assert.Equal(t, &NameID{ID: 1, Name: "Lorem"}, item.Status)
 	assert.Equal(t, "2026-10-13 09:40:57", item.CreatedDate.String())
-	assert.Equal(t, []Tag{{ID: 1, Title: "Ipsum", Color: "#41b18b"}}, item.Tags)
+	assert.Equal(t, []TagRef{{ID: 1, Title: "Ipsum", Color: "#41b18b"}}, item.Tags)
 }
 
 func TestOpportunitiesGetDecodesFixture(t *testing.T) {
@@ -98,7 +98,7 @@ func TestOpportunitiesGetDecodesFixture(t *testing.T) {
 	assert.Equal(t, &NameID{ID: 1, Name: "John Doe"}, opportunity.ClosedByUser)
 	assert.Nil(t, opportunity.Project)
 	assert.Equal(t, &NameID{ID: 1, Name: "Lorem"}, opportunity.Status)
-	assert.Equal(t, []Tag{{ID: 1, Title: "Ipsum", Color: "#41b18b"}}, opportunity.Tags)
+	assert.Equal(t, []TagRef{{ID: 1, Title: "Ipsum", Color: "#41b18b"}}, opportunity.Tags)
 }
 
 func TestOpportunityStateAcceptsLowercaseDocsSpelling(t *testing.T) {

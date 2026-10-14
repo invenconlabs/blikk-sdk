@@ -36,7 +36,7 @@ type TaskListParams struct {
 	ProjectID             int      `query:"filter.projectId"`
 }
 
-type TaskListItem struct {
+type Task struct {
 	ID                      int          `json:"id"`
 	Title                   string       `json:"title"`
 	Description             string       `json:"description"`
@@ -50,7 +50,7 @@ type TaskListItem struct {
 	NumberOfComments        int          `json:"numberOfComments"`
 	NumberOfAttachments     int          `json:"numberOfAttachments"`
 	NumberOfChecklistPoints int          `json:"numberOfChecklistPoints"`
-	Tags                    []Tag        `json:"tags"`
+	Tags                    []TagRef     `json:"tags"`
 	Members                 []TaskMember `json:"members"`
 	BoardColumn             *NameID      `json:"boardColumn"`
 	Board                   *NameID      `json:"board"`
@@ -84,10 +84,6 @@ type TaskInput struct {
 }
 
 const TaskCommentSortByCreatedDate = "createdDate"
-
-type taskCommentInput struct {
-	Text string `json:"text"`
-}
 
 const TaskChecklistSortByName = "name"
 
@@ -169,12 +165,12 @@ type taskAttachmentNameInput struct {
 	Name string `json:"name"`
 }
 
-func (s *TasksService) List(ctx context.Context, params TaskListParams) (*Page[TaskListItem], error) {
-	return listPage[TaskListItem](ctx, s.client, tasksPath, params)
+func (s *TasksService) List(ctx context.Context, params TaskListParams) (*Page[Task], error) {
+	return listPage[Task](ctx, s.client, tasksPath, params)
 }
 
-func (s *TasksService) ListAll(ctx context.Context, params TaskListParams) iter.Seq2[TaskListItem, error] {
-	return listAll[TaskListItem](ctx, s.client, tasksPath, params)
+func (s *TasksService) ListAll(ctx context.Context, params TaskListParams) iter.Seq2[Task, error] {
+	return listAll[Task](ctx, s.client, tasksPath, params)
 }
 
 func (s *TasksService) Create(ctx context.Context, input TaskInput) (int, error) {
@@ -199,11 +195,11 @@ func (s *TasksService) ListAllComments(ctx context.Context, taskID int, params L
 }
 
 func (s *TasksService) CreateComment(ctx context.Context, taskID int, text string) (int, error) {
-	return createResourceID(ctx, s.client, taskCommentInput{Text: text}, tasksPath, strconv.Itoa(taskID), "Comments")
+	return createResourceID(ctx, s.client, commentInput{Text: text}, tasksPath, strconv.Itoa(taskID), "Comments")
 }
 
 func (s *TasksService) UpdateComment(ctx context.Context, taskID, commentID int, text string) error {
-	return updateResource(ctx, s.client, taskCommentInput{Text: text}, tasksPath, strconv.Itoa(taskID), "Comments", strconv.Itoa(commentID))
+	return updateResource(ctx, s.client, commentInput{Text: text}, tasksPath, strconv.Itoa(taskID), "Comments", strconv.Itoa(commentID))
 }
 
 func (s *TasksService) DeleteComment(ctx context.Context, taskID, commentID int) error {

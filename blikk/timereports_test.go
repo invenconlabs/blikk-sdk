@@ -159,7 +159,7 @@ func TestTimeReportsGetDecodesNestedReports(t *testing.T) {
 	assert.Equal(t, 15.0, travel.Rate)
 	assert.Equal(t, &CostCenterRef{ID: 3, Name: "Cost center 3"}, travel.CostCenter)
 	assert.Equal(t, &NameID{ID: 2, Name: "BP 2"}, travel.BookingProject)
-	assert.Equal(t, &CompanyCar{ID: 12, Name: "Company car #1", TripStart: 15000, TripEnd: 15250, AddressStart: "My street 123, My city", AddressGoal: "My street 321, Another city", AddressEnd: "My street 123, My city"}, travel.CompanyCar)
+	assert.Equal(t, &TravelReportCompanyCar{ID: 12, Name: "Company car #1", TripStart: 15000, TripEnd: 15250, AddressStart: "My street 123, My city", AddressGoal: "My street 321, Another city", AddressEnd: "My street 123, My city"}, travel.CompanyCar)
 
 	require.NotNil(t, report.AllowanceReport)
 	allowance := report.AllowanceReport
@@ -362,7 +362,7 @@ func TestUserDayStatisticsEncodesFiltersAndDecodesFixture(t *testing.T) {
 	handler := &recordingHandler{respond: serveFixture(t, "userdaystatistics.json")}
 	client := newTestClient(t, handler.ServeHTTP)
 
-	page, err := client.TimeReports.ListUserDayStatistics(context.Background(), UserDayStatisticsParams{
+	page, err := client.TimeReports.ListUserDayStatistics(context.Background(), UserDayStatisticsListParams{
 		From:          NewDate(2021, time.October, 1),
 		To:            NewDate(2021, time.October, 2),
 		UserIDs:       []int{1},
@@ -398,7 +398,7 @@ func TestListAllUserDayStatisticsWalksPages(t *testing.T) {
 	client := newTestClient(t, serveFixture(t, "userdaystatistics.json"))
 
 	var names []string
-	for statistics, err := range client.TimeReports.ListAllUserDayStatistics(context.Background(), UserDayStatisticsParams{}) {
+	for statistics, err := range client.TimeReports.ListAllUserDayStatistics(context.Background(), UserDayStatisticsListParams{}) {
 		require.NoError(t, err)
 		names = append(names, statistics.Name)
 	}

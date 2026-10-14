@@ -21,11 +21,11 @@ type OpportunityTagListParams struct {
 	ListOptions
 }
 
-func (s *OpportunityTagsService) List(ctx context.Context, params OpportunityTagListParams) (*Page[TagListItem], error) {
-	return listPage[TagListItem](ctx, s.client, opportunityTagsPath, params)
+func (s *OpportunityTagsService) List(ctx context.Context, params OpportunityTagListParams) (*Page[Tag], error) {
+	return listPage[Tag](ctx, s.client, opportunityTagsPath, params)
 }
 
 // ListAll walks every page from params.Page onwards; on failure it yields a single error and stops.
-func (s *OpportunityTagsService) ListAll(ctx context.Context, params OpportunityTagListParams) iter.Seq2[TagListItem, error] {
-	return listAll[TagListItem](ctx, s.client, opportunityTagsPath, params)
+func (s *OpportunityTagsService) ListAll(ctx context.Context, params OpportunityTagListParams) iter.Seq2[Tag, error] {
+	return listAll[Tag](ctx, s.client, opportunityTagsPath, params)
 }

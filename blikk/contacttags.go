@@ -31,13 +31,13 @@ type ContactTagUpdateInput struct {
 	ColorID int    `json:"colorId,omitempty"`
 }
 
-func (s *ContactTagsService) List(ctx context.Context, params ContactTagListParams) (*Page[TagListItem], error) {
-	return listPage[TagListItem](ctx, s.client, contactTagsPath, params)
+func (s *ContactTagsService) List(ctx context.Context, params ContactTagListParams) (*Page[Tag], error) {
+	return listPage[Tag](ctx, s.client, contactTagsPath, params)
 }
 
 // ListAll walks every page from params.Page onwards; on failure it yields a single error and stops.
-func (s *ContactTagsService) ListAll(ctx context.Context, params ContactTagListParams) iter.Seq2[TagListItem, error] {
-	return listAll[TagListItem](ctx, s.client, contactTagsPath, params)
+func (s *ContactTagsService) ListAll(ctx context.Context, params ContactTagListParams) iter.Seq2[Tag, error] {
+	return listAll[Tag](ctx, s.client, contactTagsPath, params)
 }
 
 // Create returns the ID of the new contact tag.

@@ -17,7 +17,7 @@ type InternalProjectListParams struct {
 	ListOptions
 }
 
-type InternalProjectListItem struct {
+type InternalProject struct {
 	ID                               int       `json:"id"`
 	Name                             string    `json:"name"`
 	CommentRequiredWhenTimeReporting bool      `json:"commentRequiredWhenTimeReporting"`
@@ -28,10 +28,10 @@ type InternalProjectListItem struct {
 	Updated                          *DateTime `json:"updated"`
 }
 
-func (s *InternalProjectsService) List(ctx context.Context, params InternalProjectListParams) (*Page[InternalProjectListItem], error) {
-	return listPage[InternalProjectListItem](ctx, s.client, internalProjectsPath, params)
+func (s *InternalProjectsService) List(ctx context.Context, params InternalProjectListParams) (*Page[InternalProject], error) {
+	return listPage[InternalProject](ctx, s.client, internalProjectsPath, params)
 }
 
-func (s *InternalProjectsService) ListAll(ctx context.Context, params InternalProjectListParams) iter.Seq2[InternalProjectListItem, error] {
-	return listAll[InternalProjectListItem](ctx, s.client, internalProjectsPath, params)
+func (s *InternalProjectsService) ListAll(ctx context.Context, params InternalProjectListParams) iter.Seq2[InternalProject, error] {
+	return listAll[InternalProject](ctx, s.client, internalProjectsPath, params)
 }

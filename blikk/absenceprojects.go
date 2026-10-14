@@ -17,7 +17,7 @@ type AbsenceProjectListParams struct {
 	ListOptions
 }
 
-type AbsenceProjectListItem struct {
+type AbsenceProject struct {
 	ID                               int       `json:"id"`
 	Name                             string    `json:"name"`
 	CommentRequiredWhenTimeReporting bool      `json:"commentRequiredWhenTimeReporting"`
@@ -31,10 +31,10 @@ type AbsenceProjectListItem struct {
 	Updated                          *DateTime `json:"updated"`
 }
 
-func (s *AbsenceProjectsService) List(ctx context.Context, params AbsenceProjectListParams) (*Page[AbsenceProjectListItem], error) {
-	return listPage[AbsenceProjectListItem](ctx, s.client, absenceProjectsPath, params)
+func (s *AbsenceProjectsService) List(ctx context.Context, params AbsenceProjectListParams) (*Page[AbsenceProject], error) {
+	return listPage[AbsenceProject](ctx, s.client, absenceProjectsPath, params)
 }
 
-func (s *AbsenceProjectsService) ListAll(ctx context.Context, params AbsenceProjectListParams) iter.Seq2[AbsenceProjectListItem, error] {
-	return listAll[AbsenceProjectListItem](ctx, s.client, absenceProjectsPath, params)
+func (s *AbsenceProjectsService) ListAll(ctx context.Context, params AbsenceProjectListParams) iter.Seq2[AbsenceProject, error] {
+	return listAll[AbsenceProject](ctx, s.client, absenceProjectsPath, params)
 }

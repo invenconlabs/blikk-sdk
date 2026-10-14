@@ -47,59 +47,59 @@ type ProjectListParams struct {
 }
 
 type ProjectListItem struct {
-	ID                int              `json:"id"`
-	OrderNumber       string           `json:"orderNumber"`
-	Title             string           `json:"title"`
-	Status            *ProjectStatus   `json:"status"`
-	Category          *ProjectCategory `json:"category"`
-	SalesResponsible  *NameID          `json:"salesResponsible"`
-	StartDate         *Date            `json:"startDate"`
-	EndDate           *Date            `json:"endDate"`
-	InvoiceType       InvoiceType      `json:"invoiceType"`
-	Location          *Location        `json:"location"`
-	ProjectManager    *NameID          `json:"projectManager"`
-	Customer          *NameID          `json:"customer"`
-	ProjectCollection *ProjectRef      `json:"projectCollection"`
-	Tags              []Tag            `json:"tags"`
-	CostCenter        *CostCenterRef   `json:"costCenter"`
-	CreatedBy         *NameID          `json:"createdBy"`
-	UpdatedBy         *NameID          `json:"updatedBy"`
-	Created           *DateTime        `json:"created"`
-	Updated           *DateTime        `json:"updated"`
+	ID                int               `json:"id"`
+	OrderNumber       string            `json:"orderNumber"`
+	Title             string            `json:"title"`
+	Status            *ProjectStatusRef `json:"status"`
+	Category          *ProjectCategory  `json:"category"`
+	SalesResponsible  *NameID           `json:"salesResponsible"`
+	StartDate         *Date             `json:"startDate"`
+	EndDate           *Date             `json:"endDate"`
+	InvoiceType       InvoiceType       `json:"invoiceType"`
+	Location          *Location         `json:"location"`
+	ProjectManager    *NameID           `json:"projectManager"`
+	Customer          *NameID           `json:"customer"`
+	ProjectCollection *ProjectRef       `json:"projectCollection"`
+	Tags              []TagRef          `json:"tags"`
+	CostCenter        *CostCenterRef    `json:"costCenter"`
+	CreatedBy         *NameID           `json:"createdBy"`
+	UpdatedBy         *NameID           `json:"updatedBy"`
+	Created           *DateTime         `json:"created"`
+	Updated           *DateTime         `json:"updated"`
 }
 
 type Project struct {
-	ID                             int              `json:"id"`
-	OrderNumber                    string           `json:"orderNumber"`
-	Title                          string           `json:"title"`
-	Status                         *ProjectStatus   `json:"status"`
-	ReadyForInvoice                bool             `json:"readyForInvoice"`
-	Category                       *ProjectCategory `json:"category"`
-	InvoiceText                    string           `json:"invoiceText"`
-	YourReference                  string           `json:"yourReference"`
-	OurReference                   string           `json:"ourReference"`
-	CustomerReferenceMarking       string           `json:"customerReferenceMarking"`
-	SalesResponsible               *NameID          `json:"salesResponsible"`
-	Description                    string           `json:"description"`
-	StartDate                      *Date            `json:"startDate"`
-	EndDate                        *Date            `json:"endDate"`
-	InvoiceType                    InvoiceType      `json:"invoiceType"`
-	Location                       *Location        `json:"location"`
-	ProjectManager                 *NameID          `json:"projectManager"`
-	Customer                       *NameID          `json:"customer"`
-	ProjectCollection              *ProjectRef      `json:"projectCollection"`
-	Tags                           []Tag            `json:"tags"`
-	CostCenter                     *CostCenterRef   `json:"costCenter"`
-	BookingProject                 *NameID          `json:"bookingProject"`
-	CreatedBy                      *NameID          `json:"createdBy"`
-	UpdatedBy                      *NameID          `json:"updatedBy"`
-	Created                        *DateTime        `json:"created"`
-	Updated                        *DateTime        `json:"updated"`
-	CompletedDate                  *DateTime        `json:"completedDate"`
-	ElectronicInvoiceReferenceCode string           `json:"electronicInvoiceReferenceCode"`
-	ImportantInvoiceInformation    string           `json:"importantInvoiceInformation"`
-	AllIsMember                    bool             `json:"allIsMember"`
-	Members                        []NameID         `json:"members"`
+	ID                             int               `json:"id"`
+	OrderNumber                    string            `json:"orderNumber"`
+	Title                          string            `json:"title"`
+	Status                         *ProjectStatusRef `json:"status"`
+	ReadyForInvoice                bool              `json:"readyForInvoice"`
+	Category                       *ProjectCategory  `json:"category"`
+	InvoiceText                    string            `json:"invoiceText"`
+	YourReference                  string            `json:"yourReference"`
+	OurReference                   string            `json:"ourReference"`
+	CustomerReferenceMarking       string            `json:"customerReferenceMarking"`
+	SalesResponsible               *NameID           `json:"salesResponsible"`
+	Description                    string            `json:"description"`
+	StartDate                      *Date             `json:"startDate"`
+	EndDate                        *Date             `json:"endDate"`
+	InvoiceType                    InvoiceType       `json:"invoiceType"`
+	Location                       *Location         `json:"location"`
+	ProjectManager                 *NameID           `json:"projectManager"`
+	Customer                       *NameID           `json:"customer"`
+	ProjectCollection              *ProjectRef       `json:"projectCollection"`
+	Tags                           []TagRef          `json:"tags"`
+	CostCenter                     *CostCenterRef    `json:"costCenter"`
+	BookingProject                 *NameID           `json:"bookingProject"`
+	CreatedBy                      *NameID           `json:"createdBy"`
+	UpdatedBy                      *NameID           `json:"updatedBy"`
+	Created                        *DateTime         `json:"created"`
+	Updated                        *DateTime         `json:"updated"`
+	CompletedDate                  *DateTime         `json:"completedDate"`
+	ElectronicInvoiceReferenceCode string            `json:"electronicInvoiceReferenceCode"`
+	ImportantInvoiceInformation    string            `json:"importantInvoiceInformation"`
+	AllIsMember                    bool              `json:"allIsMember"`
+	Members                        []NameID          `json:"members"`
 }
 
 type ProjectWorkSiteAddressInput struct {
@@ -176,10 +176,6 @@ type ProjectCommentListParams struct {
 	CreatedByUserIDs []int    `query:"filter.createdByUserIds"`
 }
 
-type projectCommentInput struct {
-	Text string `json:"text"`
-}
-
 type ProjectTimeCalculation struct {
 	Total                    float64                          `json:"total"`
 	IsTotal                  bool                             `json:"isTotal"`
@@ -247,11 +243,11 @@ func (s *ProjectsService) ListAllComments(ctx context.Context, projectID int, pa
 }
 
 func (s *ProjectsService) CreateComment(ctx context.Context, projectID int, text string) (int, error) {
-	return createResourceID(ctx, s.client, projectCommentInput{Text: text}, projectCommentsPath(projectID))
+	return createResourceID(ctx, s.client, commentInput{Text: text}, projectCommentsPath(projectID))
 }
 
 func (s *ProjectsService) UpdateComment(ctx context.Context, projectID, commentID int, text string) error {
-	return updateResource(ctx, s.client, projectCommentInput{Text: text}, projectCommentsPath(projectID), strconv.Itoa(commentID))
+	return updateResource(ctx, s.client, commentInput{Text: text}, projectCommentsPath(projectID), strconv.Itoa(commentID))
 }
 
 func (s *ProjectsService) DeleteComment(ctx context.Context, projectID, commentID int) error {

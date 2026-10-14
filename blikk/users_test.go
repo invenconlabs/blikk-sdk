@@ -96,7 +96,7 @@ func TestUserAddressDecodes(t *testing.T) {
 
 	require.NoError(t, err)
 	assert.Equal(t, &Address{StreetAddress: "Storgatan 1", AdditionalAddress: "c/o Doe", PostalCode: "94131", City: "Piteå", CountryID: 205, CountryName: "Sverige"}, user.Address)
-	assert.Equal(t, []Tag{{ID: 3, Title: "Senior", Color: "#fff"}}, user.Tags)
+	assert.Equal(t, []TagRef{{ID: 3, Title: "Senior", Color: "#fff"}}, user.Tags)
 }
 
 func TestSalaryTypeDecodesNumbersFromListAndNamesFromDetail(t *testing.T) {

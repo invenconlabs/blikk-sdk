@@ -1,0 +1,42 @@
+{
+  "objectName": "generic.pagedlist",
+  "page": 1,
+  "pageSize": 25,
+  "itemCount": 1,
+  "totalItemCount": 1,
+  "totalPages": 1,
+  "items": [
+    {
+      "objectName": "contact.list",
+      "id": 1,
+      "guid": null,
+      "name": "John Doe",
+      "phoneNumber": null,
+      "cellPhoneNumber": null,
+      "email": "John.doe@gmail.com",
+      "customerNumber": "1",
+      "contactType": "person",
+      "organizationalOrSocialSecurityNumber": null,
+      "visitingAddress": {
+        "objectName": "generic.address",
+        "streetAddress": "Trädvägen 123",
+        "additionalAddress": null,
+        "postalCode": "94100",
+        "city": "Piteå",
+        "state": "Norrbotten",
+        "countryId": 1,
+        "countryName": "Sverige"
+      },
+      "company": {
+        "objectName": "generic.name_id",
+        "id": 2,
+        "name": "My company"
+      },
+      "parentCompany": null,
+      "created": "2026-10-13 09:40:57 +00:00",
+      "lastUpdated": null,
+      "externalId": null,
+      "isKycCustomer": false
+    }
+  ]
+}

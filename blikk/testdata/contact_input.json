@@ -1,0 +1,51 @@
+{
+  "name": "Lotta Larsson",
+  "customerNumber": "111",
+  "contactType": "Person",
+  "organizationalOrSocialSecurityNumber": "860311-7063",
+  "companyId": null,
+  "parentCompanyId": null,
+  "externalId": "12345",
+  "isActive": true,
+  "email": "lotta@familjenlarsson.se",
+  "invoiceEmail": "",
+  "phoneNumber": "075-9902281",
+  "cellPhoneNumber": "0707788994",
+  "importantInformation": null,
+  "isSupplier": false,
+  "isWholeSale": false,
+  "isRetailer": false,
+  "isSubContractor": false,
+  "isPartner": false,
+  "isCustomer": false,
+  "useReverseBuildTax": false,
+  "responsibleId": 15,
+  "tagIds": [
+    10,
+    16
+  ],
+  "visitingAddress": {
+    "streetAddress": "Solberga",
+    "additionalAddress": null,
+    "postalCode": "92372",
+    "city": null,
+    "state": null,
+    "countryId": 1
+  },
+  "deliveryAddress": {
+    "streetAddress": "",
+    "additionalAddress": null,
+    "postalCode": "",
+    "city": null,
+    "state": null,
+    "countryId": 1
+  },
+  "invoiceAddress": {
+    "streetAddress": "",
+    "additionalAddress": "",
+    "postalCode": "",
+    "city": null,
+    "state": null,
+    "countryId": 1
+  }
+}

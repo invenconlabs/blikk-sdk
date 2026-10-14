@@ -1,0 +1,37 @@
+{
+  "objectName": "project.calculation.detail",
+  "total": 50.0,
+  "isTotal": false,
+  "isByActivity": true,
+  "isByActivityAndUser": false,
+  "activityCalculations": [
+    {
+      "objectName": "project.calculation.byactivity",
+      "activity": {
+        "objectName": "generic.name_id",
+        "id": 1,
+        "name": "Activity 1"
+      },
+      "calculation": 8.0
+    },
+    {
+      "objectName": "project.calculation.byactivity",
+      "activity": {
+        "objectName": "generic.name_id",
+        "id": 2,
+        "name": "Activity 2"
+      },
+      "calculation": 26.0
+    },
+    {
+      "objectName": "project.calculation.byactivity",
+      "activity": {
+        "objectName": "generic.name_id",
+        "id": 3,
+        "name": "Activity 3"
+      },
+      "calculation": 16.0
+    }
+  ],
+  "userActivityCalculations": null
+}

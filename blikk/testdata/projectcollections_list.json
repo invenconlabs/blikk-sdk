@@ -1,0 +1,41 @@
+{
+  "objectName": "generic.pagedlist",
+  "page": 1,
+  "pageSize": 25,
+  "itemCount": 1,
+  "totalItemCount": 1,
+  "totalPages": 1,
+  "items": [
+    {
+      "objectName": "projectcollection.list",
+      "id": 1,
+      "name": "26 Lorem ipsum",
+      "title": "Lorem ipsum",
+      "projectNumber": "26",
+      "description": "Lorem ipsum dolor sit amit.",
+      "status": {
+        "objectName": "projectcollection.list.status",
+        "id": 1,
+        "name": "Ongoing",
+        "isCompletedStatus": false
+      },
+      "type": "Normal",
+      "category": {
+        "objectName": "projectcollection.list.category",
+        "name": "Category 1",
+        "color": "Green"
+      },
+      "manager": {
+        "objectName": "generic.name_id",
+        "id": 1,
+        "name": "John Doe"
+      },
+      "customer": {
+        "objectName": "generic.name_id",
+        "id": 1,
+        "name": "Ipsum"
+      },
+      "finishedDate": "2021-02-01"
+    }
+  ]
+}

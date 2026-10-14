@@ -1,0 +1,16 @@
+{
+  "objectName": "generic.pagedlist",
+  "page": 1,
+  "pageSize": 25,
+  "itemCount": 1,
+  "totalItemCount": 1,
+  "totalPages": 1,
+  "items": [
+    {
+      "objectName": "project.list.category",
+      "id": 1,
+      "name": "Lorem ipsum",
+      "color": "#e3168a"
+    }
+  ]
+}

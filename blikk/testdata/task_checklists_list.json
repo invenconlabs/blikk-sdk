@@ -1,0 +1,52 @@
+{
+  "objectName": "generic.pagedlist",
+  "page": 1,
+  "pageSize": 25,
+  "itemCount": 1,
+  "totalItemCount": 1,
+  "totalPages": 1,
+  "items": [
+    {
+      "objectName": "task.checklist.list",
+      "id": 1,
+      "name": "Att göra",
+      "items": [
+        {
+          "objectName": "task.checklistitem.detail",
+          "id": 1,
+          "title": "Lorem ipsum 1",
+          "sortOrder": 0,
+          "completedDate": "2026-10-13 09:40:57 +00:00",
+          "createdByUser": {
+            "objectName": "generic.name_id",
+            "id": 1,
+            "name": "John Doe"
+          },
+          "createdDate": "2026-10-11 09:40:57 +00:00",
+          "updatedDate": null
+        },
+        {
+          "objectName": "task.checklistitem.detail",
+          "id": 2,
+          "title": "Lorem ipsum 1",
+          "sortOrder": 1,
+          "completedDate": "2026-10-13 09:40:57 +00:00",
+          "createdByUser": {
+            "objectName": "generic.name_id",
+            "id": 1,
+            "name": "John Doe"
+          },
+          "createdDate": "2026-10-11 09:40:57 +00:00",
+          "updatedDate": null
+        }
+      ],
+      "createdByUser": {
+        "objectName": "generic.name_id",
+        "id": 1,
+        "name": "John Doe"
+      },
+      "createdDate": "2026-10-11 09:40:57 +00:00",
+      "updatedDate": null
+    }
+  ]
+}

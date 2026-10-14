@@ -1,0 +1,42 @@
+{
+  "objectName": "generic.pagedlist",
+  "page": 1,
+  "pageSize": 25,
+  "itemCount": 2,
+  "totalItemCount": 1,
+  "totalPages": 1,
+  "items": [
+    {
+      "objectName": "task.attachment.list",
+      "id": 1,
+      "name": "MyImage.png",
+      "type": "file",
+      "contentType": "image/png",
+      "sizeInBytes": 12542,
+      "externalLinkUrl": null,
+      "createdByUser": {
+        "objectName": "generic.name_id",
+        "id": 1,
+        "name": "John Doe"
+      },
+      "createdDate": "2026-10-11 09:40:57 +00:00",
+      "updatedDate": null
+    },
+    {
+      "objectName": "task.attachment.list",
+      "id": 2,
+      "name": "Our external library",
+      "type": "link",
+      "contentType": null,
+      "sizeInBytes": null,
+      "externalLinkUrl": "https://example.com",
+      "createdByUser": {
+        "objectName": "generic.name_id",
+        "id": 1,
+        "name": "John Doe"
+      },
+      "createdDate": "2026-10-12 09:40:57 +00:00",
+      "updatedDate": null
+    }
+  ]
+}

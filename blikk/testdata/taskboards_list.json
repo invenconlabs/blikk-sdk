@@ -1,0 +1,99 @@
+{
+  "objectName": "generic.pagedlist",
+  "page": 1,
+  "pageSize": 25,
+  "itemCount": 1,
+  "totalItemCount": 1,
+  "totalPages": 1,
+  "items": [
+    {
+      "objectName": "taskboard.list",
+      "id": 1,
+      "name": "Sprint 2.8",
+      "project": {
+        "objectName": "project.name_id",
+        "id": 15,
+        "name": "Utvecklingsprojektet",
+        "number": "26"
+      },
+      "tags": [
+        {
+          "objectName": "generic.tag",
+          "id": 1,
+          "title": null,
+          "color": "#41b18b"
+        },
+        {
+          "objectName": "generic.tag",
+          "id": 2,
+          "title": "Bug",
+          "color": "#f2d600"
+        }
+      ],
+      "columns": [
+        {
+          "objectName": "taskboard.list.column",
+          "id": 1,
+          "name": "Ska göras",
+          "taskCount": 21,
+          "createdByUser": {
+            "objectName": "generic.name_id",
+            "id": 1,
+            "name": "John Doe"
+          },
+          "updatedByUser": null,
+          "createdDate": "2026-10-04 09:40:57 +00:00",
+          "updatedDate": null
+        },
+        {
+          "objectName": "taskboard.list.column",
+          "id": 2,
+          "name": "Pågår",
+          "taskCount": 7,
+          "createdByUser": {
+            "objectName": "generic.name_id",
+            "id": 1,
+            "name": "John Doe"
+          },
+          "updatedByUser": null,
+          "createdDate": "2026-10-06 09:40:57 +00:00",
+          "updatedDate": null
+        },
+        {
+          "objectName": "taskboard.list.column",
+          "id": 1,
+          "name": "Klart",
+          "taskCount": 234,
+          "createdByUser": {
+            "objectName": "generic.name_id",
+            "id": 1,
+            "name": "John Doe"
+          },
+          "updatedByUser": null,
+          "createdDate": "2026-10-05 09:40:57 +00:00",
+          "updatedDate": null
+        }
+      ],
+      "members": [
+        {
+          "objectName": "generic.name_id",
+          "id": 1,
+          "name": "John Doe"
+        },
+        {
+          "objectName": "generic.name_id",
+          "id": 2,
+          "name": "Jane Doe"
+        }
+      ],
+      "createdByUser": {
+        "objectName": "generic.name_id",
+        "id": 1,
+        "name": "John Doe"
+      },
+      "updatedByUser": null,
+      "createdDate": "2026-10-03 09:40:57 +00:00",
+      "updatedDate": null
+    }
+  ]
+}

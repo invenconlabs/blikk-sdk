@@ -1,10 +1,10 @@
 module github.com/invenconlabs/blikk-sdk
 
-go 1.23.4
+go 1.27
 
 require (
 	github.com/stretchr/testify v1.10.0
-	golang.org/x/time v0.12.0
+	golang.org/x/time v0.16.0
 )
 
 require (

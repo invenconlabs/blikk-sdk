@@ -1,9 +1,31 @@
 {
-  "name": "Go dev",
-  "image": "mcr.microsoft.com/devcontainers/go:1.23-bookworm",
+  "name": "blikk-sdk",
+  // Toolchain 1.27, the current release. The module's own `go` directive (go.mod) still
+  // decides the language version; bumping it is part of the rework.
+  "image": "mcr.microsoft.com/devcontainers/go:dev-1.27-bookworm",
   "runArgs": [
-    "--name=go-dev"
+    "--name=blikk-sdk-dev",
+    // Container-only secrets (BLIKK_APP_ID, BLIKK_APP_SECRET) from a git-ignored file.
+    // Docker reads it when the container is created, so after changing values run
+    // "Dev Containers: Rebuild Container".
+    "--env-file",
+    "${localWorkspaceFolder}/.devcontainer/.env"
   ],
+  "features": {
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
+  // Shared Claude Code config volume, same as your other devcontainers, so you stay signed in.
+  // Runs on the host before the container starts. It creates the shared Claude volume and an
+  // empty, private .env file if missing (docker refuses to start when --env-file doesn't exist).
+  "initializeCommand": "(docker volume inspect claude-config >/dev/null 2>&1 || docker volume create claude-config) && f='${localWorkspaceFolder}/.devcontainer/.env' && { [ -f \"$f\" ] || printf '# KEY=value, no quotes, no export\\nBLIKK_APP_ID=\\nBLIKK_APP_SECRET=\\n' > \"$f\"; } && chmod 600 \"$f\"",
+  "mounts": [
+    "source=claude-config,target=/opt/claude,type=volume"
+  ],
+  "containerEnv": {
+    "CLAUDE_CONFIG_DIR": "/opt/claude"
+  },
+  "onCreateCommand": "curl -fsSL https://claude.ai/install.sh | bash",
+  "postCreateCommand": "gh auth setup-git || echo 'gh not authenticated yet: run gh auth login'",
   "customizations": {
     "vscode": {
       "extensions": [

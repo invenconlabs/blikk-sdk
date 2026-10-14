@@ -155,13 +155,13 @@ func (s *InvoicesService) SetSentToEconomySystem(ctx context.Context, id int, da
 	return setInvoiceSentToEconomySystem(ctx, s.client, id, sentToEconomySystemQuery(date, economySystemInvoiceNumber))
 }
 
-func (s *InvoicesService) ListAttachments(ctx context.Context, invoiceID int, options ListOptions) (*Page[InvoiceAttachment], error) {
-	return listInvoiceAttachments(ctx, s.client, invoiceID, options)
+func (s *InvoicesService) ListAttachments(ctx context.Context, invoiceID int, params ListOptions) (*Page[InvoiceAttachment], error) {
+	return listInvoiceAttachments(ctx, s.client, invoiceID, params)
 }
 
-// ListAllAttachments walks every page from options.Page onwards; on failure it yields a single error and stops.
-func (s *InvoicesService) ListAllAttachments(ctx context.Context, invoiceID int, options ListOptions) iter.Seq2[InvoiceAttachment, error] {
-	return listAllInvoiceAttachments(ctx, s.client, invoiceID, options)
+// ListAllAttachments walks every page from params.Page onwards; on failure it yields a single error and stops.
+func (s *InvoicesService) ListAllAttachments(ctx context.Context, invoiceID int, params ListOptions) iter.Seq2[InvoiceAttachment, error] {
+	return listAllInvoiceAttachments(ctx, s.client, invoiceID, params)
 }
 
 // DownloadAttachment streams the file; the caller must close Content.
@@ -189,20 +189,20 @@ func invoiceAttachmentsPath(invoiceID int) (string, error) {
 	return resourcePath(invoicesPath, strconv.Itoa(invoiceID), "attachments")
 }
 
-func listInvoiceAttachments(ctx context.Context, c *Client, invoiceID int, options ListOptions) (*Page[InvoiceAttachment], error) {
+func listInvoiceAttachments(ctx context.Context, c *Client, invoiceID int, params ListOptions) (*Page[InvoiceAttachment], error) {
 	path, err := invoiceAttachmentsPath(invoiceID)
 	if err != nil {
 		return nil, err
 	}
-	return listPage[InvoiceAttachment](ctx, c, path, options)
+	return listPage[InvoiceAttachment](ctx, c, path, params)
 }
 
-func listAllInvoiceAttachments(ctx context.Context, c *Client, invoiceID int, options ListOptions) iter.Seq2[InvoiceAttachment, error] {
+func listAllInvoiceAttachments(ctx context.Context, c *Client, invoiceID int, params ListOptions) iter.Seq2[InvoiceAttachment, error] {
 	path, err := invoiceAttachmentsPath(invoiceID)
 	if err != nil {
 		return failedSeq[InvoiceAttachment](err)
 	}
-	return listAll[InvoiceAttachment](ctx, c, path, options)
+	return listAll[InvoiceAttachment](ctx, c, path, params)
 }
 
 func downloadInvoiceAttachment(ctx context.Context, c *Client, invoiceID, attachmentID int) (*Download, error) {
